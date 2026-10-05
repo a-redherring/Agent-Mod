@@ -1,0 +1,9 @@
+{
+  "version": "0.1.2-prototype",
+  "compiler": {
+    "name": "Caprica v0.3.0",
+    "url": "https://github.com/Orvid/Caprica/releases/download/v0.3.0/Caprica.v0.3.0.7z",
+    "archive_sha256": "0037e54cf3a1021e976278d9a637e8ae541aaf9ebeb8d274b6c2cfe32f4ee559",
+    "executable_sha256": "389fef19a803c36342fa7f733c96b6e27ef10fcd0b171af10427e29cbe153ec6"
+  }
+}

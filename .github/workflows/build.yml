@@ -1,0 +1,27 @@
+name: Build Skyrim prototype
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch verified compiler
+        run: python tools/fetch_compiler.py
+      - name: Compile, inspect, test and package
+        run: python tools/build.py --caprica .tools/caprica/Caprica.exe --restore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ElenwenAgent-prototype
+          path: dist/*
+          if-no-files-found: error

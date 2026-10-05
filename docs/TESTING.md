@@ -1,0 +1,30 @@
+# Validation and manual test record
+
+Automated validation covers compilation, Mutagen binary round trips, independent ESP structure/VMAD inspection, and execution of Caprica's emitted assembly with mocked Skyrim natives. Python graph serialization tests the test interpreter's persisted state only; it does not validate a Skyrim save.
+
+Game validation status: **not run**. Creation Kit/xEdit validation status: **not run**. The workspace contains neither the game nor the required dependency records.
+
+## Required first game pass
+
+Record game version, Creation Kit version, enabled plugins, exact load order and SHA-256 of each installed EA file. Use a fresh test character. Do not use a valued save for prototype tests.
+
+1. Load all five ESPs in xEdit; check errors and verify the only records are new EA QUST/BOOK/MESG/CONT/ACTI records. Check VMAD links and master's load order. Inspect/save a copy in Creation Kit and compare any changes before accepting them.
+2. Place one box, verify its strongbox mesh, activation and paper UI. Verify its archive appears nearby and does not respawn. Check another interior after the cell unloads; verify the original box and archive persist.
+3. Open the commission once. Confirm exactly one commission, one field-paper copy and 100 gold. Reopen the box and place/activate a second test box: supplies must not repeat.
+4. Read field papers both before and after collecting orders, file protocol, and attempt to repeat it. Turn in supplies with too few, exactly enough, and excess items. Only the required quantity should be consigned, once, and delivered goods must not appear in the paper archive.
+5. Check responses at 0, 23 and 24 game hours. Test ordinary travel, wait/sleep, and a long menu session. Collection must use game time and work even if a notification was missed.
+6. Save/reload before and after filing, during transit, at response collection, during an Accounts transaction, and after delivery. Test death/reload at each handoff. Check for duplicate gold, books, or objective transitions and inspect the Papyrus log.
+7. Drop/sell/store player copies and remove archive copies. Recover filed copies. Physical paper may be reprinted, but no monetary or authority effect may repeat.
+8. Test a report on the tenth day, after it, and after a long delay. An assignment becomes overdue but remains completable. Test first extension approved, second refused, further requests making no transaction, completion while an extension is in transit, and balanced nested suspension/resume hooks in a debug build. Inspect each extension paper for the correct instruction number.
+9. Request advance authority. Before collection, no advance should be available. After collection while the wine duty is open, collect 80 exactly once. Authority must not affect other categories or operations.
+10. Use separate test saves for each claim outcome. With an advance, a 30-septim valid claim leaves 50 outstanding and pays no extra gold. An 80-septim claim allows 30 and leaves 50 debt. A 30-septim gift claim leaves 50 outstanding plus 30 debt. Without an advance, a valid claim pays 30 once, and a denied gift creates no Embassy debt.
+11. Test both meal explanations and their distinct papers, a returned claim across save/reload, insufficient gold when returning funds, 14-day audit despite an uncollected response or unanswered explanation, actual transit briefly deferring audit, repayment clearing probation, and a valid claim after audit.
+12. Before the first three completion replies are collected, try filing each second-packet duty: it must be rejected without consuming goods. Collect all first replies, verify one packet notice, wait several days, then collect the new orders. Each must begin with ten days remaining. Repeat collection without resetting deadlines.
+13. Turn in exactly six firewood, four leather strips and six wheat, testing shortages and surplus. Confirm matching reports/objectives, only required supplies consumed, no supplies accessible in the archive, and no new advance/claim for these duties. Test both extension outcomes for a new duty.
+14. Open Review status at active, overdue, filed and completed stages. Check decimal days and ready/in-transit counts against the journal and elapsed game time. Ensure the nine-button main menu and seven-button assignment menu remain legible using the vanilla interface. Cancel every menu, including status and repayment; no transaction or failure message should follow cancellation.
+15. File reports with at least five days remaining, under five days remaining, and after a missed deadline. Inspect each corresponding Elenwen letter. An approved extension after a missed deadline must not erase the late history, and leaving an early reply uncollected must not turn it into a reprimand. Check the chosen Accounts decision's remarks.
+16. Repay 10, 25 and all funds; repeat with fewer septims than requested and a balance smaller than the request. Confirm the exact amount in inventory, the confirmation, and Accounts statement, then save/reload and recheck. There must be no negative balance or duplicate reimbursement when a subsequent claim settles.
+17. Complete both packets with clean records, one missed deadline, repeated lateness, a partial claim, a denied claim and unsettled funds on separate test saves. Check the correct closing assessment, one further day of transit, its journal objective and lost-copy recovery. It must not be issued twice or grant rank, authority or money. With a pending/returned meal claim, the review must wait for explanation and decision. A fully returned advance before its due date must not leave an adverse audit finding.
+18. Run without optional UI mods and SKSE. Then repeat under the intended installed profile. Verify no unexpected Helgen/main-quest activation or allegiance changes; this build should have no hooks into those systems.
+
+The wider matrix in the original specification remains pending, including every curated NPC, courier interruption, Alternate Perspective, major quest route, and optional integration. A pass here does not certify those absent features.
