@@ -83,8 +83,12 @@ def scripts(data):
             assert number("<B") == 1, "Property must be marked edited"
             if kind == 1:
                 value = obj()
+            elif kind == 3:
+                value = number("<i")
             elif kind == 11:
                 value = [obj() for _ in range(number("<I"))]
+            elif kind == 13:
+                value = [number("<i") for _ in range(number("<I"))]
             else:
                 raise AssertionError("Unexpected VMAD property type: " + str(kind))
             properties[prop] = value

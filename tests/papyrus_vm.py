@@ -8,6 +8,7 @@ This does not emulate the game's VM scheduling, save format, physics, or UI.
 from __future__ import annotations
 
 import copy
+import json
 import re
 import shlex
 from collections import Counter, deque
@@ -205,6 +206,8 @@ class VM:
             elif op == "ARRAYCREATE":
                 kind = types[a[0].lower()][:-2]
                 put(a[0], [default(kind) for _ in range(get(a[1]))])
+            elif op == "ARRAYLENGTH":
+                put(a[0], len(get(a[1])))
             elif op == "ARRAYGETELEMENT":
                 assert get(a[2]) >= 0, "Negative array index"
                 put(a[0], get(a[1])[get(a[2])])
@@ -259,18 +262,36 @@ class VM:
                 raise RuntimeError("Unsupported opcode: " + op)
 
 
+PACKETS = json.loads((Path(__file__).resolve().parents[1] / "content/packets.json").read_text())
+
+
 def fixture(directory, collect_orders=True):
+    """Wire the scripts as the plugin does. Packet layout comes from content/packets.json.
+
+    Inventory items are named by packet key ("Wine", "Reserve"); case papers are "Case<key>".
+    """
     vm = VM(directory)
     core = vm.instance("EA_Core")
     dispatch = vm.instance("EA_Dispatch").prop("Core", core).prop("Archive", Inventory())
     service = vm.instance("EA_Service").prop("Core", core).prop("Dispatch", dispatch)
     accounts = vm.instance("EA_Accounts").prop("Core", core).prop("Dispatch", dispatch)
     for p in ("Orders", "Reports", "Responses", "PromptResponses", "LateResponses", "ExtensionRequests", "ApprovedExtensions", "DeniedExtensions"):
-        service.prop(p, [f"{p}{i}" for i in range(6)])
-    for p in ("AuthorityRequest", "AuthorityApproved", "Wine", "Flowers", "Firewood", "LeatherStrips", "Wheat", "EvaluationRequest"):
+        service.prop(p, [f"{p}{i}" for i in range(len(PACKETS))])
+    supplied = [p for p in PACKETS if "supply" in p]
+    cases = [p for p in PACKETS if "case" in p]
+    service.prop("SupplyIndex", [supplied.index(p) if "supply" in p else -1 for p in PACKETS])
+    service.prop("Supplies", [p["key"] for p in supplied])
+    service.prop("SupplyCounts", [p["supply"]["count"] for p in supplied])
+    service.prop("MissingMessages", [Menu() for _ in supplied])
+    service.prop("CaseIndex", [cases.index(p) if "case" in p else -1 for p in PACKETS])
+    service.prop("CaseFiles", ["Case" + p["key"] for p in cases])
+    service.prop("ConclusionMenus", [Menu() for _ in cases])
+    service.prop("SoundConclusions", [p["case"]["sound"] for p in cases])
+    service.prop("MisjudgedResponses", ["Misjudged" + p["key"] for p in cases])
+    for p in ("AuthorityRequest", "AuthorityApproved", "EvaluationRequest"):
         service.prop(p, p)
     service.prop("Evaluations", [f"Evaluations{i}" for i in range(3)])
-    for p, count in (("FailureMessages", 8), ("MissingMessages", 6), ("StatusMessages", 5)):
+    for p, count in (("FailureMessages", 10), ("StatusMessages", 5)):
         service.prop(p, [Menu() for _ in range(count)])
     for p in ("SummaryMessage", "PacketReadyMessage", "EvaluationQueuedMessage"):
         service.prop(p, Menu())

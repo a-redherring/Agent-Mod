@@ -1,8 +1,46 @@
-# Review of 0.1.2-prototype
+# Review record
+
+## Changes in 0.2.0: Revision Phase B
+
+This revision applies Continuation 01's Revision Phase B (authored service pool) as far as it can be built and checked without the game.
+
+- The six generic duties are replaced by eleven authored instructions, defined in `content/packets.json`. The plugin builder generates their papers, shortage messages, conclusion menus, journal objectives and Service bindings from that file, and rejects gaps in numbering or a malformed case.
+- Every item requirement is one exact Skyrim.esm base object. Nine instructions name an item; five issue case papers and require one of three conclusions; four do both. The pool covers provenance, commercial-intelligence, archival, denial, personal and administrative work.
+- Instructions circulate in a fixed order, three at a time, each exactly once. A later instruction cannot overtake an earlier one. Positional menus replace the seven-button assignment list, which could not hold eleven instructions.
+- Case papers are archived and recoverable like orders, and their `EA_CaseFile` script records the reading fact for its own assignment. The conclusion menu appears only after the papers are read and the item is held. Cancel files nothing; a misjudged conclusion completes the work with a specific rejection and a net trust loss, and counts as a fault in the closing assessment.
+- Every Elenwen letter in the packets and Accounts was rewritten against the section 6 voice guide. Alto wine became Solitude spiced wine, and the claim, explanation and decision papers follow it.
+- 37 records were retired and listed in `content/retired-records.json`. Every retained record kept its FormID and no retired ID was reused. Objectives, runtime arrays and the instruction set changed, so 0.2.0 requires a fresh save.
+
+Test coverage: the automated suite has grown from 87 tests to 108. Several second-packet tests were replaced rather than kept. New behaviour tests cover:
+- circulation order, the three-open limit and no repeats across the whole series;
+- substitute items being refused;
+- the case-paper, conclusion and Cancel paths, and the controller's ordering of those checks;
+- the sound and misjudged reply for every conclusion of every case;
+- tone with a sound conclusion;
+- faults counted in the assessment;
+- capacity with every extension in a full series;
+- serialization mid-case.
+
+New plugin tests check the packet bindings, case scripts and objectives. A new content suite enforces:
+- the pool size;
+- complete packets;
+- distinct, non-generic and non-quest items;
+- three conclusions for each case;
+- distinct reply variants;
+- signed and economical letters;
+- a starter prohibited-phrase list;
+- no reuse of retired IDs.
+
+As a check on the tests themselves, three deliberate faults were compiled into the Service script: four open instructions, an inverted judgement, and case papers not required. The suite caught each one (9, 23 and 2 failures) before the source was restored.
+
+Not established: whether the named FormIDs carry the display names the orders use, what the items cost, where they can be obtained, whether a quest reserves any of them, and how long case papers render in the book interface. None of this can be checked without the game, and TESTING.md steps 13–13b record it. Families D (observation) and E (world-placed recovery) need hand-placed references and remain unbuilt, as do random packet selection, compromised-cover replies and the corpus-based voice review (Phase C).
+
+## Review of 0.1.2-prototype
+
 
 Reviewed the eight runtime scripts, generated plugin schema and bindings, all authored documents, compiler declarations, build/package tools, CI configuration, test interpreter and test coverage against the original specification. This was a source, binary and simulated-behavior review. Skyrim, Creation Kit and the installed dependency plugins remain unavailable.
 
-## Additions in 0.1.2
+### Additions in 0.1.2
 
 All six requested additions are implemented:
 
@@ -19,7 +57,7 @@ The catalogue grew to 70 authored forms, so retention increased to 128 document 
 
 The automated suite contains 87 tests, including 23 new behavior/binding checks and the prior regressions. Matrix tests include cash conservation across the original 30 repayment/audit/claim combinations and 10 additional partial-payment/audit/claim combinations. Plugin inspection verifies every service letter is bound to the correct instruction slot, all three new supply FormIDs, and native menu/argument limits. Manual engine validation is still pending.
 
-## Earlier fixes retained from 0.1.1
+### Earlier fixes retained from 0.1.1
 
 | Finding | Correction and regression coverage |
 | --- | --- |
@@ -42,13 +80,13 @@ The automated suite contains 87 tests, including 23 new behavior/binding checks 
 
 Thirteen targeted regression tests were first run against the original compiled scripts/test interpreter and reproduced failures. The corrected suite additionally checks startup recovery, actual state dispatch, document capacity, wrong outcomes, cash conservation across thirty repayment/audit/claim combinations, and packaging failure behavior. In that revision, existing local FormIDs were retained and eight new BOOK records received explicit unused IDs. There is still no supported saved-game upgrade path.
 
-## What is built
+### What was built in 0.1.2
 
 Five ESPs contain 123 new records, including 70 readable BOOK records. Eight compiled PEX scripts implement the prototype's commission, six duties in two packets, secure dispatch and archive, status register, contextual delayed responses, closing assessment, deadlines/extensions, scoped authority, one accounts case with partial repayments, audit/liability and development recovery. The mod requires no SKSE or optional plugin for this bounded loop and overrides no vanilla records.
 
 The source repository contains the Papyrus, authored content, deterministic FormID contract, Mutagen builder with locked dependencies, verified compiler downloader, automated checks, Windows CI definition and manual game-validation checklist. The packaged build includes compiled plugins/scripts, their Papyrus source, documentation and a SHA-256 manifest.
 
-## Validation limits
+### Validation limits
 
 Papyrus is compiled for Skyrim with warnings treated as errors, using project-authored native API declarations. Binary structure, plugin masters, IDs, VMAD target types, script properties and note records are checked independently after Mutagen round trips. Logic tests execute Caprica's emitted assembly with simulated native game calls. Tests also exercise package integrity and preserve an existing package when validation fails.
 

@@ -74,13 +74,13 @@ Function UseBox(ObjectReference box)
         Dispatch.RecoverDocument(Commission)
         Dispatch.RecoverDocument(FieldPapers)
     ElseIf selected == 1
-        assignment = AssignmentMenu.Show()
-        If assignment >= 0 && assignment < 6
-            ShowServiceResult(Service.FileReport(assignment))
+        assignment = Service.ChooseInstruction(AssignmentMenu)
+        If assignment >= 0
+            FileReport(assignment)
         EndIf
     ElseIf selected == 2
-        assignment = AssignmentMenu.Show()
-        If assignment >= 0 && assignment < 6
+        assignment = Service.ChooseInstruction(AssignmentMenu)
+        If assignment >= 0
             ShowServiceResult(Service.RequestExtension(assignment))
         EndIf
     ElseIf selected == 3
@@ -94,12 +94,12 @@ Function UseBox(ObjectReference box)
         Dispatch.RecoverFiledCopies()
     ElseIf selected == 7
         If Service.ShowSummary() == 0
-            assignment = AssignmentMenu.Show()
-            If assignment >= 0 && assignment < 6
+            assignment = Service.ChooseInstruction(AssignmentMenu)
+            If assignment >= 0
                 Service.ShowAssignmentStatus(assignment)
             EndIf
         EndIf
-        If Service.CountState(4) == 6 && Service.GetEvaluationState() == 0 && Accounts.IsReviewPending()
+        If Service.CountOpen() == 0 && Service.NextUnissued() < 0 && Service.GetEvaluationState() == 0 && Accounts.IsReviewPending()
             ReviewPendingMessage.Show()
         EndIf
     EndIf
@@ -141,6 +141,18 @@ Function UseAccounts()
         EndIf
     ElseIf selected == 3
         Accounts.ShowStatement()
+    EndIf
+EndFunction
+
+Function FileReport(Int assignment)
+    ; A case report needs one conclusion, asked only once the papers and supplies are in order.
+    If Service.IsReadyForConclusion(assignment)
+        Int conclusion = Service.AskConclusion(assignment)
+        If conclusion >= 0
+            ShowServiceResult(Service.FileReport(assignment, conclusion))
+        EndIf
+    Else
+        ShowServiceResult(Service.FileReport(assignment, -1))
     EndIf
 EndFunction
 

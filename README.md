@@ -1,6 +1,6 @@
 # Elenwen Agent — Skyrim SE/AE technical prototype
 
-**Version 0.1.2-prototype. This is an installable development build, not the completed mod described in [the specification](Elenwen_Agent_Mod_Build_Specification.md). It has been compiled and tested outside Skyrim; it has not been run in the game.**
+**Version 0.2.0-prototype. This is an installable development build, not the completed mod described in [the specification](Elenwen_Agent_Mod_Build_Specification.md) and its [Continuation 01](Elenwen_Agent_Mod_Build_Specification_Continuation_01.md). It has been compiled and tested outside Skyrim; it has not been run in the game.**
 
 The repository began with the design specification only. This implementation builds its first paper-based service loop using real ESP records and compiled Papyrus scripts. No Skyrim installation, Creation Kit, Alternate Perspective plugin, Sinister Serana plugin, or installed load order was available for record inspection or playtesting.
 
@@ -8,22 +8,24 @@ The repository began with the design specification only. This implementation bui
 
 - A physical secure dispatch activator and a persistent, non-respawning document archive.
 - A confidential commission, private field papers, and a one-time 100-septim allowance.
-- Six finite instructions in two packets. The first covers field protocol, three Alto wines, and six blue mountain flowers. The second adds six firewood, four leather strips, and six wheat. Supplies are actually removed from inventory when filed.
-- Seventy readable orders, reports, requests, decisions, assessments, and receipts. Extensions identify their assignment; meal explanations preserve the chosen declaration. Responses take one game day and must be collected physically.
+- Eleven authored instructions (1001–1011), issued in a fixed order with at most three open at once (Continuation 01, Revision Phase B). Apart from the protocol acknowledgment, every instruction rests on a **named item**, on **case papers**, or on both:
+  - Named items are specific vanilla base objects, never "any wine" or "any book": Solitude spiced wine, *The Rise and Fall of the Blades*, Black-Briar Reserve, *The Book of the Dragonborn*, *The Rising Threat, Vol. I*, jazbay grapes, Honningbrew Mead, moon sugar and a roll of paper. They are removed from inventory only when the report is accepted.
+  - Five instructions issue case papers with the order. The report must state one of three conclusions, and it can only be filed after the papers have been read. A sound conclusion receives a prompt, ordinary or late reply; a misjudged one receives a specific rejection and costs trust.
+- 120 readable orders, case papers, reports, requests, decisions, assessments and receipts. Extensions identify their assignment; meal explanations preserve the chosen declaration. Responses take one game day and must be collected physically.
 - Ten-day deadlines, overdue state with one trust consequence, and a five-day extension followed by refusal of a second extension.
 - Core authorization scoped to operation and decision category, including emergency review functions for later modules.
-- A single wine-procurement accounts case: authorized 80-septim advance, declared claims, all four outcomes, explanations, return of funds, a 14-day audit, and liability/probation. Recognized costs settle the advance before any reimbursement.
-- A dispatch status register with active/overdue/filed/completed counts, ready/in-transit replies, and per-instruction remaining days. Specific feedback explains missing supplies, permissions, pending requests, and settled claims.
-- Elenwen replies differently to prompt, ordinary, and previously overdue work; Accounts letters address the chosen expense. A delayed closing assessment follows both packets and any pending claim decision.
+- A single accounts case for the spiced wine purchase (instruction 1002): authorized 80-septim advance, declared claims, all four outcomes, explanations, return of funds, a 14-day audit, and liability/probation. Recognized costs settle the advance before any reimbursement.
+- A dispatch status register with active/overdue/filed/completed counts, ready/in-transit replies, and per-instruction remaining days. Specific feedback explains missing items, unread case papers, permissions, pending requests, and settled claims.
+- Elenwen replies differently to prompt, ordinary, and previously overdue work, and to sound or misjudged conclusions. Her letters follow the voice guide in Continuation 01, section 6. Accounts letters address the chosen expense. A delayed closing assessment follows the last instruction and any pending claim decision; late and misjudged reports both count against it.
 - Partial repayments of up to 10 or 25 septims, or all affordable outstanding funds, with confirmation of the actual payment and remaining balance.
-- Replay protection for commissioning, orders, deliveries, responses, advances, and claim payments; recovery of lost paper copies.
+- Replay protection for commissioning, orders, deliveries, responses, advances, and claim payments; recovery of lost paper copies, including case papers.
 
 All public text is SFW. Hidden trust and creditworthiness are not displayed. Core requires only `Skyrim.esm`; no SKSE or optional mod is needed for this prototype. No vanilla records are overridden. These ESPs are intentionally **not ESL-flagged**.
 
 ## Install and try it
 
 1. Use a separate Skyrim Special Edition / Anniversary Edition **test profile and fresh save**. LE and VR are not supported targets. SE/AE runtime compatibility has not been playtested.
-2. Install `dist/ElenwenAgent-0.1.2-prototype.zip` through MO2 or Vortex. The ZIP root is the Data directory. For manual installation, copy its ESPs and `Scripts` directory into the test installation's Data folder.
+2. Install `dist/ElenwenAgent-0.2.0-prototype.zip` through MO2 or Vortex. The ZIP root is the Data directory. For manual installation, copy its ESPs and `Scripts` directory into the test installation's Data folder.
 3. Enable this order after the game's official masters:
 
    ```text
@@ -43,25 +45,24 @@ All public text is SFW. Hidden trust and creditworthiness are not displayed. Cor
 
    Replace the placeholder with the actual eight-digit FormID. The local ID is `000800` in `EA_Prototype.esp`; its load-order prefix varies. Place **one** box.
 
-5. Activate it, open the commission, and choose **Collect Orders**. Read the field papers in your inventory; reading them before collecting orders also counts. A second strongbox beside the dispatch box contains archived correspondence. Delivered supplies are consigned immediately and cannot be taken back from this paper archive.
-6. File the protocol acknowledgment. Obtain three bottles of standard Alto wine and six blue mountain flowers for the other reports. Return after 24 game hours and choose **Check Responses**.
-7. To test Accounts, request supply authority **before filing the wine delivery**, wait a day, collect the authorization, then collect the advance under **Accounts**. After delivering wine, submit one of the declared claim forms. Each claim/explanation needs its own return dispatch.
+5. Activate it, open the commission, and choose **Collect Orders**. Three instructions arrive: 1001 (field protocol), 1002 (Solitude spiced wine) and 1003 (*The Rise and Fall of the Blades*). Read the field papers in your inventory; reading them before collecting orders also counts. A second strongbox beside the dispatch box contains archived correspondence. Delivered items are consigned immediately and cannot be taken back from this paper archive.
+6. **File Report** and **Request Extension** list the open instructions by position (first, second, third) with their numbers; the number is printed on each order. File the protocol acknowledgment. Obtain three bottles of Solitude spiced wine and one copy of *The Rise and Fall of the Blades* for the other two. Alto or other wine, or another book, is refused without anything being taken. Return after 24 game hours and choose **Check Responses**.
+7. To test Accounts, request supply authority **before filing the wine delivery**, wait a day, collect the authorization, then collect the advance under **Accounts**. After delivering the wine, submit one of the declared claim forms. Each claim/explanation needs its own return dispatch.
+8. Each collected completion response frees a position. Choose **Collect Orders** again to receive the next instruction; its ten-day deadline begins on collection. Instructions 1004, 1005, 1008, 1009 and 1011 include case papers. Read them, obtain the named item if the order asks for one, then file: you are asked for one of three conclusions, and **Cancel** at that point files nothing.
+9. Use **Review status** to inspect the register and individual open instructions. Under **Accounts → Return outstanding funds**, choose a partial payment or all affordable outstanding funds.
+10. After all eleven completion responses and any pending Accounts decision have been collected, a closing review is sent automatically. Wait another full game day and collect Elenwen's assessment. A returned meal claim must first be explained and settled. The assessment reflects the record when the review was sent; later actions do not rewrite it.
 
-8. After collecting all three first-packet acknowledgments, choose **Collect Orders** again to open the second packet. Its ten-day deadlines begin on collection. Deliver six firewood, four leather strips, and six wheat, then collect their responses.
-9. Use **Review status** to inspect the register and individual instructions. Under **Accounts → Return outstanding funds**, choose a partial payment or all affordable outstanding funds.
-10. After all six completion responses and any pending Accounts decision have been collected, a closing review is sent automatically. Wait another full game day and collect Elenwen's assessment. A returned meal claim must first be explained and settled. The assessment reflects the record when the review was sent; later actions do not rewrite it.
-
-Supply cost forms are the player's **declarations**; this build does not track vendor transactions. Only one claim is allowed for instruction 1002. Use separate fresh test saves to exercise the four different outcomes. The six assignments do not regenerate. The second packet has no separate advance, claim, or completion reward; its orders explicitly authorize use of the initial allowance.
+Supply cost forms are the player's **declarations**; this build does not track vendor transactions. Only one claim is allowed for instruction 1002. Use separate fresh test saves to exercise the four different outcomes. The eleven instructions do not regenerate, and only instruction 1002 has an advance or claim. Instruction 1007 is a personal request and says so. The item references and their in-game names, prices and availability have not been checked in the game; see [manual game validation](docs/TESTING.md).
 
 After fourteen days, Accounts audits an unreturned advance even if its response is left uncollected or its explanation unanswered. Actual return transit defers the audit until the response arrives. A valid later claim can still discharge recognized costs against the audited liability.
 
 **Recover filed copies** restores missing documents, including archive copies, without repeating their quest or monetary effects. Reprints may coexist with originals dropped elsewhere; all EA papers have zero resale value.
 
-Do not remove these plugins from a save you intend to keep. There is no supported upgrade or uninstall migration yet, including from 0.1.0 or 0.1.1 to 0.1.2. Runtime arrays changed in this revision. Use a fresh test save for this revision. To discard a test, disable the package and use a save from before installation, or start a new game.
+Do not remove these plugins from a save you intend to keep. There is no supported upgrade or uninstall migration yet, including from any 0.1.x build to 0.2.0. Runtime arrays, quest objectives and the instruction set changed in this revision. Use a fresh test save for this revision. To discard a test, disable the package and use a save from before installation, or start a new game.
 
 ## Not yet implemented
 
-The bespoke Alternate Perspective start, actual civilian accommodation and Establish Cover assignment, repeatable service backlog, curated NPC relationship locks and behavioral hooks, courier integrations, Mantella integration, and all main-quest / Dawnguard / Dark Brotherhood / Civil War / Serana routes remain unfinished. `EA_Prototype.esp` is a development entry point, not `EA_Start.esp`.
+The bespoke Alternate Perspective start, actual civilian accommodation and Establish Cover assignment (Revision Phase A), the observation, dead-drop and world-placed recovery cases that need hand-placed objects, random selection among eligible packets, compromised-cover reply variants, the Elenwen dialogue corpus (Revision Phase C), repeatable service backlog, curated NPC relationship locks and behavioral hooks, courier integrations, Mantella integration, and all main-quest / Dawnguard / Dark Brotherhood / Civil War / Serana routes remain unfinished. `EA_Prototype.esp` is a development entry point, not `EA_Start.esp`.
 
 No compatibility patch or empty placeholder ESP has been manufactured. The specification requires inspecting installed records first. See [implementation status and conflict work](docs/IMPLEMENTATION_STATUS.md) and [manual game validation](docs/TESTING.md).
 
@@ -96,4 +97,4 @@ This switches to the supplied base scripts instead of the declarations. A succes
 
 The test interpreter executes Caprica's emitted assembly with simulated game natives. It does **not** establish Skyrim save compatibility, VM scheduling, physical placement, mesh appearance, or UI correctness. Those checks still require the game and Creation Kit.
 
-Source layout: `Data/Source/Scripts` holds Papyrus; `content/documents.json` holds authored papers; `tools/PluginBuilder` builds plugin records; `tests` verifies the compiled logic and binaries. See [architecture and API](docs/ARCHITECTURE.md) for state conventions and limitations.
+Source layout: `Data/Source/Scripts` holds Papyrus; `content/packets.json` holds the authored instructions, their papers, items and conclusions; `content/documents.json` holds the other papers; `tools/PluginBuilder` builds plugin records; `tests` verifies the compiled logic and binaries. See [architecture and API](docs/ARCHITECTURE.md) for state conventions and limitations.

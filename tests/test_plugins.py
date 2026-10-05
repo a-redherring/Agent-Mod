@@ -8,6 +8,7 @@ from plugin_reader import records, scripts
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "build/Data"
+PACKETS = json.loads((ROOT / "content/packets.json").read_text())
 ORDER = ["Skyrim.esm", "EA_Core.esp", "EA_Dispatch.esp", "EA_Service.esp", "EA_Accounts.esp", "EA_Prototype.esp"]
 
 
@@ -53,19 +54,28 @@ class PluginTests(unittest.TestCase):
                         self.assertEqual(isinstance(value, list), declared[prop].endswith("[]"), prop)
                         self.assertTrue(value, (script, prop))
                     if script == "EA_Service":
-                        for prop in ("Orders", "Reports", "Responses", "PromptResponses", "LateResponses", "ExtensionRequests", "ApprovedExtensions", "DeniedExtensions", "MissingMessages"):
-                            self.assertEqual(len(props[prop]), 6)
+                        for prop in ("Orders", "Reports", "Responses", "PromptResponses", "LateResponses", "ExtensionRequests", "ApprovedExtensions", "DeniedExtensions", "SupplyIndex", "CaseIndex"):
+                            self.assertEqual(len(props[prop]), len(PACKETS), prop)
+                        supplies = sum("supply" in p for p in PACKETS)
+                        cases = sum("case" in p for p in PACKETS)
+                        for prop, count in (("Supplies", supplies), ("SupplyCounts", supplies), ("MissingMessages", supplies), ("CaseFiles", cases), ("ConclusionMenus", cases), ("SoundConclusions", cases), ("MisjudgedResponses", cases), ("FailureMessages", 10)):
+                            self.assertEqual(len(props[prop]), count, prop)
                     if script == "EA_Accounts":
                         self.assertEqual(len(props["ClaimForms"]), 4)
                         self.assertEqual(len(props["Decisions"]), 4)
 
     def test_vmad_references_resolve_and_have_no_optional_masters(self):
-        vanilla = {0xF, 0x3133B, 0x77E1C, 0x97788, 0x6F993, 0x800E4, 0x4B0BA}
+        # Gold, the note inventory art, and each packet's named item.
+        vanilla = {0xF, 0x97788} | {int(p["supply"]["form"], 16) for p in PACKETS if "supply" in p}
         for name, recs in self.plugins.items():
             masters = [v.rstrip(b"\0").decode() for n, v in recs[0].fields if n == "MAST"] + [name]
             for record in recs:
                 for script, props in scripts(record.field("VMAD")):
-                    for value in props.values():
+                    source = (ROOT / "Data/Source/Scripts" / (script + ".psc")).read_text()
+                    numeric = {n for t, n in re.findall(r"(?mi)^(Int(?:\[\])?) Property (\w+).*Auto$", source)}
+                    for prop, value in props.items():
+                        if prop in numeric:
+                            continue
                         for form in value if isinstance(value, list) else [value]:
                             owner = masters[form >> 24]
                             local = form & 0xFFFFFF
@@ -76,6 +86,10 @@ class PluginTests(unittest.TestCase):
 
     def test_books_are_readable_zero_value_documents(self):
         documents = json.loads((ROOT / "content/documents.json").read_text())
+        for packet in PACKETS:
+            documents += list(packet["documents"].values())
+            if "case" in packet:
+                documents += [packet["case"]["file"], packet["case"]["misjudged"]]
         books = {r.editor_id: r for recs in self.plugins.values() for r in recs if r.kind == "BOOK"}
         self.assertEqual(len(books), len(documents))
         for doc in documents:
@@ -115,7 +129,7 @@ class PluginTests(unittest.TestCase):
                     source = (ROOT / "Data/Source/Scripts" / (script + ".psc")).read_text()
                     declared = dict((n, t.removesuffix("[]")) for t, n in re.findall(r"(?mi)^(\w+(?:\[\])?) Property (\w+).*Auto$", source))
                     for prop, value in props.items():
-                        if declared[prop] == "Form":
+                        if declared[prop] in ("Form", "Int"):
                             continue
                         for form in value if isinstance(value, list) else [value]:
                             owner = masters[form >> 24]
@@ -127,12 +141,11 @@ class PluginTests(unittest.TestCase):
                                 self.assertEqual(target.kind, types[declared[prop]])
 
     def test_extension_papers_identify_each_assignment(self):
-        docs = {d["editorID"]: d for d in json.loads((ROOT / "content/documents.json").read_text())}
-        for suffix, assignment in (("", 1001), ("Wine", 1002), ("Flowers", 1003), ("Firewood", 1004), ("Leather", 1005), ("Wheat", 1006)):
-            for base in ("EA_ExtensionRequest", "EA_ExtensionApproved", "EA_ExtensionDenied"):
-                document = docs[base + suffix]
-                self.assertIn(str(assignment), document["title"])
-                self.assertIn(str(assignment), document["text"])
+        for packet in PACKETS:
+            for part in ("extensionRequest", "extensionApproved", "extensionDenied"):
+                document = packet["documents"][part]
+                self.assertIn(str(packet["assignment"]), document["title"])
+                self.assertIn(str(packet["assignment"]), document["text"])
 
     def test_archives_do_not_respawn_and_quests_do_not_autostart(self):
         for recs in self.plugins.values():
@@ -148,14 +161,42 @@ class PluginTests(unittest.TestCase):
         recs = self.plugins['EA_Service.esp']
         quest = next(r for r in recs if r.editor_id == 'EA_ServiceQuest')
         props = dict(scripts(quest.field('VMAD')))['EA_Service']
-        documents = {d['editorID']: d for d in json.loads((ROOT / 'content/documents.json').read_text())}
+        documents = {d['editorID']: d for p in PACKETS for d in list(p['documents'].values()) + ([p['case']['file'], p['case']['misjudged']] if 'case' in p else [])}
         for prop in ('Orders', 'Reports', 'Responses', 'PromptResponses', 'LateResponses', 'ExtensionRequests', 'ApprovedExtensions', 'DeniedExtensions'):
             for index, form in enumerate(props[prop]):
                 record = next(r for r in recs if r.form_id == form)
                 doc = documents[record.editor_id]
                 self.assertIn(str(1001 + index), doc['title'] + doc['text'], (prop, index))
-        for prop, form in {'Firewood': 0x6F993, 'LeatherStrips': 0x800E4, 'Wheat': 0x4B0BA}.items():
-            self.assertEqual(props[prop], form)
+        supplied = [p for p in PACKETS if 'supply' in p]
+        cases = [p for p in PACKETS if 'case' in p]
+        self.assertEqual(props['SupplyIndex'], [supplied.index(p) if 'supply' in p else -1 for p in PACKETS])
+        self.assertEqual(props['CaseIndex'], [cases.index(p) if 'case' in p else -1 for p in PACKETS])
+        self.assertEqual(props['Supplies'], [int(p['supply']['form'], 16) for p in supplied])
+        self.assertEqual(props['SupplyCounts'], [p['supply']['count'] for p in supplied])
+        self.assertEqual(props['SoundConclusions'], [p['case']['sound'] for p in cases])
+        for prop, part in (('CaseFiles', 'file'), ('MisjudgedResponses', 'misjudged')):
+            for case, form in zip(cases, props[prop]):
+                record = next(r for r in recs if r.form_id == form)
+                self.assertEqual(record.editor_id, case['case'][part]['editorID'])
+                self.assertIn(str(case['assignment']), documents[record.editor_id]['title'], prop)
+
+    def test_case_papers_carry_their_assignment_and_menus_offer_three_conclusions(self):
+        recs = self.plugins['EA_Service.esp']
+        for packet in [p for p in PACKETS if 'case' in p]:
+            with self.subTest(packet=packet['assignment']):
+                papers = next(r for r in recs if r.editor_id == packet['case']['file']['editorID'])
+                props = dict(scripts(papers.field('VMAD')))['EA_CaseFile']
+                self.assertEqual(props['AssignmentID'], packet['assignment'])
+                menu = next(r for r in recs if r.editor_id == packet['case']['menu']['editorID'])
+                buttons = [v.rstrip(b'\0').decode() for n, v in menu.fields if n == 'ITXT']
+                self.assertEqual(len(buttons), 4)
+                self.assertEqual(buttons[-1], 'Cancel')
+                self.assertIn(str(packet['assignment']), menu.field('DESC').decode())
+
+    def test_quest_objectives_follow_packet_positions(self):
+        quest = next(r for r in self.plugins['EA_Service.esp'] if r.editor_id == 'EA_ServiceQuest')
+        indices = sorted(struct.unpack('<H', v)[0] for n, v in quest.fields if n == 'QOBJ')
+        self.assertEqual(indices, sorted([100 + i for i in range(len(PACKETS))] + [200 + i for i in range(len(PACKETS))] + [300]))
 
     def test_menus_and_numeric_status_fit_the_native_message_interface(self):
         for recs in self.plugins.values():

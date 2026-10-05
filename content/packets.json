@@ -1,0 +1,838 @@
+[
+  {
+    "assignment": 1001,
+    "key": "Protocol",
+    "family": "administrative",
+    "objective": "Read the field papers, then file an acknowledgment",
+    "documents": {
+      "order": {
+        "id": "810",
+        "editorID": "EA_OrderProtocol",
+        "title": "Instruction 1001: Field Protocol",
+        "text": "Read your private field papers. Then file an acknowledgment through this box. Ten days are allowed from collection.\n\nThe acknowledgment confirms that you have received the procedure. It does not certify lodging, a cover, or any finding, and you will not treat it as one.\n\nFurther instructions follow as earlier ones close. No more than three will be open at once.\n\nElenwen"
+      },
+      "report": {
+        "id": "813",
+        "editorID": "EA_ReportProtocol",
+        "title": "Filed Acknowledgment: Field Protocol",
+        "text": "Instruction 1001\n\nI have read the private field papers and understand the procedure for reports, replies, and authority. I hold no public rank and will claim none.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "816",
+        "editorID": "EA_ResponseProtocol",
+        "title": "Response 1001: Acknowledgment Entered",
+        "text": "Your acknowledgment is entered. Read the field papers again before you are tempted to improvise.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "852",
+        "editorID": "EA_ResponsePromptProtocol",
+        "title": "Response 1001: Prompt Acknowledgment",
+        "text": "Acknowledged, and without delay. The work that follows will not be so simple.\n\nElenwen"
+      },
+      "late": {
+        "id": "853",
+        "editorID": "EA_ResponseLateProtocol",
+        "title": "Response 1001: Delay Noted",
+        "text": "Your acknowledgment arrived after its deadline. It required reading, not travel. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "819",
+        "editorID": "EA_ExtensionRequest",
+        "title": "Filed Extension Request: Instruction 1001",
+        "text": "Instruction 1001\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "81A",
+        "editorID": "EA_ExtensionApproved",
+        "title": "Extension Approved: Instruction 1001",
+        "text": "Instruction 1001: five further days, counted from the present deadline. You asked for more time to read. Use it to read.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "81B",
+        "editorID": "EA_ExtensionDenied",
+        "title": "Further Extension Refused: Instruction 1001",
+        "text": "Instruction 1001: no further time. File the acknowledgment. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1002,
+    "key": "Wine",
+    "family": "provenance",
+    "objective": "Deliver three bottles of Solitude spiced wine",
+    "supply": {
+      "form": "085368",
+      "name": "Solitude spiced wine",
+      "count": 3,
+      "message": {
+        "id": "911",
+        "editorID": "EA_MissingSupply1",
+        "text": "This consignment is short by %.0f bottles of Solitude spiced wine. Alto and other wines do not count. Nothing has been taken."
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "811",
+        "editorID": "EA_OrderWine",
+        "title": "Instruction 1002: Solitude Spiced Wine",
+        "text": "Obtain three bottles of Solitude spiced wine and deliver them unopened through this box within ten days.\n\nIt must be the city's own spiced wine: not Alto, not a Cyrodilic bottle, and not whatever an innkeeper calls wine. The Embassy is receiving guests from Solitude. They will recognize their own city's wine, which is the point of serving it.\n\nA purchase by a private customer draws no remark. One by an Embassy steward would.\n\nThirty septims should cover it. If you need an advance, request supply authority first, then collect it from Accounts, and return unused funds within fourteen days. A meal or a gift is not a purchase. Do not declare one as such.\n\nElenwen"
+      },
+      "report": {
+        "id": "814",
+        "editorID": "EA_ReportWine",
+        "title": "Filed Delivery 1002: Solitude Spiced Wine",
+        "text": "Instruction 1002\n\nThree bottles of Solitude spiced wine are consigned unopened with this report. They were bought as a private customer.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "817",
+        "editorID": "EA_ResponseWine",
+        "title": "Response 1002: Delivery Received",
+        "text": "Three bottles, correct and unopened. The steward has them. Any claim is a matter for Accounts and will be judged on what it declares.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "854",
+        "editorID": "EA_ResponsePromptWine",
+        "title": "Response 1002: Prompt Delivery",
+        "text": "The correct wine, delivered early and without an invented difficulty. Good. Accounts will settle any honest claim.\n\nElenwen"
+      },
+      "late": {
+        "id": "855",
+        "editorID": "EA_ResponseLateWine",
+        "title": "Response 1002: Delay Noted",
+        "text": "The wine arrived after the reception it was bought for. It will be served at the next. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "830",
+        "editorID": "EA_ExtensionRequestWine",
+        "title": "Filed Extension Request: Instruction 1002",
+        "text": "Instruction 1002\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "831",
+        "editorID": "EA_ExtensionApprovedWine",
+        "title": "Extension Approved: Instruction 1002",
+        "text": "Instruction 1002: five further days, counted from the present deadline. The reception has been moved for other reasons. Do not assume it will move again.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "832",
+        "editorID": "EA_ExtensionDeniedWine",
+        "title": "Further Extension Refused: Instruction 1002",
+        "text": "Instruction 1002: no further time. Buy the wine and file the delivery. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1003,
+    "key": "Blades",
+    "family": "provenance",
+    "objective": "Deliver a copy of The Rise and Fall of the Blades",
+    "supply": {
+      "form": "0F4530",
+      "name": "The Rise and Fall of the Blades",
+      "count": 1,
+      "message": {
+        "id": "B03",
+        "editorID": "EA_MissingSupplyBlades",
+        "text": "This delivery is short by %.0f copy of The Rise and Fall of the Blades. Another book will not do. Nothing has been taken."
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "A30",
+        "editorID": "EA_OrderBlades",
+        "title": "Instruction 1003: A Public History",
+        "text": "Buy one copy of The Rise and Fall of the Blades and deliver it through this box within ten days.\n\nI want a copy bought in Skyrim, as any reader would buy it. What the public is told about the Blades, and what it is not told, is itself information. Buy from a seller's stock, not from a private shelf or a library.\n\nDo not ask the seller about other buyers. A question about a book is ordinary. A question about its readers is not.\n\nElenwen"
+      },
+      "report": {
+        "id": "A31",
+        "editorID": "EA_ReportBlades",
+        "title": "Filed Delivery 1003: The Rise and Fall of the Blades",
+        "text": "Instruction 1003\n\nOne copy of The Rise and Fall of the Blades, bought from a seller's stock, is consigned with this report. I asked nothing about other buyers.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "A32",
+        "editorID": "EA_ResponseBlades",
+        "title": "Response 1003: Volume Received",
+        "text": "The volume is received and goes to the Embassy library. It tells its readers less than its author knew. That is also useful.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "A33",
+        "editorID": "EA_ResponsePromptBlades",
+        "title": "Response 1003: Prompt Delivery",
+        "text": "The correct book, promptly, and no conversation about its readers. Good.\n\nElenwen"
+      },
+      "late": {
+        "id": "A34",
+        "editorID": "EA_ResponseLateBlades",
+        "title": "Response 1003: Delay Noted",
+        "text": "The book arrived late. A bookseller's shelf is not a remote ruin. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "A35",
+        "editorID": "EA_ExtensionRequestBlades",
+        "title": "Filed Extension Request: Instruction 1003",
+        "text": "Instruction 1003\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "A36",
+        "editorID": "EA_ExtensionApprovedBlades",
+        "title": "Extension Approved: Instruction 1003",
+        "text": "Instruction 1003: five further days, counted from the present deadline. If the nearest seller has no copy, try another city. Do not take one from a private shelf.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "A37",
+        "editorID": "EA_ExtensionDeniedBlades",
+        "title": "Further Extension Refused: Instruction 1003",
+        "text": "Instruction 1003: no further time. Deliver the book. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1004,
+    "key": "Reserve",
+    "family": "commercial intelligence",
+    "objective": "Obtain Black-Briar Reserve, read the case papers, and file a conclusion",
+    "supply": {
+      "form": "0F693F",
+      "name": "Black-Briar Reserve",
+      "count": 1,
+      "message": {
+        "id": "B04",
+        "editorID": "EA_MissingSupplyReserve",
+        "text": "This report must be filed with %.0f bottle of Black-Briar Reserve. Ordinary Black-Briar mead does not count. Nothing has been taken."
+      }
+    },
+    "case": {
+      "sound": 1,
+      "file": {
+        "id": "A48",
+        "editorID": "EA_CaseFileReserve",
+        "title": "Case Papers 1004: Copies from Riften and Solitude",
+        "text": "Copied for the officer assigned to instruction 1004. Not to be filed with ordinary correspondence.\n\nI. Riften, carter's waybill\nOne crate of \"household goods,\" Black-Briar Meadery to Solitude. Carriage paid in advance by the sender. Sealed with the meadery's own wax.\n\nII. Solitude, household book of the East Empire Company's senior factor\nReceived: one crate from Riften, \"with the compliments of M. B.-B.\" No price is entered. The entry precedes the factor's dinner for the Company's captains by three days.\n\nIII. Riften, the meadery's sales ledger for the same month, as copied by our informant\nNo sale of the Reserve to any buyer in Solitude."
+      },
+      "menu": {
+        "id": "B24",
+        "editorID": "EA_ConclusionMenuReserve",
+        "text": "Instruction 1004. Select the conclusion your report will support. It will be judged against the case papers.",
+        "buttons": [
+          "Bought through ordinary trade",
+          "A gift to cultivate the factor",
+          "Stolen from the meadery",
+          "Cancel"
+        ]
+      },
+      "misjudged": {
+        "id": "A49",
+        "editorID": "EA_ResponseMisjudgedReserve",
+        "title": "Response 1004: Conclusion Rejected",
+        "text": "Your conclusion does not follow from the papers you were sent. The sender paid the carriage and sealed the crate, and nobody bought the Reserve. Read the papers again before you next sign a conclusion. This error is on your record.\n\nElenwen"
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "A40",
+        "editorID": "EA_OrderReserve",
+        "title": "Instruction 1004: The Riften Reserve",
+        "text": "Obtain one bottle of Black-Briar Reserve and read the enclosed papers. Within ten days, deliver the bottle and file your conclusion through this box.\n\nThe Black-Briar family sells its ordinary mead to anyone. The Reserve is another matter. A bottle was served at a private table in Solitude last month. I wish to know how it got there.\n\nHow easily you obtain a bottle is itself evidence. Your report is to state one conclusion and rest on the enclosed papers.\n\nDo not mention the Black-Briar name to anyone who is not already selling you the bottle.\n\nElenwen"
+      },
+      "report": {
+        "id": "A41",
+        "editorID": "EA_ReportReserve",
+        "title": "Filed Report 1004: The Riften Reserve",
+        "text": "Instruction 1004\n\nOne bottle of Black-Briar Reserve is consigned with this report. My conclusion on the Solitude bottle is entered on the enclosed form, with reference to the case papers.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "A42",
+        "editorID": "EA_ResponseReserve",
+        "title": "Response 1004: Conclusion Accepted",
+        "text": "A gift, and a deliberate one. Maven Black-Briar is cultivating the Company's factor, and she pays the carriage herself so that no one else holds the receipt. Your conclusion is accepted. The bottle will be served to someone who will understand it.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "A43",
+        "editorID": "EA_ResponsePromptReserve",
+        "title": "Response 1004: Prompt and Correct",
+        "text": "The correct reading of the papers, filed early, with the bottle. You saw that the missing price was the point. Good.\n\nElenwen"
+      },
+      "late": {
+        "id": "A44",
+        "editorID": "EA_ResponseLateReserve",
+        "title": "Response 1004: Correct, but Late",
+        "text": "Your conclusion is correct. It arrived after the factor's next dinner, which I would have preferred to anticipate. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "A45",
+        "editorID": "EA_ExtensionRequestReserve",
+        "title": "Filed Extension Request: Instruction 1004",
+        "text": "Instruction 1004\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "A46",
+        "editorID": "EA_ExtensionApprovedReserve",
+        "title": "Extension Approved: Instruction 1004",
+        "text": "Instruction 1004: five further days, counted from the present deadline. The Reserve is not sold openly. I did not expect it to be easy.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "A47",
+        "editorID": "EA_ExtensionDeniedReserve",
+        "title": "Further Extension Refused: Instruction 1004",
+        "text": "Instruction 1004: no further time. File your conclusion with the bottle. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1005,
+    "key": "Leaf",
+    "family": "archival intelligence",
+    "objective": "Obtain The Book of the Dragonborn, compare the leaves, and file a conclusion",
+    "supply": {
+      "form": "0F86FE",
+      "name": "The Book of the Dragonborn",
+      "count": 1,
+      "message": {
+        "id": "B05",
+        "editorID": "EA_MissingSupplyLeaf",
+        "text": "This delivery is short by %.0f copy of The Book of the Dragonborn. Another book will not do. Nothing has been taken."
+      }
+    },
+    "case": {
+      "sound": 1,
+      "file": {
+        "id": "A58",
+        "editorID": "EA_CaseFileLeaf",
+        "title": "Case Papers 1005: Two Transcribed Leaves",
+        "text": "Copied for the officer assigned to instruction 1005.\n\nLeaf A, from a copy bought in Whiterun market:\n\"Here ends the book. Let the reader remember that the blood of the dragon has worn a crown before, and that the Nine were nine.\" Unsigned. The type matches the rest of the book.\n\nLeaf B, from a copy bought from a peddler on the Riverwood road:\n\"Here ends the book. Let the reader remember that the blood of the dragon has worn a crown before, and that the Nine were nine. Ask at the shrine after dark.\" Unsigned. The last sentence is in a different type, pressed later.\n\nClerk's note: both leaves are on the same paper. The binding thread of the second copy was cut and retied."
+      },
+      "menu": {
+        "id": "B25",
+        "editorID": "EA_ConclusionMenuLeaf",
+        "text": "Instruction 1005. Select the conclusion your report will support. It will be judged against the case papers.",
+        "buttons": [
+          "A printer's error",
+          "Worshippers arranging meetings",
+          "A bookseller's sales device",
+          "Cancel"
+        ]
+      },
+      "misjudged": {
+        "id": "A59",
+        "editorID": "EA_ResponseMisjudgedLeaf",
+        "title": "Response 1005: Conclusion Rejected",
+        "text": "Your conclusion ignores the second leaf. Its last line was pressed separately and bound in by hand. Printers and booksellers do not retie a binding to add an appointment. This error is on your record.\n\nElenwen"
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "A50",
+        "editorID": "EA_OrderLeaf",
+        "title": "Instruction 1005: The Inserted Leaf",
+        "text": "Buy one copy of The Book of the Dragonborn and compare the enclosed transcriptions. Within ten days, deliver the book and file your conclusion through this box.\n\nSome copies sold near Whiterun carry an extra leaf. The Embassy has transcriptions of two. I want to know whether this is a printer's error, a bookseller's device, or something written for a purpose.\n\nThe copy you buy is for the Embassy library. Bring it whether or not it contains a leaf.\n\nDo not discuss the leaf with any priest.\n\nElenwen"
+      },
+      "report": {
+        "id": "A51",
+        "editorID": "EA_ReportLeaf",
+        "title": "Filed Report 1005: The Inserted Leaf",
+        "text": "Instruction 1005\n\nOne copy of The Book of the Dragonborn is consigned with this report for the Embassy library. My conclusion on the two leaves is entered on the enclosed form.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "A52",
+        "editorID": "EA_ResponseLeaf",
+        "title": "Response 1005: Conclusion Accepted",
+        "text": "Accepted. The first leaf is sentiment. The second is an invitation, added later and bound in by hand. Someone near Whiterun is gathering worshippers of the Ninth. The finding goes no further than this office, and you will visit no shrine on its account.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "A53",
+        "editorID": "EA_ResponsePromptLeaf",
+        "title": "Response 1005: Prompt and Correct",
+        "text": "You noticed the later type and the retied thread, and you filed early. That is careful work. Leave the shrine to others.\n\nElenwen"
+      },
+      "late": {
+        "id": "A54",
+        "editorID": "EA_ResponseLateLeaf",
+        "title": "Response 1005: Correct, but Late",
+        "text": "Your conclusion is correct, and late. Whoever is gathering at that shrine has had more nights to do it. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "A55",
+        "editorID": "EA_ExtensionRequestLeaf",
+        "title": "Filed Extension Request: Instruction 1005",
+        "text": "Instruction 1005\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "A56",
+        "editorID": "EA_ExtensionApprovedLeaf",
+        "title": "Extension Approved: Instruction 1005",
+        "text": "Instruction 1005: five further days, counted from the present deadline. The book is common. The delay should not be.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "A57",
+        "editorID": "EA_ExtensionDeniedLeaf",
+        "title": "Further Extension Refused: Instruction 1005",
+        "text": "Instruction 1005: no further time. Deliver the book and your conclusion. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1006,
+    "key": "Circulation",
+    "family": "recovery and denial",
+    "objective": "Deliver a copy of The Rising Threat, Vol. I",
+    "supply": {
+      "form": "0ED5F4",
+      "name": "The Rising Threat, Vol. I",
+      "count": 1,
+      "message": {
+        "id": "B06",
+        "editorID": "EA_MissingSupplyCirculation",
+        "text": "This delivery is short by %.0f copy of The Rising Threat, Vol. I. Other volumes do not count. Nothing has been taken."
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "A60",
+        "editorID": "EA_OrderCirculation",
+        "title": "Instruction 1006: A Title in Circulation",
+        "text": "Buy one copy of The Rising Threat, Vol. I, and deliver it through this box within ten days.\n\nThe title is not forbidden, and you will not treat it as forbidden. I wish to know whether copies are being restocked in Skyrim, and a recently bound copy will tell me. Buy at the asking price. A customer who haggles is remembered.\n\nIf the seller offers to obtain further volumes, decline politely.\n\nElenwen"
+      },
+      "report": {
+        "id": "A61",
+        "editorID": "EA_ReportCirculation",
+        "title": "Filed Delivery 1006: The Rising Threat",
+        "text": "Instruction 1006\n\nOne copy of The Rising Threat, Vol. I, bought at the asking price, is consigned with this report.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "A62",
+        "editorID": "EA_ResponseCirculation",
+        "title": "Response 1006: Volume Received",
+        "text": "The volume is received. The binding is new, so someone is restocking. That is the answer I wanted. Nothing further is required of you in this matter.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "A63",
+        "editorID": "EA_ResponsePromptCirculation",
+        "title": "Response 1006: Prompt Delivery",
+        "text": "Received promptly. The binding is new, so someone is restocking. You bought it without being remembered, which is what I asked.\n\nElenwen"
+      },
+      "late": {
+        "id": "A64",
+        "editorID": "EA_ResponseLateCirculation",
+        "title": "Response 1006: Delay Noted",
+        "text": "The volume arrived late. Whether the shelf was restocked before or after your purchase, I can no longer say. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "A65",
+        "editorID": "EA_ExtensionRequestCirculation",
+        "title": "Filed Extension Request: Instruction 1006",
+        "text": "Instruction 1006\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "A66",
+        "editorID": "EA_ExtensionApprovedCirculation",
+        "title": "Extension Approved: Instruction 1006",
+        "text": "Instruction 1006: five further days, counted from the present deadline. Do not ask a bookseller to hold a copy for you.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "A67",
+        "editorID": "EA_ExtensionDeniedCirculation",
+        "title": "Further Extension Refused: Instruction 1006",
+        "text": "Instruction 1006: no further time. Buy the volume and deliver it. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1007,
+    "key": "Grapes",
+    "family": "personal favor",
+    "objective": "Deliver six jazbay grapes",
+    "supply": {
+      "form": "06AC4A",
+      "name": "jazbay grapes",
+      "count": 6,
+      "message": {
+        "id": "B07",
+        "editorID": "EA_MissingSupplyGrapes",
+        "text": "This delivery is short by %.0f jazbay grapes. Other fruit does not count. Nothing has been taken."
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "A70",
+        "editorID": "EA_OrderGrapes",
+        "title": "Instruction 1007: For the Table",
+        "text": "Obtain six jazbay grapes and deliver them through this box within ten days.\n\nA Dunmer merchant of Windhelm will be seated beside me at dinner. I prefer that he find something from his own country on the table and wonder how I knew to put it there. The Embassy kitchen does not buy from the Gray Quarter, and should not be seen to begin.\n\nThis is a personal request. There is no fee, and the purchase is not an operational expense.\n\nElenwen"
+      },
+      "report": {
+        "id": "A71",
+        "editorID": "EA_ReportGrapes",
+        "title": "Filed Delivery 1007: Jazbay Grapes",
+        "text": "Instruction 1007\n\nSix jazbay grapes are consigned with this report.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "A72",
+        "editorID": "EA_ResponseGrapes",
+        "title": "Response 1007: Received",
+        "text": "The grapes are received and will be on the table. He will notice them.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "A73",
+        "editorID": "EA_ResponsePromptGrapes",
+        "title": "Response 1007: Received Early",
+        "text": "Received early and in good condition. Thank you.\n\nElenwen"
+      },
+      "late": {
+        "id": "A74",
+        "editorID": "EA_ResponseLateGrapes",
+        "title": "Response 1007: After the Dinner",
+        "text": "The grapes arrived after the dinner. He was served Cyrodilic pears and said nothing, which was a remark of its own. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "A75",
+        "editorID": "EA_ExtensionRequestGrapes",
+        "title": "Filed Extension Request: Instruction 1007",
+        "text": "Instruction 1007\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "A76",
+        "editorID": "EA_ExtensionApprovedGrapes",
+        "title": "Extension Approved: Instruction 1007",
+        "text": "Instruction 1007: five further days, counted from the present deadline. The dinner has been moved for reasons that do not concern you.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "A77",
+        "editorID": "EA_ExtensionDeniedGrapes",
+        "title": "Further Extension Refused: Instruction 1007",
+        "text": "Instruction 1007: no further time. They are grapes. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1008,
+    "key": "Meadery",
+    "family": "commercial intelligence",
+    "objective": "Buy Honningbrew Mead, read the case papers, and file a conclusion",
+    "supply": {
+      "form": "0508CA",
+      "name": "Honningbrew Mead",
+      "count": 2,
+      "message": {
+        "id": "B08",
+        "editorID": "EA_MissingSupplyMeadery",
+        "text": "This report must be filed with %.0f more bottles of Honningbrew Mead. Other meads do not count. Nothing has been taken."
+      }
+    },
+    "case": {
+      "sound": 1,
+      "file": {
+        "id": "A88",
+        "editorID": "EA_CaseFileMeadery",
+        "title": "Case Papers 1008: Copies from Whiterun",
+        "text": "Copied for the officer assigned to instruction 1008.\n\nI. Whiterun, Honningbrew Meadery accounts, last quarter\nSales up by a third. Barley bought from the usual farms at the usual price.\n\nII. The same accounts, repayments\nFour payments of two hundred septims to \"a creditor in Riften,\" each on the first day of the month. No loan is recorded as received.\n\nIII. Riften, a moneylender's ledger, as copied by our informant\nNo account in the meadery's name.\n\nClerk's note: the Riften payments began the month after a partner in the meadery sold his share. The buyer is not named."
+      },
+      "menu": {
+        "id": "B28",
+        "editorID": "EA_ConclusionMenuMeadery",
+        "text": "Instruction 1008. Select the conclusion your report will support. It will be judged against the case papers.",
+        "buttons": [
+          "It prospers independently",
+          "A Riften buyer holds a hidden share",
+          "It launders skooma money",
+          "Cancel"
+        ]
+      },
+      "misjudged": {
+        "id": "A89",
+        "editorID": "EA_ResponseMisjudgedMeadery",
+        "title": "Response 1008: Conclusion Rejected",
+        "text": "Your conclusion does not account for the payments. A meadery that repays money it never borrowed has an owner it does not name. Nothing in the papers suggests skooma, and nothing in them suggests independence. This error is on your record.\n\nElenwen"
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "A80",
+        "editorID": "EA_OrderMeadery",
+        "title": "Instruction 1008: The Whiterun Meadery",
+        "text": "Buy two bottles of Honningbrew Mead and read the enclosed papers. Within ten days, deliver the bottles and file your conclusion through this box.\n\nHonningbrew is the meadery that competes with Black-Briar. I wish to know whether it still competes freely. The papers are copies. The bottles are your reason for being seen to take an interest.\n\nDo not suggest to anyone at the meadery that it has a rival worth fearing.\n\nElenwen"
+      },
+      "report": {
+        "id": "A81",
+        "editorID": "EA_ReportMeadery",
+        "title": "Filed Report 1008: The Whiterun Meadery",
+        "text": "Instruction 1008\n\nTwo bottles of Honningbrew Mead are consigned with this report. My conclusion on the meadery's accounts is entered on the enclosed form.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "A82",
+        "editorID": "EA_ResponseMeadery",
+        "title": "Response 1008: Conclusion Accepted",
+        "text": "Accepted. Someone in Riften bought the partner's share and is paid as a creditor so that nobody will call it ownership. The buyer need not be named. Honningbrew no longer competes freely, whatever its sales say.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "A83",
+        "editorID": "EA_ResponsePromptMeadery",
+        "title": "Response 1008: Prompt and Correct",
+        "text": "Correct, and early. You did not let the sales figures distract you from the payments. Good.\n\nElenwen"
+      },
+      "late": {
+        "id": "A84",
+        "editorID": "EA_ResponseLateMeadery",
+        "title": "Response 1008: Correct, but Late",
+        "text": "Your conclusion is correct. It reached me after I had drawn it from other sources, which makes it confirmation rather than intelligence. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "A85",
+        "editorID": "EA_ExtensionRequestMeadery",
+        "title": "Filed Extension Request: Instruction 1008",
+        "text": "Instruction 1008\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "A86",
+        "editorID": "EA_ExtensionApprovedMeadery",
+        "title": "Extension Approved: Instruction 1008",
+        "text": "Instruction 1008: five further days, counted from the present deadline. The meadery sells to anyone. Buy the bottles.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "A87",
+        "editorID": "EA_ExtensionDeniedMeadery",
+        "title": "Further Extension Refused: Instruction 1008",
+        "text": "Instruction 1008: no further time. File your conclusion with the bottles. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1009,
+    "key": "MoonSugar",
+    "family": "commercial intelligence",
+    "objective": "Buy moon sugar, read the case papers, and file a conclusion",
+    "supply": {
+      "form": "0D8E3F",
+      "name": "moon sugar",
+      "count": 1,
+      "message": {
+        "id": "B09",
+        "editorID": "EA_MissingSupplyMoonSugar",
+        "text": "This report must be filed with %.0f measure of moon sugar. Skooma does not count. Nothing has been taken."
+      }
+    },
+    "case": {
+      "sound": 1,
+      "file": {
+        "id": "A98",
+        "editorID": "EA_CaseFileMoonSugar",
+        "title": "Case Papers 1009: Copies from Windhelm",
+        "text": "Copied for the officer assigned to instruction 1009.\n\nI. Windhelm, stable guard's seizure record\nThree crates of moon sugar seized from a caravan cart. \"Held for the quartermaster.\"\n\nII. Windhelm, quartermaster's issue book, the following week\nThree crates \"released for disposal,\" signed for by a trader of the Gray Quarter. No fee is entered.\n\nIII. Caravan tally, as copied by our informant\nTrade at Windhelm down by half since the seizure.\n\nClerk's note: the price in the Gray Quarter fell the week of the release."
+      },
+      "menu": {
+        "id": "B29",
+        "editorID": "EA_ConclusionMenuMoonSugar",
+        "text": "Instruction 1009. Select the conclusion your report will support. It will be judged against the case papers.",
+        "buttons": [
+          "The caravans are bringing more",
+          "Seized crates are being resold",
+          "A skooma den has opened nearby",
+          "Cancel"
+        ]
+      },
+      "misjudged": {
+        "id": "A99",
+        "editorID": "EA_ResponseMisjudgedMoonSugar",
+        "title": "Response 1009: Conclusion Rejected",
+        "text": "Your conclusion ignores the seizure. Three crates were taken, three were released without a fee, and the price fell the same week. The caravans are trading less, not more. This error is on your record.\n\nElenwen"
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "A90",
+        "editorID": "EA_OrderMoonSugar",
+        "title": "Instruction 1009: Cheap Moon Sugar",
+        "text": "Buy one measure of moon sugar from a caravan and read the enclosed papers. Within ten days, deliver the sample and file your conclusion through this box.\n\nMoon sugar has become cheap in Windhelm. The caravans are not admitted to the city and have not grown larger. I wish to know where the surplus comes from.\n\nBuying moon sugar is lawful. Using it is your own affair, and an unwise one. Do not sell any.\n\nElenwen"
+      },
+      "report": {
+        "id": "A91",
+        "editorID": "EA_ReportMoonSugar",
+        "title": "Filed Report 1009: Cheap Moon Sugar",
+        "text": "Instruction 1009\n\nOne measure of moon sugar, bought from a caravan, is consigned as a sample with this report. My conclusion on the surplus is entered on the enclosed form.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "A92",
+        "editorID": "EA_ResponseMoonSugar",
+        "title": "Response 1009: Conclusion Accepted",
+        "text": "Accepted. Windhelm's quartermaster sells what Windhelm's guards seize, and the caravans pay for the same crates twice. This finding is to be kept, not used. Not yet.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "A93",
+        "editorID": "EA_ResponsePromptMoonSugar",
+        "title": "Response 1009: Prompt and Correct",
+        "text": "Correct, and early. You followed the crates rather than the rumors. Keep the finding to yourself.\n\nElenwen"
+      },
+      "late": {
+        "id": "A94",
+        "editorID": "EA_ResponseLateMoonSugar",
+        "title": "Response 1009: Correct, but Late",
+        "text": "Your conclusion is correct, and late. The quartermaster has since been moved, and the record may move with him. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "A95",
+        "editorID": "EA_ExtensionRequestMoonSugar",
+        "title": "Filed Extension Request: Instruction 1009",
+        "text": "Instruction 1009\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "A96",
+        "editorID": "EA_ExtensionApprovedMoonSugar",
+        "title": "Extension Approved: Instruction 1009",
+        "text": "Instruction 1009: five further days, counted from the present deadline. The caravans move. Find one.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "A97",
+        "editorID": "EA_ExtensionDeniedMoonSugar",
+        "title": "Further Extension Refused: Instruction 1009",
+        "text": "Instruction 1009: no further time. File your conclusion with the sample. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1010,
+    "key": "Paper",
+    "family": "administrative",
+    "objective": "Deliver a roll of paper bought in Skyrim",
+    "supply": {
+      "form": "033761",
+      "name": "roll of paper",
+      "count": 1,
+      "message": {
+        "id": "B0A",
+        "editorID": "EA_MissingSupplyPaper",
+        "text": "This delivery is short by %.0f roll of paper. Nothing has been taken."
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "AA0",
+        "editorID": "EA_OrderPaper",
+        "title": "Instruction 1010: Paper",
+        "text": "Buy one roll of paper from a seller in Skyrim and deliver it through this box within ten days.\n\nYour reports have been written on paper that did not come from this province. Paper can be traced. From now on, write on what you buy here, and let Accounts hold a sample so that your reports can be told from forgeries.\n\nIt is a small matter. Small matters are how people in your position are identified.\n\nElenwen"
+      },
+      "report": {
+        "id": "AA1",
+        "editorID": "EA_ReportPaper",
+        "title": "Filed Delivery 1010: Paper",
+        "text": "Instruction 1010\n\nOne roll of paper, bought locally, is consigned as a sample with this report. My reports will be written on the same stock.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "AA2",
+        "editorID": "EA_ResponsePaper",
+        "title": "Response 1010: Sample Received",
+        "text": "The sample is received and held. Reports on any other paper will be treated as doubtful.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "AA3",
+        "editorID": "EA_ResponsePromptPaper",
+        "title": "Response 1010: Prompt Delivery",
+        "text": "Received promptly, and without argument that the matter was beneath you. Reports on any other paper will be treated as doubtful.\n\nElenwen"
+      },
+      "late": {
+        "id": "AA4",
+        "editorID": "EA_ResponseLatePaper",
+        "title": "Response 1010: Delay Noted",
+        "text": "The paper arrived late. Two of your reports were written on the old stock in the meantime. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "AA5",
+        "editorID": "EA_ExtensionRequestPaper",
+        "title": "Filed Extension Request: Instruction 1010",
+        "text": "Instruction 1010\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "AA6",
+        "editorID": "EA_ExtensionApprovedPaper",
+        "title": "Extension Approved: Instruction 1010",
+        "text": "Instruction 1010: five further days, counted from the present deadline. I did not expect paper to be scarce.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "AA7",
+        "editorID": "EA_ExtensionDeniedPaper",
+        "title": "Further Extension Refused: Instruction 1010",
+        "text": "Instruction 1010: no further time. Buy the paper. A late report is still required.\n\nElenwen"
+      }
+    }
+  },
+  {
+    "assignment": 1011,
+    "key": "Register",
+    "family": "archival intelligence",
+    "objective": "Read the lending register and file a conclusion",
+    "case": {
+      "sound": 1,
+      "file": {
+        "id": "AB8",
+        "editorID": "EA_CaseFileRegister",
+        "title": "Case Papers 1011: A Lending Register",
+        "text": "Copied for the officer assigned to instruction 1011.\n\nBards College library, lending register, reader \"S. A.\"\n\nFirst week: a history of Solitude's harbor.\nSecond week: a survey of the old roads west of the city.\nThird week: a treatise on building fortifications in mountain country.\nFourth week: the same survey of roads, again.\nFifth week: the court circular's list of guests at public receptions in Solitude.\n\nClerk's note: every book was returned on time and in good condition. The register gives no address."
+      },
+      "menu": {
+        "id": "B2B",
+        "editorID": "EA_ConclusionMenuRegister",
+        "text": "Instruction 1011. Select the conclusion your report will support. It will be judged against the case papers.",
+        "buttons": [
+          "An ordinary student's reading",
+          "Someone studying the Embassy",
+          "A clerk padding the register",
+          "Cancel"
+        ]
+      },
+      "misjudged": {
+        "id": "AB9",
+        "editorID": "EA_ResponseMisjudgedRegister",
+        "title": "Response 1011: Conclusion Rejected",
+        "text": "Your conclusion misses the pattern. Roads west of the city, mountain walls, and a list of reception guests describe one building. Read the register again. This error is on your record.\n\nElenwen"
+      }
+    },
+    "documents": {
+      "order": {
+        "id": "AB0",
+        "editorID": "EA_OrderRegister",
+        "title": "Instruction 1011: A Borrower's Interest",
+        "text": "Read the enclosed copy of a lending register and file your conclusion through this box within ten days.\n\nThe Bards College lends from its library to known readers. One reader's choices have been brought to my attention. Tell me whether they mean anything.\n\nYou will not visit the College on this matter, and you will not ask after the reader.\n\nElenwen"
+      },
+      "report": {
+        "id": "AB1",
+        "editorID": "EA_ReportRegister",
+        "title": "Filed Report 1011: A Borrower's Interest",
+        "text": "Instruction 1011\n\nMy conclusion on the lending register is entered on the enclosed form. I have not visited the College or asked after the reader.\n\nFiled by secure dispatch."
+      },
+      "response": {
+        "id": "AB2",
+        "editorID": "EA_ResponseRegister",
+        "title": "Response 1011: Conclusion Accepted",
+        "text": "Accepted. Roads, walls, and a guest list. Someone is learning how to arrive at the Embassy uninvited. Security will be reviewed. You will not pursue this reader.\n\nElenwen"
+      },
+      "prompt": {
+        "id": "AB3",
+        "editorID": "EA_ResponsePromptRegister",
+        "title": "Response 1011: Prompt and Correct",
+        "text": "You saw the pattern before it was pointed out, and you filed early. Security will be reviewed. You will not pursue this reader.\n\nElenwen"
+      },
+      "late": {
+        "id": "AB4",
+        "editorID": "EA_ResponseLateRegister",
+        "title": "Response 1011: Correct, but Late",
+        "text": "Your conclusion is correct. A reception has been held since this register was copied. The delay is on your record.\n\nElenwen"
+      },
+      "extensionRequest": {
+        "id": "AB5",
+        "editorID": "EA_ExtensionRequestRegister",
+        "title": "Filed Extension Request: Instruction 1011",
+        "text": "Instruction 1011\n\nI request five further days for this instruction. Any time granted runs from the present deadline.\n\nFiled by secure dispatch."
+      },
+      "extensionApproved": {
+        "id": "AB6",
+        "editorID": "EA_ExtensionApprovedRegister",
+        "title": "Extension Approved: Instruction 1011",
+        "text": "Instruction 1011: five further days, counted from the present deadline. It is one page.\n\nElenwen"
+      },
+      "extensionDenied": {
+        "id": "AB7",
+        "editorID": "EA_ExtensionDeniedRegister",
+        "title": "Further Extension Refused: Instruction 1011",
+        "text": "Instruction 1011: no further time. File your conclusion. A late report is still required.\n\nElenwen"
+      }
+    }
+  }
+]

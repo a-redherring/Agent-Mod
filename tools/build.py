@@ -117,7 +117,7 @@ def main():
     files += [(p, "Scripts/" + p.name) for p in sorted(compiled.glob("EA_*.pex"))]
     files += [(p, "Source/Scripts/" + p.name) for p in sorted((ROOT / "Data/Source/Scripts").glob("EA_*.psc"))]
     files += [(ROOT / "README.md", "README.md")]
-    files += [(ROOT / "Elenwen_Agent_Mod_Build_Specification.md", "Elenwen_Agent_Mod_Build_Specification.md")]
+    files += [(ROOT / name, name) for name in ("Elenwen_Agent_Mod_Build_Specification.md", "Elenwen_Agent_Mod_Build_Specification_Continuation_01.md")]
     files += [(p, "docs/" + p.name) for p in sorted((ROOT / "docs").glob("*.md"))]
     files += [(ROOT / "build/record-map.json", "docs/record-map.json")]
     manifest = {
@@ -127,7 +127,7 @@ def main():
         "compiler_sha256": compiler_hash,
         "api_source": "Creation Kit sources supplied by builder" if args.papyrus_import else "project-authored compile-only API declarations",
         "plugins": [name + ".esp" for name in MODULES],
-        "build_inputs_sha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in [ROOT / "content/build-config.json", ROOT / "content/documents.json", ROOT / "content/record-ids.json", ROOT / "tools/PluginBuilder/Program.cs", ROOT / "tools/PluginBuilder/packages.lock.json"]},
+        "build_inputs_sha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in [ROOT / "content/build-config.json", ROOT / "content/documents.json", ROOT / "content/packets.json", ROOT / "content/record-ids.json", ROOT / "content/retired-records.json", ROOT / "tools/PluginBuilder/Program.cs", ROOT / "tools/PluginBuilder/packages.lock.json"]},
         "sha256": {name: hashlib.sha256(path.read_bytes()).hexdigest() for path, name in files},
     }
     dist = ROOT / "dist"

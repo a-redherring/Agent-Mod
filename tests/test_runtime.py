@@ -17,7 +17,7 @@ class RuntimeTests(unittest.TestCase):
 
     def deliver_wine(self):
         self.vm.player.items["Wine"] = 3
-        self.assertTrue(self.service.call("FileReport", 1))
+        self.assertTrue(self.service.call("FileReport", 1, -1))
 
     def advance(self):
         self.assertTrue(self.service.call("RequestSupplyAuthority"))
@@ -66,21 +66,21 @@ class RuntimeTests(unittest.TestCase):
         self.assertFalse(self.dispatch.call("DebugRecoverPending", tx))
 
     def test_report_requires_real_fact(self):
-        self.assertFalse(self.service.call("FileReport", 0))
+        self.assertFalse(self.service.call("FileReport", 0, -1))
         papers = self.vm.instance("EA_FieldPapers").prop("Core", self.core)
         papers.call("OnRead")
-        self.assertTrue(self.service.call("FileReport", 0))
+        self.assertTrue(self.service.call("FileReport", 0, -1))
         self.assertEqual(self.core.call("GetAssignmentState", 1001), 3)
         self.assertEqual(self.dispatch.call("CollectResponses"), 0)
         self.assertEqual(self.arrive(), 1)
         self.assertEqual(self.core.call("GetAssignmentState", 1001), 4)
 
     def test_supply_delivery_is_consumed_only_once(self):
-        self.assertFalse(self.service.call("FileReport", 1))
+        self.assertFalse(self.service.call("FileReport", 1, -1))
         self.deliver_wine()
         self.assertEqual(self.vm.player.items["Wine"], 0)
         self.assertEqual(self.dispatch.vars["::archive_var"].items["Wine"], 0)
-        self.assertFalse(self.service.call("FileReport", 1))
+        self.assertFalse(self.service.call("FileReport", 1, -1))
         self.arrive()
         self.assertEqual(self.dispatch.call("CollectResponses"), 0)
         self.assertEqual(self.vm.player.items["PromptResponses1"], 1)
@@ -94,7 +94,7 @@ class RuntimeTests(unittest.TestCase):
         self.core.call("RefreshDeadlines", 100.0)
         self.assertEqual(self.core.vars["professionaltrust"], trust)
         self.core.call("RecordFact", 1001, 1)
-        self.assertTrue(self.service.call("FileReport", 0))
+        self.assertTrue(self.service.call("FileReport", 0, -1))
 
     def test_suspension_preserves_travel_time(self):
         self.core.call("SuspendDeadlines")
@@ -146,7 +146,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertTrue(self.core.call("RegisterAssignment", 2001, 1, 20.0))
         self.assertFalse(self.core.call("RegisterAssignment", 2002, 1, 20.0))
         self.assertFalse(self.core.call("HasFact", -1))
-        self.assertFalse(self.service.call("FileReport", 3))
+        self.assertFalse(self.service.call("FileReport", 3, -1))
         self.assertFalse(self.service.call("RequestExtension", -1))
 
     def test_dispatch_rejects_replay_instant_and_full_queue(self):
@@ -156,7 +156,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertFalse(self.dispatch.call("Queue", *args, 1.0))
         self.dispatch.vars["count"] = 128
         self.assertFalse(self.dispatch.call("Queue", 501, 1001, 1, "out", "in", self.service, 1.0))
-        self.assertFalse(self.service.call("FileReport", 0))
+        self.assertFalse(self.service.call("FileReport", 0, -1))
 
     def test_advance_requires_authority_and_cannot_repeat(self):
         self.assertFalse(self.accounts.call("IssueAdvance"))

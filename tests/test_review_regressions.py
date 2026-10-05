@@ -13,7 +13,7 @@ class ReviewRegressions(unittest.TestCase):
 
     def deliver(self):
         self.vm.player.items["Wine"] = 3
-        self.assertTrue(self.service.call("FileReport", 1))
+        self.assertTrue(self.service.call("FileReport", 1, -1))
 
     def advance(self):
         self.service.call("RequestSupplyAuthority")
@@ -152,7 +152,7 @@ class ReviewRegressions(unittest.TestCase):
         papers = self.vm.instance("EA_FieldPapers").prop("Core", self.core)
         papers.call("OnRead")
         self.service.call("CollectOrders")
-        self.assertTrue(self.service.call("FileReport", 0))
+        self.assertTrue(self.service.call("FileReport", 0, -1))
 
     def test_failed_framework_start_does_not_pay_or_leave_controller_busy(self):
         p = self.controller()
@@ -166,7 +166,7 @@ class ReviewRegressions(unittest.TestCase):
         self.assertEqual(self.vm.player.items["Gold"], 100)
 
     def test_cancel_is_a_silent_no_op(self):
-        for main, submenu, cancel in ((1, "AssignmentMenu", 6), (2, "AssignmentMenu", 6)):
+        for main, submenu, cancel in ((1, "AssignmentMenu", 3), (2, "AssignmentMenu", 3)):
             with self.subTest(main=main):
                 p = self.controller()
                 p.vars["::mainmenu_var"].choices.append(main)
@@ -215,8 +215,8 @@ class ReviewRegressions(unittest.TestCase):
         self.core.call("CompleteAssignment", 1002)
         self.core.prop("DebugEnabled", True)
         self.assertTrue(self.dispatch.call("DebugRecoverPending", tx))
-        self.assertTrue(self.service.objectives[("setobjectivecompleted", 11)])
-        self.assertTrue(self.service.objectives[("setobjectivecompleted", 21)])
+        self.assertTrue(self.service.objectives[("setobjectivecompleted", 101)])
+        self.assertTrue(self.service.objectives[("setobjectivecompleted", 201)])
 
     def test_audit_still_defers_during_real_return_transit(self):
         self.advance()
