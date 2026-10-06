@@ -1,239 +1,452 @@
 Scriptname EA_Service extends EA_Module
+; The campaign. Phases of authored instructions and letters, each gated by conditions read from
+; vanilla state; nothing vanilla is ever changed. Instruction i is Core assignment 2001 + i.
+; Letter j is dispatch subject 2900 + j; the wander letter is subject 2899.
+; Phases: 1 Riverwood residence, 2 released (Markarth), 3 interval, 4 College.
 
 EA_Core Property Core Auto
 EA_Dispatch Property Dispatch Auto
 Book[] Property Orders Auto
 Book[] Property Reports Auto
-Book[] Property Responses Auto
-Book[] Property PromptResponses Auto
-Book[] Property LateResponses Auto
-Book Property EvaluationRequest Auto
-Book[] Property Evaluations Auto
+Book[] Property Replies Auto
+; The reply used when AltCond holds at filing; None where an instruction has one reply.
+Book[] Property AltReplies Auto
+Int[] Property Phases Auto
+Int[] Property CondStart Auto
+Int[] Property CondCount Auto
+; -1, or a condition that must hold before the order is issued at all (an optional plugin).
+Int[] Property RequireCond Auto
+Int[] Property AltCond Auto
+Int[] Property Weights Auto
+Int[] Property AltWeights Auto
+Int[] Property AltTrust Auto
+Message[] Property NotYetMessages Auto
+Book[] Property Letters Auto
+Int[] Property LetterPhases Auto
+Int[] Property LetterCondStart Auto
+Int[] Property LetterCondCount Auto
+; 0 none, 1 next phase, 2 next phase and advance authority, 3 removal authority.
+Int[] Property LetterActions Auto
+Int[] Property EnclosureStart Auto
+Int[] Property EnclosureCount Auto
+Form[] Property Enclosures Auto
+Book Property WanderLetter Auto
+Int[] Property CondKinds Auto
+Form[] Property CondForms Auto
+Form[] Property CondOtherForms Auto
+Int[] Property CondValues Auto
+; A form in a plugin that may be absent is named by file and local ID instead of CondForms.
+String[] Property CondPlugins Auto
+Int[] Property CondFormIDs Auto
+Location Property Inn Auto
+Location[] Property Bounds Auto
+Int Property AdvanceOperation Auto
+Int Property RemovalOperation Auto
 Message[] Property FailureMessages Auto
-Message[] Property MissingMessages Auto
-Message[] Property StatusMessages Auto
 Message Property SummaryMessage Auto
-Message Property PacketReadyMessage Auto
-Message Property EvaluationQueuedMessage Auto
-Book[] Property ExtensionRequests Auto
-Book[] Property ApprovedExtensions Auto
-Book[] Property DeniedExtensions Auto
-Book Property AuthorityRequest Auto
-Book Property AuthorityApproved Auto
-Form Property Wine Auto
-Form Property Flowers Auto
-Form Property Firewood Auto
-Form Property LeatherStrips Auto
-Form Property Wheat Auto
-Int lastError = 7
-Int missingSelection = 0
-Int missingCount = 0
-Int evaluationTransaction = 0
-Bool evaluationDelivered = False
-Bool packetNotified = False
+; Condition kinds: 1 nights at the inn, 2 days of residence (plus delay), 3 visited a place,
+; 4 deliver an item or one of a list, 5 hold it, 6 quest stage done, 7 quest begun, 8 quest not begun,
+; 9 player in faction, 10 actor in faction, 11 actor holds item, 12 actor dead, 13 actor alive,
+; 14 global at least, 15 earned own money, 16 level, 17 best magic school, 18 days in phase,
+; 19 phase weight, 20 form present, 21 quest completed, 22 quest stage at least.
+Int phase = 0
+Float phaseStart = 0.0
+Int phaseWeight = 0
+Float residenceStart = 0.0
+Int nights = 0
+Float delayDays = 0.0
+Bool away = False
+Float lastWanderLetter = -100.0
+Int baseMostGold = 0
+Int lastError = 2
+Int notYet = 0
+Bool[] issued
 Int[] reportTransactions
-Int[] extensionTransactions
-Bool[] extensionUsed
-Bool[] extensionDenied
-Int authorityTransaction = 0
+Bool[] alternative
+Bool[] letterSent
+Int[] letterTransactions
+Bool[] letterDone
+Bool[] visited
 Bool initialized = False
 
 Function Initialize()
     If initialized
         Return
     EndIf
-    reportTransactions = new Int[6]
-    extensionTransactions = new Int[6]
-    extensionUsed = new Bool[6]
-    extensionDenied = new Bool[6]
+    issued = new Bool[32]
+    reportTransactions = new Int[32]
+    alternative = new Bool[32]
+    letterSent = new Bool[64]
+    letterTransactions = new Int[64]
+    letterDone = new Bool[64]
+    visited = new Bool[128]
     initialized = True
 EndFunction
 
-Function CollectOrders()
+Function BeginCampaign()
+    ; Called once the service is commissioned. Earnings are measured from here.
     Initialize()
-    If !Core.IsInService() || Dispatch.Archive == None
+    If phase != 0 || !Core.IsInService()
         Return
     EndIf
-    Int limit = 3
-    If FirstPacketComplete()
-        limit = 6
+    baseMostGold = Game.QueryStat("Most Gold Carried")
+    phase = 1
+    phaseStart = Utility.GetCurrentGameTime()
+    Evaluate()
+EndFunction
+
+Int Function GetPhase()
+    Return phase
+EndFunction
+
+; Conditions
+
+Form Function ResolveForm(Int c)
+    Form result = CondForms[c]
+    If result == None && CondPlugins[c] != ""
+        result = Game.GetFormFromFile(CondFormIDs[c], CondPlugins[c])
+    EndIf
+    Return result
+EndFunction
+
+Bool Function Begun(Quest q)
+    Return q != None && (q.IsRunning() || q.IsCompleted() || q.GetStage() > 0)
+EndFunction
+
+Bool Function InPlace(Location place, Location target)
+    Return place != None && target != None && (place == target || place.IsChild(target))
+EndFunction
+
+Int Function CountHeld(ObjectReference holder, Form item)
+    ; An item, or any member of a form list.
+    FormList choices = item as FormList
+    If choices == None
+        Return holder.GetItemCount(item)
+    EndIf
+    Int total = 0
+    Int i = 0
+    While i < choices.GetSize()
+        total += holder.GetItemCount(choices.GetAt(i))
+        i += 1
+    EndWhile
+    Return total
+EndFunction
+
+Int Function BestMagic()
+    Actor player = Game.GetPlayer()
+    Float best = player.GetBaseActorValue("Alteration")
+    If player.GetBaseActorValue("Conjuration") > best
+        best = player.GetBaseActorValue("Conjuration")
+    EndIf
+    If player.GetBaseActorValue("Destruction") > best
+        best = player.GetBaseActorValue("Destruction")
+    EndIf
+    If player.GetBaseActorValue("Illusion") > best
+        best = player.GetBaseActorValue("Illusion")
+    EndIf
+    If player.GetBaseActorValue("Restoration") > best
+        best = player.GetBaseActorValue("Restoration")
+    EndIf
+    Return best as Int
+EndFunction
+
+Bool Function Check(Int c)
+    Int kind = CondKinds[c]
+    Int value = CondValues[c]
+    Float nowDay = Utility.GetCurrentGameTime()
+    If kind == 1
+        Return nights >= value
+    ElseIf kind == 2
+        Return residenceStart > 0.0 && nowDay - residenceStart >= value + delayDays
+    ElseIf kind == 3
+        Return visited[c]
+    ElseIf kind == 15
+        Return Game.QueryStat("Most Gold Carried") > baseMostGold
+    ElseIf kind == 16
+        Return Game.GetPlayer().GetLevel() >= value
+    ElseIf kind == 17
+        Return BestMagic() >= value
+    ElseIf kind == 18
+        Return nowDay - phaseStart >= value
+    ElseIf kind == 19
+        Return phaseWeight >= value
+    EndIf
+    Form subject = ResolveForm(c)
+    If subject == None
+        Return kind == 8
+    ElseIf kind == 4 || kind == 5
+        Return CountHeld(Game.GetPlayer(), subject) >= value
+    ElseIf kind == 6
+        Return (subject as Quest).GetStageDone(value)
+    ElseIf kind == 7
+        Return Begun(subject as Quest)
+    ElseIf kind == 8
+        Return !Begun(subject as Quest)
+    ElseIf kind == 9
+        Return Game.GetPlayer().IsInFaction(subject as Faction)
+    ElseIf kind == 10
+        Return (subject as Actor).IsInFaction(CondOtherForms[c] as Faction)
+    ElseIf kind == 11
+        Return CountHeld(subject as ObjectReference, CondOtherForms[c]) >= value
+    ElseIf kind == 12
+        Return (subject as Actor).IsDead()
+    ElseIf kind == 13
+        Return !(subject as Actor).IsDead()
+    ElseIf kind == 14
+        Return (subject as GlobalVariable).GetValue() >= value
+    ElseIf kind == 20
+        Return True
+    ElseIf kind == 21
+        Return (subject as Quest).IsCompleted()
+    ElseIf kind == 22
+        Return (subject as Quest).GetStage() >= value
+    EndIf
+    Return False
+EndFunction
+
+Bool Function CheckAll(Int first, Int total)
+    Int c = first
+    While c < first + total
+        If !Check(c)
+            Return False
+        EndIf
+        c += 1
+    EndWhile
+    Return True
+EndFunction
+
+; Events from the player alias
+
+Function OnWake()
+    ; Sleep events: nights count only at the inn, and only while the residence lasts.
+    Initialize()
+    If phase == 1 && InPlace(Game.GetPlayer().GetCurrentLocation(), Inn)
+        nights += 1
+        If residenceStart <= 0.0
+            residenceStart = Utility.GetCurrentGameTime()
+        EndIf
+    EndIf
+    Evaluate()
+EndFunction
+
+Function RecordVisit(Location place)
+    Initialize()
+    If phase <= 0 || place == None
+        Return
+    EndIf
+    Int c = 0
+    While c < CondKinds.Length
+        If CondKinds[c] == 3 && !visited[c] && InPlace(place, CondForms[c] as Location)
+            visited[c] = True
+        EndIf
+        c += 1
+    EndWhile
+    CheckBounds(place)
+    Evaluate()
+EndFunction
+
+Function CheckBounds(Location place)
+    ; During the residence he may not leave Whiterun or Falkreath. Each absence costs trust and time.
+    If phase != 1 || residenceStart <= 0.0
+        Return
+    EndIf
+    Bool inside = False
+    Int i = 0
+    While i < Bounds.Length && !inside
+        inside = InPlace(place, Bounds[i])
+        i += 1
+    EndWhile
+    If inside
+        away = False
+        Return
+    ElseIf away
+        Return
+    EndIf
+    away = True
+    delayDays += 3.0
+    Core.AdjustTrust(-1)
+    Float nowDay = Utility.GetCurrentGameTime()
+    If nowDay - lastWanderLetter >= 3.0 && Dispatch.Send(Core.NextTransactionID(), 2899, WanderLetter, Self)
+        lastWanderLetter = nowDay
+    EndIf
+EndFunction
+
+; Issuing
+
+Function Evaluate()
+    If phase <= 0
+        Return
     EndIf
     Int i = 0
-    While i < limit
-        Int assignmentID = 1001 + i
-        If Core.GetAssignmentState(assignmentID) == 0
-            If Dispatch.ReserveDocument(Orders[i]) >= 0 && Core.RegisterAssignment(assignmentID, 3, Utility.GetCurrentGameTime() + 10.0)
-                Dispatch.ArchiveDocument(Orders[i])
-                Game.GetPlayer().AddItem(Orders[i], 1, True)
-                SetObjectiveDisplayed(10 + i, True)
-                If i == 0 && Core.HasReadFieldPapers()
-                    Core.RecordFact(1001, 1)
-                EndIf
-            EndIf
-        Else
-            Dispatch.RecoverDocument(Orders[i])
+    While i < Orders.Length
+        If !issued[i] && Phases[i] == phase && (RequireCond[i] < 0 || Check(RequireCond[i]))
+            Issue(i)
         EndIf
         i += 1
     EndWhile
-    ; Routine investigation does not imply permission to disclose or kill.
-    Core.GrantAuthority(1001, 1, 1)
-EndFunction
-
-Bool Function FileReport(Int selection)
-    Initialize()
-    If selection < 0 || selection > 5
-        Return False
-    EndIf
-    lastError = 7
-    Int assignmentID = 1001 + selection
-    If Core.GetAssignmentState(assignmentID) == 0
-        Return Reject(0)
-    EndIf
-    Core.RefreshDeadlines(Utility.GetCurrentGameTime())
-    If !Core.IsOpen(assignmentID) || reportTransactions[selection] != 0
-        Return Reject(1)
-    EndIf
-    Form supplies = None
-    Int quantity = 0
-    If selection == 1
-        supplies = Wine
-        quantity = 3
-    ElseIf selection == 2
-        supplies = Flowers
-        quantity = 6
-    ElseIf selection == 3
-        supplies = Firewood
-        quantity = 6
-    ElseIf selection == 4
-        supplies = LeatherStrips
-        quantity = 4
-    ElseIf selection == 5
-        supplies = Wheat
-        quantity = 6
-    EndIf
-    If supplies != None
-        missingCount = quantity - Game.GetPlayer().GetItemCount(supplies)
-        If missingCount > 0
-            missingSelection = selection
-            Return Reject(8)
+    Int j = 0
+    While j < Letters.Length
+        If !letterSent[j] && LetterPhases[j] == phase && CheckAll(LetterCondStart[j], LetterCondCount[j])
+            Int transactionID = Core.NextTransactionID()
+            If Dispatch.Send(transactionID, 2900 + j, Letters[j], Self)
+                letterSent[j] = True
+                letterTransactions[j] = transactionID
+            EndIf
         EndIf
-    ElseIf !Core.HasFact(assignmentID)
-        Return Reject(2)
-    EndIf
-    Book response = Responses[selection]
-    If Core.HasMissedDeadline(assignmentID)
-        response = LateResponses[selection]
-    ElseIf !extensionUsed[selection] && Core.GetDaysRemaining(assignmentID) >= 5.0
-        response = PromptResponses[selection]
-    EndIf
-    Int transactionID = Core.NextTransactionID()
-    If !Dispatch.Queue(transactionID, assignmentID, 1, Reports[selection], response, Self)
-        Return False
-    EndIf
-    reportTransactions[selection] = transactionID
-    If supplies != None
-        ; Consign supplies to delivery; the accessible archive stores only papers.
-        Game.GetPlayer().RemoveItem(supplies, quantity, True)
-        Core.RecordFact(assignmentID, 1)
-    EndIf
-    Core.FileAssignment(assignmentID)
-    SetObjectiveDisplayed(10 + selection, False)
-    SetObjectiveDisplayed(20 + selection, True)
-    Return True
+        j += 1
+    EndWhile
 EndFunction
 
-Bool Function RequestExtension(Int selection)
+Function Issue(Int i)
+    If Dispatch.ReserveDocument(Orders[i]) < 0 || !Core.RegisterAssignment(2001 + i, 4, 0.0)
+        Return
+    EndIf
+    issued[i] = True
+    Dispatch.ArchiveDocument(Orders[i])
+    Game.GetPlayer().AddItem(Orders[i], 1, True)
+    SetObjectiveDisplayed(100 + i, True)
+EndFunction
+
+Function AdvancePhase()
+    phase += 1
+    phaseStart = Utility.GetCurrentGameTime()
+    phaseWeight = 0
+    Evaluate()
+EndFunction
+
+; Reports
+
+Bool Function IsInstruction(Int i)
+    Return i >= 0 && i < Orders.Length
+EndFunction
+
+Bool Function FileReport(Int i)
     Initialize()
-    lastError = 7
-    If selection < 0 || selection > 5
+    lastError = 2
+    If !IsInstruction(i)
         Return False
-    EndIf
-    Int assignmentID = 1001 + selection
-    If Core.GetAssignmentState(assignmentID) == 0
+    ElseIf !issued[i]
         Return Reject(0)
-    ElseIf !Core.IsOpen(assignmentID)
+    ElseIf !Core.IsOpen(2001 + i) || reportTransactions[i] != 0
         Return Reject(1)
-    ElseIf extensionTransactions[selection] != 0
+    ElseIf !CheckAll(CondStart[i], CondCount[i])
+        notYet = i
         Return Reject(3)
-    ElseIf extensionDenied[selection]
-        Return Reject(4)
     EndIf
-    Int outcome = 2
-    Book reply = ApprovedExtensions[selection]
-    If extensionUsed[selection]
-        outcome = 3
-        reply = DeniedExtensions[selection]
+    Bool alt = AltCond[i] >= 0 && Check(AltCond[i])
+    Book reply = Replies[i]
+    Int outcome = 1
+    If alt
+        reply = AltReplies[i]
+        outcome = 2
     EndIf
     Int transactionID = Core.NextTransactionID()
-    If !Dispatch.Queue(transactionID, assignmentID, outcome, ExtensionRequests[selection], reply, Self)
+    If !Dispatch.Queue(transactionID, 2001 + i, outcome, Reports[i], reply, Self)
         Return False
     EndIf
-    extensionTransactions[selection] = transactionID
+    reportTransactions[i] = transactionID
+    alternative[i] = alt
+    Consume(CondStart[i], CondCount[i])
+    Core.RecordFact(2001 + i, 1)
+    Core.FileAssignment(2001 + i)
+    SetObjectiveDisplayed(100 + i, False)
+    SetObjectiveDisplayed(200 + i, True)
     Return True
 EndFunction
 
-Bool Function RequestSupplyAuthority()
-    lastError = 7
-    If Core.GetAssignmentState(1002) == 0
-        Return Reject(0)
-    ElseIf !Core.IsOpen(1002)
-        Return Reject(1)
-    ElseIf authorityTransaction != 0
-        Return Reject(5)
-    ElseIf Core.GetAuthority(1002, 5) == 2
-        Return Reject(6)
-    EndIf
-    Int transactionID = Core.NextTransactionID()
-    If !Dispatch.Queue(transactionID, 1002, 4, AuthorityRequest, AuthorityApproved, Self)
-        Return False
-    EndIf
-    authorityTransaction = transactionID
-    Return True
+Function Consume(Int first, Int total)
+    ; Deliveries leave his hands once, when the report is accepted.
+    Int c = first
+    While c < first + total
+        If CondKinds[c] == 4
+            Form item = ResolveForm(c)
+            FormList choices = item as FormList
+            If choices == None
+                Game.GetPlayer().RemoveItem(item, CondValues[c], True)
+            Else
+                Int remaining = CondValues[c]
+                Int k = 0
+                While k < choices.GetSize() && remaining > 0
+                    Form member = choices.GetAt(k)
+                    Int held = Game.GetPlayer().GetItemCount(member)
+                    If held > remaining
+                        held = remaining
+                    EndIf
+                    If held > 0
+                        Game.GetPlayer().RemoveItem(member, held, True)
+                        remaining -= held
+                    EndIf
+                    k += 1
+                EndWhile
+            EndIf
+        EndIf
+        c += 1
+    EndWhile
 EndFunction
 
 Function ReceiveResponse(Int transactionID, Int subjectID, Int outcome)
     If !Dispatch.IsDelivering(transactionID, subjectID, outcome, Self)
         Return
-    EndIf
-    If subjectID == 1099 && outcome >= 10 && outcome <= 12 && transactionID == evaluationTransaction
-        evaluationDelivered = True
-        SetObjectiveCompleted(30, True)
+    ElseIf subjectID == 2899
+        Return
+    ElseIf subjectID >= 2900
+        ReceiveLetter(subjectID - 2900, transactionID)
         Return
     EndIf
-    Int index = subjectID - 1001
-    If index < 0 || index > 5
+    Int i = subjectID - 2001
+    If !IsInstruction(i) || reportTransactions[i] != transactionID || (outcome != 1 && outcome != 2)
         Return
     EndIf
-    If outcome == 1 && reportTransactions[index] == transactionID
-        Core.CompleteAssignment(subjectID)
-        If Core.GetAssignmentState(subjectID) == 4
-            ; Reconcile journal state if a prior callback stopped after Core committed.
-            SetObjectiveCompleted(10 + index, True)
-            SetObjectiveCompleted(20 + index, True)
+    If Core.CompleteAssignment(subjectID)
+        If alternative[i]
+            Core.AdjustTrust(AltTrust[i])
+            If Phases[i] == phase
+                phaseWeight += AltWeights[i]
+            EndIf
+        ElseIf Phases[i] == phase
+            phaseWeight += Weights[i]
         EndIf
-    ElseIf (outcome == 2 || outcome == 3) && extensionTransactions[index] == transactionID
-        extensionTransactions[index] = 0
-        If outcome == 2
-            extensionUsed[index] = True
-            Core.ExtendAssignment(subjectID, 5.0)
-        Else
-            extensionDenied[index] = True
-        EndIf
-    ElseIf outcome == 4 && subjectID == 1002 && authorityTransaction == transactionID
-        authorityTransaction = 0
-        Core.GrantAuthority(1002, 5, 2)
+    EndIf
+    If Core.GetAssignmentState(subjectID) == 4
+        SetObjectiveCompleted(100 + i, True)
+        SetObjectiveCompleted(200 + i, True)
+    EndIf
+    Evaluate()
+EndFunction
+
+Function ReceiveLetter(Int j, Int transactionID)
+    If j < 0 || j >= Letters.Length || letterTransactions[j] != transactionID || letterDone[j]
+        Return
+    EndIf
+    ; Commit before any inventory call; a replayed callback does nothing.
+    letterDone[j] = True
+    If EnclosureStart[j] >= 0
+        Int k = EnclosureStart[j]
+        While k < EnclosureStart[j] + EnclosureCount[j]
+            Game.GetPlayer().AddItem(Enclosures[k], 1, True)
+            k += 1
+        EndWhile
+    EndIf
+    Int action = LetterActions[j]
+    If action == 2
+        Core.GrantAuthority(AdvanceOperation, 5, 2)
+    ElseIf action == 3
+        Core.GrantAuthority(RemovalOperation, 3, 2)
+    EndIf
+    If action == 1 || action == 2
+        AdvancePhase()
+    Else
+        Evaluate()
     EndIf
 EndFunction
 
-Bool Function FirstPacketComplete()
-    Return Core.GetAssignmentState(1001) == 4 && Core.GetAssignmentState(1002) == 4 && Core.GetAssignmentState(1003) == 4
-EndFunction
+; Register and menus
 
 Int Function CountState(Int status)
     Int result = 0
     Int i = 0
-    While i < 6
-        If Core.GetAssignmentState(1001 + i) == status
+    While i < Orders.Length
+        If issued[i] && Core.GetAssignmentState(2001 + i) == status
             result += 1
         EndIf
         i += 1
@@ -242,24 +455,54 @@ Int Function CountState(Int status)
 EndFunction
 
 Int Function ShowSummary()
-    Core.RefreshDeadlines(Utility.GetCurrentGameTime())
-    Return SummaryMessage.Show(CountState(1), CountState(2), CountState(3), CountState(4), Dispatch.CountResponses(True), Dispatch.CountResponses(False))
+    Return SummaryMessage.Show(CountState(1), CountState(3), CountState(4), Dispatch.CountResponses(True))
 EndFunction
 
-Function ShowAssignmentStatus(Int selection)
-    If selection < 0 || selection > 5
-        Return
+Int Function GetSlotIndex(Int slot)
+    ; Menu positions list open instructions: those ready to report first, then the rest,
+    ; each in issue order. Eight positions fit the menu; -1 is an empty position.
+    If slot < 0
+        Return -1
     EndIf
-    Int assignmentID = 1001 + selection
-    Core.RefreshDeadlines(Utility.GetCurrentGameTime())
-    Int status = Core.GetAssignmentState(assignmentID)
-    If status >= 0 && status <= 4
-        Float days = Core.GetDaysRemaining(assignmentID)
-        If days < 0.0
-            days = 0.0 - days
-        EndIf
-        StatusMessages[status].Show(assignmentID, days)
+    Int seen = 0
+    Int pass = 0
+    While pass < 2
+        ; Named locals: Caprica v0.3.0 gave both sides of "CheckAll(..) == (pass == 0)" one temporary.
+        Bool wantReady = pass == 0
+        Int i = 0
+        While i < Orders.Length
+            Int status = Core.GetAssignmentState(2001 + i)
+            Bool ready = False
+            If issued[i] && status >= 1 && status <= 3
+                ready = CheckAll(CondStart[i], CondCount[i])
+            EndIf
+            If issued[i] && status >= 1 && status <= 3 && ready == wantReady
+                If seen == slot
+                    Return i
+                EndIf
+                seen += 1
+            EndIf
+            i += 1
+        EndWhile
+        pass += 1
+    EndWhile
+    Return -1
+EndFunction
+
+Int Function GetSlotAssignment(Int slot)
+    Int index = GetSlotIndex(slot)
+    If index < 0
+        Return 0
     EndIf
+    Return 2001 + index
+EndFunction
+
+Int Function ChooseInstruction(Message menu)
+    Int choice = menu.Show(GetSlotAssignment(0), GetSlotAssignment(1), GetSlotAssignment(2), GetSlotAssignment(3), GetSlotAssignment(4), GetSlotAssignment(5), GetSlotAssignment(6), GetSlotAssignment(7))
+    If choice > 7
+        Return -1
+    EndIf
+    Return GetSlotIndex(choice)
 EndFunction
 
 Bool Function Reject(Int reason)
@@ -268,54 +511,13 @@ Bool Function Reject(Int reason)
 EndFunction
 
 Function ShowFailure()
-    If lastError == 8
-        MissingMessages[missingSelection].Show(missingCount)
+    If lastError == 3
+        NotYetMessages[notYet].Show()
     Else
         FailureMessages[lastError].Show()
     EndIf
 EndFunction
 
-Function CheckPacketNotice()
-    If !packetNotified && FirstPacketComplete() && Core.GetAssignmentState(1004) == 0
-        packetNotified = True
-        PacketReadyMessage.Show()
-    EndIf
-EndFunction
-
-Bool Function TryQueueEvaluation(Int financialConcern, Bool accountsPending)
-    ; Controller supplies the Accounts snapshot, preserving the plugin dependency graph.
-    If evaluationTransaction != 0 || CountState(4) != 6 || accountsPending
-        Return False
-    EndIf
-    Int late = 0
-    Int i = 0
-    While i < 6
-        If Core.HasMissedDeadline(1001 + i)
-            late += 1
-        EndIf
-        i += 1
-    EndWhile
-    Int assessment = 0
-    If late >= 2 || financialConcern >= 2
-        assessment = 2
-    ElseIf late > 0 || financialConcern == 1
-        assessment = 1
-    EndIf
-    Int transactionID = Core.NextTransactionID()
-    If !Dispatch.Queue(transactionID, 1099, 10 + assessment, EvaluationRequest, Evaluations[assessment], Self)
-        Return False
-    EndIf
-    evaluationTransaction = transactionID
-    SetObjectiveDisplayed(30, True)
-    EvaluationQueuedMessage.Show()
-    Return True
-EndFunction
-
-Int Function GetEvaluationState()
-    If evaluationDelivered
-        Return 2
-    ElseIf evaluationTransaction > 0
-        Return 1
-    EndIf
-    Return 0
+Bool Function IsIssued(Int i)
+    Return IsInstruction(i) && issued[i]
 EndFunction

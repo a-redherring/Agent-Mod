@@ -1,492 +1,107 @@
 [
   {
     "module": "EA_Core",
-    "id": "801",
-    "editorID": "EA_FieldPapersBook",
-    "title": "Field Papers: Private Instructions",
-    "text": "PRIVATE\n\nYou already hold my commission. Conduct yourself as a civilian. These papers confer no public rank. Do not claim Embassy protection to settle a private quarrel.\n\nRead these papers and file an acknowledgment with your orders. Reports travel with the next dispatch; replies require a full day.\n\nOrdinary observation is permitted. Disclosure, political commitments, and the removal of persons are separate decisions. Permission concerning one case says nothing about another.\n\nYour work precedes any distinction Skyrim may later confer upon you. Remember that.\n\nElenwen"
-  },
-  {
-    "module": "EA_Core",
     "id": "802",
     "editorID": "EA_Commission",
     "title": "Confidential Commission",
     "text": "For the bearer alone\n\nYour existing appointment as a confidential field officer remains in force. Maintain your civilian identity and report by the agreed channel. The enclosed one hundred septims are an initial allowance, not an advance against a claim.\n\nDo not present yourself as a uniformed member of my delegation, promise favors in my name, or treat personal acquaintance as operational authority. Further instructions await at the secure box. Audiences are by summons.\n\nElenwen\nFirst Emissary"
   },
   {
-    "module": "EA_Service",
-    "id": "810",
-    "editorID": "EA_OrderProtocol",
-    "title": "Instruction 1001: Field Protocol",
-    "text": "Read your private field papers and file the acknowledgment. Ten days are allowed from collection.\n\nThis instruction confirms receipt of procedure. It does not certify lodging, a cover identity, or a completed investigation.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "811",
-    "editorID": "EA_OrderWine",
-    "title": "Instruction 1002: Wine Procurement",
-    "text": "Obtain three bottles of ordinary Alto wine. Deliver them through the secure box within ten days of collecting this instruction. Substitute vintages are not required.\n\nThirty septims is the normal expense ceiling. If an advance is needed, request supply authority before collecting eighty septims from Accounts. Return unused money within fourteen days of receiving it.\n\nA gift or dinner is not automatically a service expense. No fee is offered for this duty.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "812",
-    "editorID": "EA_OrderFlowers",
-    "title": "Instruction 1003: Materials for the Stillroom",
-    "text": "Supply six blue mountain flowers for the stillroom. Gather them or obtain them lawfully. Deliver them through dispatch within ten days of collection.\n\nDo not submit an inflated account for an afternoon's gathering. There is no separate reward for this duty.\n\nBy instruction of the First Emissary"
-  },
-  {
-    "module": "EA_Service",
-    "id": "813",
-    "editorID": "EA_ReportProtocol",
-    "title": "Filed Acknowledgment: Field Protocol",
-    "text": "Instruction 1001\n\nThe private field papers have been read. The bearer acknowledges the limits on disclosure, expenditure, and public representation.\n\nFiled through the secure dispatch channel."
-  },
-  {
-    "module": "EA_Service",
-    "id": "814",
-    "editorID": "EA_ReportWine",
-    "title": "Filed Delivery: Alto Wine",
-    "text": "Instruction 1002\n\nThree bottles of Alto wine were deposited with this report. Receipt of the physical consignment is recorded by dispatch.\n\nAny declared expense is subject to a separate Accounts decision."
-  },
-  {
-    "module": "EA_Service",
-    "id": "815",
-    "editorID": "EA_ReportFlowers",
-    "title": "Filed Delivery: Blue Mountain Flowers",
-    "text": "Instruction 1003\n\nSix blue mountain flowers were deposited with this report. Receipt of the physical consignment is recorded by dispatch.\n\nNo reimbursement is requested."
-  },
-  {
-    "module": "EA_Service",
-    "id": "816",
-    "editorID": "EA_ResponseProtocol",
-    "title": "Response 1001: Acknowledgment Accepted",
-    "text": "Your acknowledgment has been received and filed. The instruction is complete.\n\nUnderstanding a procedure is useful only if you observe it when it becomes inconvenient.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "817",
-    "editorID": "EA_ResponseWine",
-    "title": "Response 1002: Delivery Accepted",
-    "text": "Instruction 1002 is complete. The wine consignment was filed within the time allowed.\n\nA purchase does not require ceremony. It requires the right goods, delivered when requested. Any outstanding advance remains accountable until settled or returned.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "818",
-    "editorID": "EA_ResponseFlowers",
-    "title": "Response 1003: Delivery Accepted",
-    "text": "Instruction 1003 is complete. The stillroom has accepted the six flowers, filed within the time allowed.\n\nSmall provisions keep larger work moving. Do not mistake their simplicity for permission to disregard them.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "819",
-    "editorID": "EA_ExtensionRequest",
-    "title": "Filed Extension Request: Instruction 1001",
-    "text": "Instruction 1001: Field Protocol\n\nThe bearer requests an additional five days on the instruction identified in the dispatch register. The existing due date remains in effect until a response is collected.\n\nA completed instruction cannot be reopened by this application."
-  },
-  {
-    "module": "EA_Service",
-    "id": "81A",
-    "editorID": "EA_ExtensionApproved",
-    "title": "Extension Approved: Instruction 1001",
-    "text": "Instruction 1001: Field Protocol\n\nAn additional five days is allowed on the instruction recorded with this response. If overdue, the five days run from collection of this letter.\n\nThis concession will not be repeated. If the work has already been filed, no further action is required."
-  },
-  {
-    "module": "EA_Service",
-    "id": "81B",
-    "editorID": "EA_ExtensionDenied",
-    "title": "Further Extension Refused: Instruction 1001",
-    "text": "Instruction 1001: Field Protocol\n\nThe instruction has already received an extension. No further time is allowed. File the work or account for the delay.\n\nAn overdue instruction remains your responsibility."
-  },
-  {
-    "module": "EA_Service",
-    "id": "81C",
-    "editorID": "EA_AuthorityRequest",
-    "title": "Filed Request: Supply Advance",
-    "text": "Instruction 1002\n\nThe bearer requests authority to draw an eighty-septim procurement advance. The normal allowable expense remains thirty septims. Unused funds will be returned within fourteen days of collection."
-  },
-  {
-    "module": "EA_Service",
-    "id": "81D",
-    "editorID": "EA_AuthorityApproved",
-    "title": "Authorization 1002: Supply Advance",
-    "text": "Instruction 1002 only\n\nAuthority is granted to draw eighty septims while procurement remains open. This is an advance, not an increase in the thirty-septim expense allowance.\n\nNo authority is granted to disclose protected information, make political commitments, or remove any person.\n\nElenwen"
-  },
-  {
     "module": "EA_Accounts",
     "id": "810",
     "editorID": "EA_AdvanceReceipt",
     "title": "Accounts: Advance Receipt",
-    "text": "Instruction 1002\n\nEighty septims issued as an operational advance. Approved costs settle this sum before any cash reimbursement. Return the unused balance within fourteen days.\n\nPersonal spending from the advance remains payable by the bearer."
+    "text": "Five hundred septims issued as an operational advance, against the hire of a sword. Recognised costs settle this sum before any reimbursement. Return the unused balance within fourteen days.\n\nPersonal spending from the advance remains payable by the bearer.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "811",
     "editorID": "EA_ReturnReceipt",
     "title": "Accounts: Funds Returned",
-    "text": "Funds were received against the bearer's outstanding advance and operational liability. The current balance is available at the dispatch box.\n\nThis acknowledgment does not authorize another advance."
+    "text": "Funds were received against the bearer's outstanding advance and liability. The current balance is shown on the statement.\n\nThis receipt does not authorise another advance.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "812",
     "editorID": "EA_AuditNotice",
     "title": "Accounts: Overdue Advance",
-    "text": "Instruction 1002\n\nThe fourteen-day accounting period has expired. Unreturned funds have become the bearer's liability. Further advances are suspended while money remains due.\n\nReturn the funds through dispatch. A valid later claim may discharge recognized costs against this balance."
+    "text": "The fourteen-day period for the advance has expired. Unreturned funds are now the bearer's liability, and further advances are suspended while money remains due.\n\nReturn the funds through the case. A valid later claim may discharge recognised costs against this balance.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "813",
     "editorID": "EA_ClaimSupplies",
-    "title": "Claim 1002: Supplies, Thirty Septims",
-    "text": "Declared cost: thirty septims. Purpose: procurement of the delivered Alto wine. Payee: supplier declared by the bearer.\n\nThis declaration is submitted for Accounts review; it is not independent proof of a shop transaction."
+    "title": "Claim: Hire Fee, Five Hundred Septims",
+    "text": "Declared cost: five hundred septims. Purpose: the hire of a sword, as instructed. Payee: declared by the bearer.\n\nSubmitted for review. A declaration is not proof of payment.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "814",
     "editorID": "EA_ClaimExtravagant",
-    "title": "Claim 1002: Supplies, Eighty Septims",
-    "text": "Declared cost: eighty septims. Purpose: procurement of the delivered Alto wine. Payee: supplier declared by the bearer.\n\nThis exceeds the written thirty-septim allowance and requires review."
+    "title": "Claim: Hire Fee and Expenses, Six Hundred and Fifty Septims",
+    "text": "Declared cost: six hundred and fifty septims. Purpose: the hire of a sword, with expenses on the road. Payee: declared by the bearer.\n\nThis exceeds the authorised fee and requires review.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "815",
     "editorID": "EA_ClaimGift",
-    "title": "Claim 1002: Personal Gift",
-    "text": "Declared cost: thirty septims. Purpose: a personal gift associated by the bearer with the procurement errand.\n\nNo instruction required this gift. Its inclusion is expressly disclosed."
+    "title": "Claim: A Gift",
+    "text": "Declared cost: sixty septims. Purpose: a gift to the hired sword.\n\nNo instruction required it. Its inclusion is disclosed.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "816",
     "editorID": "EA_ClaimMeal",
-    "title": "Claim 1002: Meal",
-    "text": "Declared cost: thirty septims. Purpose: a meal during the procurement errand.\n\nThe connection to the instruction has not been explained. No reimbursement is presumed."
+    "title": "Claim: A Meal",
+    "text": "Declared cost: forty septims. Purpose: a meal on the road.\n\nIts connection to the instruction has not been explained.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "817",
     "editorID": "EA_ClaimApproved",
-    "title": "Accounts Decision: Approved",
-    "text": "The declared thirty-septim supply expense is allowed.\n\nRecognized costs first settle an advance or audited liability. Any balance due to the bearer is paid on collection. This decision may be used once only.\n\nThe declared cost stays within my instruction. That is the standard I expect.\n\nElenwen"
+    "title": "Accounts Decision: Allowed",
+    "text": "The declared fee is allowed. Recognised costs first settle the advance or any liability; any balance due to the bearer is paid on collection.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "818",
     "editorID": "EA_ClaimPartial",
-    "title": "Accounts Decision: Partially Approved",
-    "text": "Instruction 1002\n\nOf the eighty septims declared for wine procurement, thirty are allowed. The fifty-septim excess remains personal expenditure. Any portion paid from the advance remains payable to Accounts.\n\nConsult the statement for the settlement.\n\nAn eighty-septim advance was permission to draw funds, not to ignore a thirty-septim ceiling. The distinction should have been clear.\n\nElenwen"
+    "title": "Accounts Decision: Partly Allowed",
+    "text": "Of the six hundred and fifty septims declared, five hundred are allowed: the fee. The remainder is personal expenditure, and any part of it drawn from the advance is owed.\n\nAccounts\n\nAn advance is permission to spend what was agreed. — E."
   },
   {
     "module": "EA_Accounts",
     "id": "819",
     "editorID": "EA_ClaimDenied",
-    "title": "Accounts Decision: Denied",
-    "text": "Personal expenditure is not chargeable to the Embassy. Any portion drawn from the advance is due from the bearer.\n\nYour availability to an acquaintance is not evidence of an operational requirement.\n\nBy instruction of the First Emissary\n\nYou were sent to procure supplies. Your personal generosity remains your own responsibility.\n\nElenwen"
+    "title": "Accounts Decision: Not Allowed",
+    "text": "Personal expenditure is not chargeable. Any portion drawn from the advance is owed by the bearer.\n\nAccounts\n\nYour generosity is your own affair, and so is its cost. — E."
   },
   {
     "module": "EA_Accounts",
     "id": "81A",
     "editorID": "EA_ClaimReturned",
     "title": "Accounts Decision: Explanation Required",
-    "text": "The meal claim is returned without settlement. Explain whether it was a necessary supplier meeting or personal entertainment.\n\nSubmit the explanation at the dispatch box. No money is paid by this letter.\n\nThis request does not suspend the fourteen-day obligation to account for the advance. A later accepted explanation may discharge recognized costs against any audited liability.\n\nExplain the purpose plainly. A meal does not become Embassy business merely because it occurred during an errand.\n\nElenwen"
+    "text": "The meal is returned without settlement. State whether it was necessary to the hire or a personal expense, and file the explanation through the case. Nothing is paid by this notice.\n\nThe fourteen-day obligation on the advance is not suspended.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "81B",
     "editorID": "EA_ExplanationForm",
-    "title": "Filed Explanation: Supplier Meeting",
-    "text": "Instruction 1002\n\nThe bearer declares that the meal was a necessary meeting with the wine supplier, rather than personal entertainment. Thirty septims are claimed; no more than fifteen are allowable.\n\nThe declaration is submitted for Accounts review. A decision follows by return dispatch."
-  },
-  {
-    "module": "EA_Service",
-    "id": "830",
-    "editorID": "EA_ExtensionRequestWine",
-    "title": "Filed Extension Request: Instruction 1002",
-    "text": "Instruction 1002: Wine Procurement\n\nThe bearer requests an additional five days on the instruction identified in the dispatch register. The existing due date remains in effect until a response is collected.\n\nA completed instruction cannot be reopened by this application."
-  },
-  {
-    "module": "EA_Service",
-    "id": "833",
-    "editorID": "EA_ExtensionRequestFlowers",
-    "title": "Filed Extension Request: Instruction 1003",
-    "text": "Instruction 1003: Stillroom Materials\n\nThe bearer requests an additional five days on the instruction identified in the dispatch register. The existing due date remains in effect until a response is collected.\n\nA completed instruction cannot be reopened by this application."
-  },
-  {
-    "module": "EA_Service",
-    "id": "831",
-    "editorID": "EA_ExtensionApprovedWine",
-    "title": "Extension Approved: Instruction 1002",
-    "text": "Instruction 1002: Wine Procurement\n\nAn additional five days is allowed on the instruction recorded with this response. If overdue, the five days run from collection of this letter.\n\nThis concession will not be repeated. If the work has already been filed, no further action is required."
-  },
-  {
-    "module": "EA_Service",
-    "id": "834",
-    "editorID": "EA_ExtensionApprovedFlowers",
-    "title": "Extension Approved: Instruction 1003",
-    "text": "Instruction 1003: Stillroom Materials\n\nAn additional five days is allowed on the instruction recorded with this response. If overdue, the five days run from collection of this letter.\n\nThis concession will not be repeated. If the work has already been filed, no further action is required."
-  },
-  {
-    "module": "EA_Service",
-    "id": "832",
-    "editorID": "EA_ExtensionDeniedWine",
-    "title": "Further Extension Refused: Instruction 1002",
-    "text": "Instruction 1002: Wine Procurement\n\nThe instruction has already received an extension. No further time is allowed. File the work or account for the delay.\n\nAn overdue instruction remains your responsibility."
-  },
-  {
-    "module": "EA_Service",
-    "id": "835",
-    "editorID": "EA_ExtensionDeniedFlowers",
-    "title": "Further Extension Refused: Instruction 1003",
-    "text": "Instruction 1003: Stillroom Materials\n\nThe instruction has already received an extension. No further time is allowed. File the work or account for the delay.\n\nAn overdue instruction remains your responsibility."
+    "title": "Explanation: Necessary Meal",
+    "text": "The meal was a necessary meeting with the hired sword, not entertainment. Forty septims are claimed; no more than twenty are allowable.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "81C",
     "editorID": "EA_ExplanationPersonal",
-    "title": "Filed Explanation: Personal Entertainment",
-    "text": "Instruction 1002\n\nThe bearer declares that the thirty-septim meal was personal entertainment. No operational order required it.\n\nThis explanation is submitted to Accounts. The decision follows by return dispatch."
+    "title": "Explanation: Personal Meal",
+    "text": "The forty-septim meal was a personal expense. No instruction required it.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "81D",
     "editorID": "EA_MealPartialDecision",
     "title": "Accounts Decision: Meal Allowance",
-    "text": "Instruction 1002\n\nFifteen septims of the thirty-septim supplier-meeting meal are allowed. The remaining fifteen are personal expenditure.\n\nRecognized costs first settle outstanding advances or audited liability; any remaining amount is reimbursed on collection.\n\nA necessary meeting may justify a modest expense. It does not justify the entire bill you have submitted.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "840",
-    "editorID": "EA_OrderFirewood",
-    "title": "Instruction 1004: Fuel for the Dispatch Room",
-    "text": "The dispatch room must remain usable through cold evenings. Supply six pieces of firewood through the secure box. Ordinary split wood will suffice; no special timber is wanted.\n\nTen days are allowed from collection. Use your initial allowance where necessary. No separate advance, expense claim, or completion fee is authorized for this duty.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "841",
-    "editorID": "EA_ReportFirewood",
-    "title": "Filed Delivery 1004: Fuel for the Dispatch Room",
-    "text": "Instruction 1004\n\nThe bearer consigned six pieces of firewood through the secure dispatch channel. The physical delivery is recorded with this report. No reimbursement is requested."
-  },
-  {
-    "module": "EA_Service",
-    "id": "842",
-    "editorID": "EA_ResponseFirewood",
-    "title": "Response 1004: Delivery Accepted",
-    "text": "Instruction 1004 is complete.\n\nThe wood has reached the dispatch room. A clerk with warm hands is less likely to spoil a cipher. Attend to small requirements before they become large inconveniences.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "843",
-    "editorID": "EA_ExtensionRequestFirewood",
-    "title": "Filed Extension Request: Instruction 1004",
-    "text": "Instruction 1004: Fuel for the Dispatch Room\n\nThe bearer requests an additional five days. The current deadline remains in force until the response is collected. Filing the work before that response closes the instruction without reopening it."
-  },
-  {
-    "module": "EA_Service",
-    "id": "844",
-    "editorID": "EA_ExtensionApprovedFirewood",
-    "title": "Extension Approved: Instruction 1004",
-    "text": "Instruction 1004: Fuel for the Dispatch Room\n\nFive additional days are allowed. If the instruction is overdue, the five days run from collection of this letter. Work already filed requires no further action.\n\nThis concession will not be repeated.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "845",
-    "editorID": "EA_ExtensionDeniedFirewood",
-    "title": "Further Extension Refused: Instruction 1004",
-    "text": "Instruction 1004: Fuel for the Dispatch Room\n\nYou have already received an extension. No further time is allowed. An overdue duty remains your responsibility; complete it and file your report.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "846",
-    "editorID": "EA_OrderLeather",
-    "title": "Instruction 1005: Bindings for Confidential Papers",
-    "text": "The document cases require fresh bindings. Supply four leather strips through dispatch. Do not send complete hides or finished armor. Obtain the material lawfully; this instruction gives no claim on a craftsman's stock.\n\nTen days are allowed from collection. Use your initial allowance where necessary. No separate advance, expense claim, or completion fee is authorized for this duty.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "847",
-    "editorID": "EA_ReportLeather",
-    "title": "Filed Delivery 1005: Bindings for Confidential Papers",
-    "text": "Instruction 1005\n\nThe bearer consigned four leather strips through the secure dispatch channel. The physical delivery is recorded with this report. No reimbursement is requested."
-  },
-  {
-    "module": "EA_Service",
-    "id": "848",
-    "editorID": "EA_ResponseLeather",
-    "title": "Response 1005: Delivery Accepted",
-    "text": "Instruction 1005 is complete.\n\nThe bindings have been replaced. A sealed case is a modest thing on which a great deal may depend. I expect you to remember that when handling the papers inside it.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "849",
-    "editorID": "EA_ExtensionRequestLeather",
-    "title": "Filed Extension Request: Instruction 1005",
-    "text": "Instruction 1005: Bindings for Confidential Papers\n\nThe bearer requests an additional five days. The current deadline remains in force until the response is collected. Filing the work before that response closes the instruction without reopening it."
-  },
-  {
-    "module": "EA_Service",
-    "id": "84A",
-    "editorID": "EA_ExtensionApprovedLeather",
-    "title": "Extension Approved: Instruction 1005",
-    "text": "Instruction 1005: Bindings for Confidential Papers\n\nFive additional days are allowed. If the instruction is overdue, the five days run from collection of this letter. Work already filed requires no further action.\n\nThis concession will not be repeated.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "84B",
-    "editorID": "EA_ExtensionDeniedLeather",
-    "title": "Further Extension Refused: Instruction 1005",
-    "text": "Instruction 1005: Bindings for Confidential Papers\n\nYou have already received an extension. No further time is allowed. An overdue duty remains your responsibility; complete it and file your report.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "84C",
-    "editorID": "EA_OrderWheat",
-    "title": "Instruction 1006: Stillroom Reserve",
-    "text": "Supply six measures of wheat for the stillroom reserve. Deliver the raw ingredient through dispatch, rather than bread or flour. This is a small replenishment, not authority to requisition a farm's harvest.\n\nTen days are allowed from collection. Use your initial allowance where necessary. No separate advance, expense claim, or completion fee is authorized for this duty.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "84D",
-    "editorID": "EA_ReportWheat",
-    "title": "Filed Delivery 1006: Stillroom Reserve",
-    "text": "Instruction 1006\n\nThe bearer consigned six measures of wheat through the secure dispatch channel. The physical delivery is recorded with this report. No reimbursement is requested."
-  },
-  {
-    "module": "EA_Service",
-    "id": "84E",
-    "editorID": "EA_ResponseWheat",
-    "title": "Response 1006: Delivery Accepted",
-    "text": "Instruction 1006 is complete.\n\nThe stillroom reserve has been replenished. Your instructions did not require an expedition or a public display of importance. Quiet completion is entirely sufficient.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "84F",
-    "editorID": "EA_ExtensionRequestWheat",
-    "title": "Filed Extension Request: Instruction 1006",
-    "text": "Instruction 1006: Stillroom Reserve\n\nThe bearer requests an additional five days. The current deadline remains in force until the response is collected. Filing the work before that response closes the instruction without reopening it."
-  },
-  {
-    "module": "EA_Service",
-    "id": "850",
-    "editorID": "EA_ExtensionApprovedWheat",
-    "title": "Extension Approved: Instruction 1006",
-    "text": "Instruction 1006: Stillroom Reserve\n\nFive additional days are allowed. If the instruction is overdue, the five days run from collection of this letter. Work already filed requires no further action.\n\nThis concession will not be repeated.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "851",
-    "editorID": "EA_ExtensionDeniedWheat",
-    "title": "Further Extension Refused: Instruction 1006",
-    "text": "Instruction 1006: Stillroom Reserve\n\nYou have already received an extension. No further time is allowed. An overdue duty remains your responsibility; complete it and file your report.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "852",
-    "editorID": "EA_ResponsePromptProtocol",
-    "title": "Response 1001: Prompt Service",
-    "text": "Instruction 1001 is complete.\n\nYou have acknowledged the field procedure promptly. Good. A rule read before it is needed has some chance of being observed when it matters.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "853",
-    "editorID": "EA_ResponseLateProtocol",
-    "title": "Response 1001: Delay Noted",
-    "text": "Instruction 1001 is complete.\n\nYour acknowledgment is accepted, but the file records a missed deadline. Procedure is the foundation of this appointment. Treat reading it as work in its own right.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "854",
-    "editorID": "EA_ResponsePromptWine",
-    "title": "Response 1002: Prompt Service",
-    "text": "Instruction 1002 is complete.\n\nThe wine arrived with ample time to spare. I prefer a modest request completed promptly to an elaborate account of why it proved difficult. Any procurement claim remains a separate matter for Accounts.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "855",
-    "editorID": "EA_ResponseLateWine",
-    "title": "Response 1002: Delay Noted",
-    "text": "Instruction 1002 is complete.\n\nThe wine has been received. The missed deadline is also recorded. An ordinary procurement duty should not require this much patience. Any account remains subject to its written allowance.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "856",
-    "editorID": "EA_ResponsePromptFlowers",
-    "title": "Response 1003: Prompt Service",
-    "text": "Instruction 1003 is complete.\n\nThe flowers reached the stillroom promptly. Its work need not pause while a field officer decides whether a small errand is beneath their attention.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "857",
-    "editorID": "EA_ResponseLateFlowers",
-    "title": "Response 1003: Delay Noted",
-    "text": "Instruction 1003 is complete.\n\nThe flowers have been received. The file records that this duty missed a deadline. The stillroom cannot plan its work around an officer's changing priorities.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "858",
-    "editorID": "EA_ResponsePromptFirewood",
-    "title": "Response 1004: Prompt Service",
-    "text": "Instruction 1004 is complete.\n\nThe fuel arrived before the dispatch room needed it. Anticipating a small inconvenience is part of competent service.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "859",
-    "editorID": "EA_ResponseLateFirewood",
-    "title": "Response 1004: Delay Noted",
-    "text": "Instruction 1004 is complete.\n\nThe wood is accepted. Its arrival does not erase the missed deadline recorded against this instruction. Small provisions cease to be small matters when others must wait for them.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "85A",
-    "editorID": "EA_ResponsePromptLeather",
-    "title": "Response 1005: Prompt Service",
-    "text": "Instruction 1005 is complete.\n\nThe leather bindings arrived promptly. The clerks can now finish their work without borrowing time from mine.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "85B",
-    "editorID": "EA_ResponseLateLeather",
-    "title": "Response 1005: Delay Noted",
-    "text": "Instruction 1005 is complete.\n\nThe bindings are accepted. The record of delay remains. Confidential papers should not sit unsecured while a simple supply duty awaits attention.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "85C",
-    "editorID": "EA_ResponsePromptWheat",
-    "title": "Response 1006: Prompt Service",
-    "text": "Instruction 1006 is complete.\n\nThe wheat reached the stillroom with time to spare. Reliable replenishment attracts little notice. You should regard that as a useful quality.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "85D",
-    "editorID": "EA_ResponseLateWheat",
-    "title": "Response 1006: Delay Noted",
-    "text": "Instruction 1006 is complete.\n\nThe wheat is accepted. A missed deadline is recorded against the instruction. Replenishment should follow the needs of the stillroom, not the convenience of your itinerary.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "85E",
-    "editorID": "EA_EvaluationRequest",
-    "title": "Filed Docket: Closing Review",
-    "text": "Instructions 1001-1006\n\nBoth packets have been completed and their responses collected. The filing dates and available Accounts record are submitted for the First Emissary's closing review. Her response will follow by the next dispatch.\n\nThis docket requests no payment or change in public standing."
-  },
-  {
-    "module": "EA_Service",
-    "id": "85F",
-    "editorID": "EA_EvaluationGood",
-    "title": "Private Assessment: Dependable Service",
-    "text": "Instructions 1001-1006\n\nThe two packets are closed. At the time of review, the record contains no missed deadlines or adverse Accounts finding, and no advance remains outstanding.\n\nYou have attended to unremarkable work without making it troublesome. That is a useful beginning. Dependability is established in these details long before it is tested in an important matter.\n\nYour commission continues on its existing terms. This letter confers no public rank or additional authority.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "860",
-    "editorID": "EA_EvaluationMixed",
-    "title": "Private Assessment: Further Care Required",
-    "text": "Instructions 1001-1006\n\nThe two packets are closed and the work has been accepted. The filing dates and Accounts record have also been reviewed. There is room for greater care in your handling of these duties.\n\nCompletion is necessary. Judgement about time and expenditure is part of the same responsibility. Carry that lesson into your next instructions.\n\nYour existing commission remains in force. No additional authority or payment is conferred by this assessment.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "861",
-    "editorID": "EA_EvaluationPoor",
-    "title": "Private Assessment: Formal Reprimand",
-    "text": "Instructions 1001-1006\n\nThe two packets are closed. I have accepted the completed work, but the record warrants a reprimand. The deficiencies in timeliness or the handling of expenses are material to my assessment of your service.\n\nConsult the filed decisions. Any money still shown as outstanding must be returned through Accounts. Accepting your reports does not cancel that obligation.\n\nYour commission continues. I expect closer attention to the terms of future instructions; this letter enlarges none of your authority.\n\nElenwen"
+    "text": "Twenty septims of the meal are allowed; the remainder is personal. Recognised costs first settle any advance or liability.\n\nAccounts\n\nA meeting may justify a modest meal. It does not justify the bill you sent. — E."
   }
 ]

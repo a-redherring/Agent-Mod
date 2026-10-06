@@ -1,0 +1,1098 @@
+{
+  "instructions": [
+    {
+      "assignment": 2001,
+      "key": "Inn",
+      "phase": 1,
+      "objective": "Note who comes to the Sleeping Giant twice",
+      "order": {
+        "id": "1000",
+        "editorID": "EA_OrderInn",
+        "title": "Instruction 2001: The Inn",
+        "text": "C.,\n\nWhile you are at the inn, note who stays more than one night, and who comes back. Names if you have them; descriptions if you don't. You needn't hurry. You'll be there a while.\n\n— E."
+      },
+      "report": {
+        "id": "1001",
+        "editorID": "EA_ReportInn",
+        "title": "Report 2001: The Inn",
+        "text": "Instruction 2001\n\nI have kept the room at the inn for some nights now. No guest has stayed more than a night, and none has come back. Travellers pass through on the road to Whiterun or Helgen and are not seen again. The regulars are villagers.\n\n— C."
+      },
+      "reply": {
+        "id": "1002",
+        "editorID": "EA_ReplyInn",
+        "title": "Reply 2001: The Inn",
+        "text": "C.,\n\nYour note on the inn's guests is received. No one stays, and no one comes back. Very well. Keep watching anyway. An inn where nobody lingers is either very dull or very careful, and I should like to know which.\n\n— E."
+      },
+      "notYet": {
+        "id": "1200",
+        "editorID": "EA_NotYetInn",
+        "text": "You have not spent enough nights at the Sleeping Giant to say who comes back. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "nights",
+          "value": 5
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2002,
+      "key": "Proprietor",
+      "phase": 1,
+      "objective": "Learn the proprietor's habits",
+      "order": {
+        "id": "1010",
+        "editorID": "EA_OrderProprietor",
+        "title": "Instruction 2002: The Proprietor",
+        "text": "C.,\n\nThe woman who keeps the inn. Her hours, her habits, who she talks to and who she doesn't. Do not ask her anything she would remember being asked.\n\n— E."
+      },
+      "report": {
+        "id": "1011",
+        "editorID": "EA_ReportProprietor",
+        "title": "Report 2002: The Proprietor",
+        "text": "Instruction 2002\n\nThe proprietor keeps to the inn. She is up before the cook and seldom far from the bar. She is civil to guests and says little. The cook answers for her and will not discuss her. I have seen no one call on her privately.\n\n— C."
+      },
+      "reply": {
+        "id": "1012",
+        "editorID": "EA_ReplyProprietor",
+        "title": "Reply 2002: The Proprietor",
+        "text": "C.,\n\nReceived. A proprietor who is always at home and has no callers. How restful for her. You will go on lodging there, and you will go on asking her nothing.\n\n— E."
+      },
+      "notYet": {
+        "id": "1201",
+        "editorID": "EA_NotYetProprietor",
+        "text": "You have not lodged at the Sleeping Giant long enough to describe the proprietor's habits. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "nights",
+          "value": 8
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2003,
+      "key": "Neighbours",
+      "phase": 1,
+      "objective": "Learn which neighbours pray to the Ninth",
+      "order": {
+        "id": "1020",
+        "editorID": "EA_OrderNeighbours",
+        "title": "Instruction 2003: Neighbours",
+        "text": "C.,\n\nLearn which of your neighbours pray to the Ninth, and which only grumble about those who are taken for it. The difference matters more than you'd think.\n\n— E."
+      },
+      "report": {
+        "id": "1021",
+        "editorID": "EA_ReportNeighbours",
+        "title": "Report 2003: Neighbours",
+        "text": "Instruction 2003\n\nThe miller and his wife speak openly for Ulfric. She has a brother with the Stormcloaks and says the arrests are why. The smith is for the Empire, though he resents the arrests as much as anyone; his nephew is a Legionary. I have seen no shrine in the village. What prayers there are, are said indoors.\n\n— C."
+      },
+      "reply": {
+        "id": "1022",
+        "editorID": "EA_ReplyNeighbours",
+        "title": "Reply 2003: Neighbours",
+        "text": "C.,\n\nThank you. A miller for Ulfric and a smith for the Empire, in a village of twenty. Skyrim in miniature. You needn't report on them again unless one of them does something interesting.\n\n— E."
+      },
+      "notYet": {
+        "id": "1202",
+        "editorID": "EA_NotYetNeighbours",
+        "text": "You have not lived in Riverwood long enough to know your neighbours' loyalties. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "residenceDays",
+          "value": 7
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2004,
+      "key": "Preacher",
+      "phase": 1,
+      "objective": "Hear the street preacher in Whiterun",
+      "order": {
+        "id": "1030",
+        "editorID": "EA_OrderPreacher",
+        "title": "Instruction 2004: The Preacher",
+        "text": "C.,\n\nI'm told there is a priest in Whiterun who preaches Talos in the street, in daylight, under the Jarl's own windows. Go and listen to him once. Note whether the guards do anything about it.\n\n— E."
+      },
+      "report": {
+        "id": "1031",
+        "editorID": "EA_ReportPreacher",
+        "title": "Report 2004: The Preacher",
+        "text": "Instruction 2004\n\nI have been to Whiterun. The priest preaches every day below Dragonsreach, at a statue of Talos, to whoever will stop. The guards pass him without a word. Few stop.\n\n— C."
+      },
+      "reply": {
+        "id": "1032",
+        "editorID": "EA_ReplyPreacher",
+        "title": "Reply 2004: The Preacher",
+        "text": "C.,\n\nReceived. The guards do nothing and the people do not listen, which is very much what I expected of Whiterun. Leave him alone. A man shouting at a statue is harmless; a man taken away for it is not.\n\n— E."
+      },
+      "notYet": {
+        "id": "1203",
+        "editorID": "EA_NotYetPreacher",
+        "text": "You have not been to Whiterun yet. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "visited",
+          "value": 0,
+          "form": "018A56"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2005,
+      "key": "Roads",
+      "phase": 1,
+      "objective": "Note which soldiers use the roads",
+      "order": {
+        "id": "1040",
+        "editorID": "EA_OrderRoads",
+        "title": "Instruction 2005: The Roads",
+        "text": "C.,\n\nWhen you travel, note which soldiers use the roads, how many, and in what colours. Do not follow them, and do not be followed.\n\n— E."
+      },
+      "report": {
+        "id": "1041",
+        "editorID": "EA_ReportRoads",
+        "title": "Report 2005: The Roads",
+        "text": "Instruction 2005\n\nLegion patrols use the road from Whiterun south, in threes. I have seen Stormcloaks on the eastern roads, also in threes, and once a fight between them. Our friends pass now and then with a prisoner. Nobody stops them.\n\n— C."
+      },
+      "reply": {
+        "id": "1042",
+        "editorID": "EA_ReplyRoads",
+        "title": "Reply 2005: The Roads",
+        "text": "C.,\n\nYour report on the roads is received, and is about what I expected. Nobody stops our friends. Good. Help keep it that way by not being seen anywhere near them.\n\n— E."
+      },
+      "notYet": {
+        "id": "1204",
+        "editorID": "EA_NotYetRoads",
+        "text": "You have not been in Riverwood long enough to describe the roads. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "residenceDays",
+          "value": 10
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2006,
+      "key": "Hillside",
+      "phase": 1,
+      "objective": "Learn why a friend stopped reporting near Lake Ilinalta",
+      "order": {
+        "id": "1050",
+        "editorID": "EA_OrderHillside",
+        "title": "Instruction 2006: A Silence",
+        "text": "C.,\n\nOne of our friends stopped reporting some weeks ago. He was last occupied with the hills above Lake Ilinalta, south of the standing stones. If you happen to find out why, bring me whatever he was carrying. Don't go looking for trouble on his account; he found enough for both of you.\n\n— E."
+      },
+      "report": {
+        "id": "1051",
+        "editorID": "EA_ReportHillside",
+        "title": "Report 2006: A Silence",
+        "text": "Instruction 2006\n\nI found him on a promontory in the hills, beside a shrine to Talos, with four of the worshippers. All dead some time. The enclosed letter was on his body.\n\n— C."
+      },
+      "reply": {
+        "id": "1052",
+        "editorID": "EA_ReplyHillside",
+        "title": "Reply 2006: A Silence",
+        "text": "C.,\n\nYour report concerning the man on the hillside has been received, together with a letter of mine I am not in the habit of having returned to me. It appears his informant was reliable after all. That doesn't change the fact that he went up there alone, which I don't recall advising.\n\nThe shrine will be attended to. You will say nothing about any of this in Riverwood.\n\n— E."
+      },
+      "notYet": {
+        "id": "1205",
+        "editorID": "EA_NotYetHillside",
+        "text": "You have nothing of his to send. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "deliver",
+          "value": 1,
+          "form": "097803"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2007,
+      "key": "Dunmer",
+      "phase": 2,
+      "objective": "Hire the Dunmer at the Drunken Huntsman",
+      "order": {
+        "id": "1060",
+        "editorID": "EA_OrderDunmer",
+        "title": "Instruction 2007: The Dunmer",
+        "text": "C.,\n\nThe Dunmer who drinks at the Drunken Huntsman in Whiterun sells her sword. Hire her before you go west. Accounts will advance her fee on request; it is not to be spent on anything else.\n\n— E."
+      },
+      "report": {
+        "id": "1061",
+        "editorID": "EA_ReportDunmer",
+        "title": "Report 2007: The Dunmer",
+        "text": "Instruction 2007\n\nI have hired the Dunmer from the Drunken Huntsman. Her fee is paid. She asks no questions.\n\n— C."
+      },
+      "reply": {
+        "id": "1062",
+        "editorID": "EA_ReplyDunmer",
+        "title": "Reply 2007: The Dunmer",
+        "text": "C.,\n\nYou may keep the Dunmer on afterwards, if you find her company agreeable. You'll pay for it yourself, naturally.\n\n— E."
+      },
+      "notYet": {
+        "id": "1206",
+        "editorID": "EA_NotYetDunmer",
+        "text": "You have not hired the Dunmer yet. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "actorInFaction",
+          "value": 0,
+          "form": "0E1BA9",
+          "other": "0BD738"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2008,
+      "key": "Market",
+      "phase": 2,
+      "objective": "Learn who is killing whom in Markarth",
+      "order": {
+        "id": "1070",
+        "editorID": "EA_OrderMarket",
+        "title": "Instruction 2008: The Killings",
+        "text": "C.,\n\nOnce in Markarth, learn who is killing whom, and on whose account. Begin wherever the city is already bleeding. That will not take you long.\n\n— E."
+      },
+      "report": {
+        "id": "1071",
+        "editorID": "EA_ReportMarket",
+        "title": "Report 2008: The Killings",
+        "text": "Instruction 2008\n\nThe killings in Markarth are the Forsworn's, but the Forsworn take their orders from a prisoner in the city's own silver mine, and the family that owns the mine knows it. The inquiry ended with me in Cidhna Mine.\n\n— C."
+      },
+      "reply": {
+        "id": "1072",
+        "editorID": "EA_ReplyMarket",
+        "title": "Reply 2008: The Killings",
+        "text": "C.,\n\nSo the Silver-Bloods keep the king of the Forsworn in their own mine and pay him to murder their rivals. How very Nord. And you were arrested for finding out. I'm told our friend in the Keep was asked about you and could not recall the name. Neither could I.\n\n— E."
+      },
+      "notYet": {
+        "id": "1207",
+        "editorID": "EA_NotYetMarket",
+        "text": "You have not yet learned who is behind the killings in Markarth. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "visited",
+          "value": 0,
+          "form": "018A59"
+        },
+        {
+          "kind": "questCompleted",
+          "value": 0,
+          "form": "018B4B"
+        }
+      ],
+      "weight": 1,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2009,
+      "key": "OldMan",
+      "phase": 2,
+      "objective": "Decide the fate of the old man in the mine",
+      "order": {
+        "id": "1080",
+        "editorID": "EA_OrderOldMan",
+        "title": "Instruction 2009: The Old Man",
+        "text": "C.,\n\nIf you find yourself in the company of the old man who runs the Forsworn from inside the mine, consider whether the Reach would be livelier with him outside it. I leave the decision to you.\n\n— E."
+      },
+      "report": {
+        "id": "1081",
+        "editorID": "EA_ReportOldMan",
+        "title": "Report 2009: The Old Man",
+        "text": "Instruction 2009\n\nThe matter of the old man in the mine is settled. The particulars are set down here.\n\n— C."
+      },
+      "reply": {
+        "id": "1082",
+        "editorID": "EA_ReplyOldMan",
+        "title": "Reply 2009: The Old Man",
+        "text": "C.,\n\nI'm told the old man in the mine is loose in the Reach and the Jarl can talk of nothing else. Good. That is very much what I sent you there to do.\n\n— E."
+      },
+      "notYet": {
+        "id": "1208",
+        "editorID": "EA_NotYetOldMan",
+        "text": "The matter of the old man in the mine is not settled yet. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "questCompleted",
+          "value": 0,
+          "form": "040A5E"
+        }
+      ],
+      "weight": 2,
+      "altWeight": 1,
+      "altTrust": -2,
+      "altReply": {
+        "id": "1083",
+        "editorID": "EA_ReplyAltOldMan",
+        "title": "Reply 2009: The Old Man",
+        "text": "C.,\n\nThe Jarl is grateful, I hear. He has pardoned you, and the Silver-Bloods have given you a ring. How very nice for you. I did not send you to Markarth to be thanked by Nords.\n\n— E."
+      },
+      "alt": {
+        "kind": "actorDead",
+        "value": 0,
+        "form": "019916"
+      }
+    },
+    {
+      "assignment": 2010,
+      "key": "Feast",
+      "phase": 2,
+      "objective": "Learn why the Hall of the Dead was closed",
+      "order": {
+        "id": "1090",
+        "editorID": "EA_OrderFeast",
+        "title": "Instruction 2010: The Hall of the Dead",
+        "text": "C.,\n\nThe Hall of the Dead in Markarth has been closed, and the priest is unpopular for closing it. Find out why. If whoever is responsible proves to be a citizen of some standing, I should like their names more than their heads.\n\n— E."
+      },
+      "report": {
+        "id": "1091",
+        "editorID": "EA_ReportFeast",
+        "title": "Report 2010: The Hall of the Dead",
+        "text": "Instruction 2010\n\nThose responsible meet in a cave outside the city. They are citizens of Markarth, the butcher among them. I sat at their table. Their names are set down here. The priest will not be reopening the Hall.\n\n— C."
+      },
+      "reply": {
+        "id": "1092",
+        "editorID": "EA_ReplyFeast",
+        "title": "Reply 2010: The Hall of the Dead",
+        "text": "C.,\n\nThe names are received, and they are more interesting than I'd hoped. A city whose respectable people eat its dead can be persuaded to do a great many things. You'll say nothing of what you ate, I trust. I certainly won't.\n\n— E."
+      },
+      "notYet": {
+        "id": "1209",
+        "editorID": "EA_NotYetFeast",
+        "text": "You have not dealt with the trouble at the Hall of the Dead in a way that leaves you with names. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "questCompleted",
+          "value": 0,
+          "form": "02C358"
+        },
+        {
+          "kind": "actorDead",
+          "value": 0,
+          "form": "01BB8F"
+        }
+      ],
+      "weight": 1,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2011,
+      "key": "Skald",
+      "phase": 2,
+      "objective": "Help our friend in the Keep with the skald",
+      "order": {
+        "id": "10A0",
+        "editorID": "EA_OrderSkald",
+        "title": "Instruction 2011: The Skald",
+        "text": "C.,\n\nOur friend in the Keep has a skald he suspects of praying to the Ninth, and nothing to prove it with. If he asks you for help, give it. It costs me nothing to oblige him.\n\n— E."
+      },
+      "report": {
+        "id": "10A1",
+        "editorID": "EA_ReportSkald",
+        "title": "Report 2011: The Skald",
+        "text": "Instruction 2011\n\nOur friend in the Keep has the skald's amulet. I found it in the skald's house and took it to him.\n\n— C."
+      },
+      "reply": {
+        "id": "10A2",
+        "editorID": "EA_ReplySkald",
+        "title": "Reply 2011: The Skald",
+        "text": "C.,\n\nI understand our friend in the Keep has his skald at last. He'll be insufferable about it for weeks. Still, it costs the house nothing, and it keeps him occupied.\n\n— E."
+      },
+      "notYet": {
+        "id": "120A",
+        "editorID": "EA_NotYetSkald",
+        "text": "Our friend in the Keep does not have the skald's amulet yet. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "actorHolds",
+          "value": 1,
+          "form": "01990D",
+          "other": "064796"
+        }
+      ],
+      "weight": 1,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2012,
+      "key": "Shrine",
+      "phase": 2,
+      "objective": "Find the shrine below Markarth and tell no one",
+      "order": {
+        "id": "10B0",
+        "editorID": "EA_OrderShrine",
+        "title": "Instruction 2012: Below the City",
+        "text": "C.,\n\nThere is a shrine to the Ninth somewhere below Markarth that our friend in the Keep has never found. Find it. Tell me, and tell no one else. He in particular is not to hear of it.\n\n— E."
+      },
+      "report": {
+        "id": "10B1",
+        "editorID": "EA_ReportShrine",
+        "title": "Report 2012: Below the City",
+        "text": "Instruction 2012\n\nThe shrine is below the city, in use, and tended. I have told no one.\n\n— C."
+      },
+      "reply": {
+        "id": "10B2",
+        "editorID": "EA_ReplyShrine",
+        "title": "Reply 2012: Below the City",
+        "text": "C.,\n\nReceived. Leave it standing. It does more for us full of angry Nords than it would empty. If our friend in the Keep ever finds it, it will not be because of you.\n\n— E."
+      },
+      "notYet": {
+        "id": "120B",
+        "editorID": "EA_NotYetShrine",
+        "text": "You have not found the shrine below Markarth. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "visited",
+          "value": 0,
+          "form": "06E830"
+        }
+      ],
+      "weight": 1,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2013,
+      "key": "Translator",
+      "phase": 2,
+      "objective": "Learn what the Jarl's Altmer scholar is working on",
+      "order": {
+        "id": "10C0",
+        "editorID": "EA_OrderTranslator",
+        "title": "Instruction 2013: The Translator",
+        "text": "C.,\n\nThe Jarl keeps an Altmer scholar in the Keep who translates the Dwemer for him. An Altmer who serves a Nord Jarl. Learn what he is working on, if you can do it without being noticed by him or by our friend.\n\n— E."
+      },
+      "report": {
+        "id": "10C1",
+        "editorID": "EA_ReportTranslator",
+        "title": "Report 2013: The Translator",
+        "text": "Instruction 2013\n\nThe scholar works in his own rooms in the Keep and in the ruins beneath it. His work is on the Dwemer language. He guards it closely and talks of little else.\n\n— C."
+      },
+      "reply": {
+        "id": "10C2",
+        "editorID": "EA_ReplyTranslator",
+        "title": "Reply 2013: The Translator",
+        "text": "C.,\n\nThank you. A Mer who has made himself indispensable to a Nord, and guards his work from everyone. I can't say I blame him. Leave him to it for now.\n\n— E."
+      },
+      "notYet": {
+        "id": "120C",
+        "editorID": "EA_NotYetTranslator",
+        "text": "You have not been to Understone Keep. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "visited",
+          "value": 0,
+          "form": "01F316"
+        }
+      ],
+      "weight": 1,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2014,
+      "key": "Admission",
+      "phase": 4,
+      "objective": "Gain admission to the College of Winterhold",
+      "order": {
+        "id": "10D0",
+        "editorID": "EA_OrderAdmission",
+        "title": "Instruction 2014: Admission",
+        "text": "C.,\n\nWhen the College has admitted you, say so.\n\n— E."
+      },
+      "report": {
+        "id": "10D1",
+        "editorID": "EA_ReportAdmission",
+        "title": "Report 2014: Admission",
+        "text": "Instruction 2014\n\nI have been admitted to the College as an apprentice. The adviser keeps his own counsel and sits in on the masters' business uninvited.\n\n— C."
+      },
+      "reply": {
+        "id": "10D2",
+        "editorID": "EA_ReplyAdmission",
+        "title": "Reply 2014: Admission",
+        "text": "C.,\n\nReceived. Remain a student. You will be told when that changes.\n\n— E."
+      },
+      "notYet": {
+        "id": "120D",
+        "editorID": "EA_NotYetAdmission",
+        "text": "The College has not admitted you yet. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "stageDone",
+          "value": 30,
+          "form": "01F251"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2015,
+      "key": "Saarthal",
+      "phase": 4,
+      "objective": "Report what the College finds at Saarthal",
+      "order": {
+        "id": "10E0",
+        "editorID": "EA_OrderSaarthal",
+        "title": "Instruction 2015: The Dig",
+        "text": "C.,\n\nThe College digs at Saarthal. Whatever they find there, I would like to know of it before the adviser tells me.\n\n— E."
+      },
+      "report": {
+        "id": "10E1",
+        "editorID": "EA_ReportSaarthal",
+        "title": "Report 2015: The Dig",
+        "text": "Instruction 2015\n\nThe dig at Saarthal uncovered a sealed chamber and, inside it, a great orb of some kind, now taken back to the College. A monk appeared to me in a vision and warned of danger. I report that because it happened, not because I understand it.\n\n— C."
+      },
+      "reply": {
+        "id": "10E2",
+        "editorID": "EA_ReplySaarthal",
+        "title": "Reply 2015: The Dig",
+        "text": "C.,\n\nA vision. How very like the College. Describe the object to no one, and do not handle it again.\n\n— E."
+      },
+      "notYet": {
+        "id": "120E",
+        "editorID": "EA_NotYetSaarthal",
+        "text": "Nothing has come of the dig at Saarthal yet. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "stageDone",
+          "value": 200,
+          "form": "01F252"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2016,
+      "key": "Books",
+      "phase": 4,
+      "objective": "Follow the College's search through its books",
+      "order": {
+        "id": "10F0",
+        "editorID": "EA_OrderBooks",
+        "title": "Instruction 2016: The Books",
+        "text": "C.,\n\nIf the College goes looking in its books for what it found, look with it.\n\n— E."
+      },
+      "report": {
+        "id": "10F1",
+        "editorID": "EA_ReportBooks",
+        "title": "Report 2016: The Books",
+        "text": "Instruction 2016\n\nThe librarian sent me after stolen books. One of them, Night of Tears, speaks of Saarthal in the days of the Snow Elves. The College has it back.\n\n— C."
+      },
+      "reply": {
+        "id": "10F2",
+        "editorID": "EA_ReplyBooks",
+        "title": "Reply 2016: The Books",
+        "text": "C.,\n\nThank you. The Snow Elves. I shall read it myself when I have a quiet evening, which is to say not soon.\n\n— E."
+      },
+      "notYet": {
+        "id": "120F",
+        "editorID": "EA_NotYetBooks",
+        "text": "The College's search through its books is not finished. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "stageDone",
+          "value": 200,
+          "form": "01F253"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2017,
+      "key": "Monk",
+      "phase": 4,
+      "objective": "Report the adviser's interest in you",
+      "order": {
+        "id": "1100",
+        "editorID": "EA_OrderMonk",
+        "title": "Instruction 2017: The Adviser's Interest",
+        "text": "C.,\n\nIf the adviser ever takes an interest in you, report it the same day.\n\n— E."
+      },
+      "report": {
+        "id": "1101",
+        "editorID": "EA_ReportMonk",
+        "title": "Report 2017: The Adviser's Interest",
+        "text": "Instruction 2017\n\nThe adviser interrupted my lesson and insisted I speak to a monk of the Psijic Order, who had come to the Arch-Mage's quarters asking for whoever found the orb. He was very eager that I go.\n\n— C."
+      },
+      "reply": {
+        "id": "1102",
+        "editorID": "EA_ReplyMonk",
+        "title": "Reply 2017: The Adviser's Interest",
+        "text": "C.,\n\nYou were right to go with him. You were wrong to let him choose your words for you. In future, he gets nothing from you that I haven't seen first.\n\n— E."
+      },
+      "notYet": {
+        "id": "1210",
+        "editorID": "EA_NotYetMonk",
+        "text": "The adviser has taken no particular interest in you yet. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "stageDone",
+          "value": 20,
+          "form": "01F254"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2018,
+      "key": "Eye",
+      "phase": 4,
+      "objective": "Give your account of how the business at the College ends",
+      "order": {
+        "id": "1110",
+        "editorID": "EA_OrderEye",
+        "title": "Instruction 2018: The End of It",
+        "text": "C.,\n\nWhatever ends this business at the College, I will want your account of it.\n\n— E."
+      },
+      "report": {
+        "id": "1111",
+        "editorID": "EA_ReportEye",
+        "title": "Report 2018: The End of It",
+        "text": "Instruction 2018\n\nThe adviser is dead. The orb, the Eye of Magnus they call it, has been taken away by the Psijic monks. The College is rebuilding.\n\n— C."
+      },
+      "reply": {
+        "id": "1112",
+        "editorID": "EA_ReplyEye",
+        "title": "Reply 2018: The End of It",
+        "text": "C.,\n\nThe adviser is dead, I'm told, and the College is calling it an accident of his own making. That is precisely what the house will call it, too.\n\n— E."
+      },
+      "notYet": {
+        "id": "1211",
+        "editorID": "EA_NotYetEye",
+        "text": "The business at the College is not finished. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "stageDone",
+          "value": 200,
+          "form": "01F258"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2019,
+      "key": "Library",
+      "phase": 4,
+      "objective": "Send her a book from the Arcanaeum, if it can be done unseen",
+      "order": {
+        "id": "1120",
+        "editorID": "EA_OrderLibrary",
+        "title": "Instruction 2019: The Arcanaeum",
+        "text": "C.,\n\nThe College keeps a library (the Arcanaeum, I believe they call it) with a number of volumes the house has never managed to acquire by honest means: on the dragons, chiefly, and on Akavir. Should one of them leave the building without the librarian noticing, I'd be glad to have it. I would rather not hear that you were caught.\n\n— E."
+      },
+      "report": {
+        "id": "1121",
+        "editorID": "EA_ReportLibrary",
+        "title": "Report 2019: The Arcanaeum",
+        "text": "Instruction 2019\n\nA book from the Arcanaeum, enclosed. The librarian has not noticed.\n\n— C."
+      },
+      "reply": {
+        "id": "1122",
+        "editorID": "EA_ReplyLibrary",
+        "title": "Reply 2019: The Arcanaeum",
+        "text": "C.,\n\nThe book arrived safely. I trust the Orc hasn't noticed yet.\n\n— E."
+      },
+      "notYet": {
+        "id": "1212",
+        "editorID": "EA_NotYetLibrary",
+        "text": "You have none of the books she asked for. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "deliver",
+          "value": 1,
+          "form": "LIST"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2020,
+      "key": "Town",
+      "phase": 4,
+      "objective": "Learn what Winterhold thinks of the College and its Jarl",
+      "order": {
+        "id": "1130",
+        "editorID": "EA_OrderTown",
+        "title": "Instruction 2020: Winterhold",
+        "text": "C.,\n\nWhile you're there, learn what the town thinks of the College, and of its Jarl. I don't imagine it will take you long.\n\n— E."
+      },
+      "report": {
+        "id": "1131",
+        "editorID": "EA_ReportTown",
+        "title": "Report 2020: Winterhold",
+        "text": "Instruction 2020\n\nThe town blames the College for the Collapse and the empty houses. The Jarl is for Ulfric, and short of everything but grievances.\n\n— C."
+      },
+      "reply": {
+        "id": "1132",
+        "editorID": "EA_ReplyTown",
+        "title": "Reply 2020: Winterhold",
+        "text": "C.,\n\nThank you for your report on Winterhold. It is very much as I expected: a ruin with a Jarl in it. You needn't trouble yourself with the town again.\n\n— E."
+      },
+      "notYet": {
+        "id": "1213",
+        "editorID": "EA_NotYetTown",
+        "text": "You have not spent time in Winterhold's longhouse and inn. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "visited",
+          "value": 0,
+          "form": "01EB7D"
+        },
+        {
+          "kind": "visited",
+          "value": 0,
+          "form": "01EB7C"
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0
+    },
+    {
+      "assignment": 2021,
+      "key": "Lesson",
+      "phase": 4,
+      "objective": "Take the librarian's reading test",
+      "order": {
+        "id": "1140",
+        "editorID": "EA_OrderLesson",
+        "title": "Instruction 2021: The Librarian's Test",
+        "text": "C.,\n\nI'm told the librarian sets new students a test on what they read. Take it.\n\n— E."
+      },
+      "report": {
+        "id": "1141",
+        "editorID": "EA_ReportLesson",
+        "title": "Report 2021: The Librarian's Test",
+        "text": "Instruction 2021\n\nI have been to the librarian about his reading test. How it went is set down here.\n\n— C."
+      },
+      "reply": {
+        "id": "1142",
+        "editorID": "EA_ReplyLesson",
+        "title": "Reply 2021: The Librarian's Test",
+        "text": "C.,\n\nAn Orc, teaching method. Skyrim never stops surprising me. Do take the lesson to heart.\n\n— E."
+      },
+      "notYet": {
+        "id": "1214",
+        "editorID": "EA_NotYetLesson",
+        "text": "You have not taken the librarian's test. Nothing has been filed."
+      },
+      "conditions": [
+        {
+          "kind": "stageAtLeast",
+          "value": 20,
+          "plugin": "College Of Winterhold - Quest Expansion.esp",
+          "local": 2160
+        }
+      ],
+      "weight": 0,
+      "altWeight": 0,
+      "altTrust": 0,
+      "altReply": {
+        "id": "1143",
+        "editorID": "EA_ReplyAltLesson",
+        "title": "Reply 2021: The Librarian's Test",
+        "text": "C.,\n\nI'm told you declined the librarian's test. I had not thought you so short of time.\n\n— E."
+      },
+      "alt": {
+        "kind": "stageDone",
+        "value": 30,
+        "plugin": "College Of Winterhold - Quest Expansion.esp",
+        "local": 2160
+      },
+      "require": {
+        "kind": "present",
+        "value": 0,
+        "plugin": "College Of Winterhold - Quest Expansion.esp",
+        "local": 2160
+      }
+    }
+  ],
+  "letters": [
+    {
+      "key": "Settled",
+      "phase": 1,
+      "action": 0,
+      "letter": {
+        "id": "1300",
+        "editorID": "EA_LetterSettled",
+        "title": "A Note",
+        "text": "C.,\n\nI'm told you've taken a room at the inn and pay for it on time. Good. Keep it that way.\n\n— E."
+      },
+      "conditions": [
+        {
+          "kind": "nights",
+          "value": 3
+        }
+      ],
+      "enclosures": []
+    },
+    {
+      "key": "Release",
+      "phase": 1,
+      "action": 2,
+      "letter": {
+        "id": "1301",
+        "editorID": "EA_LetterRelease",
+        "title": "A Letter",
+        "text": "C.,\n\nRiverwood has served its purpose, and so, for the moment, have you.\n\nThere is a Dunmer who drinks at the Drunken Huntsman in Whiterun who will sell her sword to anyone with the coin. Hire her. Accounts will advance her fee, and I trust you won't mistake it for an allowance. When that's done, go to Markarth. Your instructions for the Reach follow, along with something on the Reach you won't have read. The Forsworn tell it rather differently.\n\n— E."
+      },
+      "conditions": [
+        {
+          "kind": "residenceDays",
+          "value": 14
+        },
+        {
+          "kind": "earned",
+          "value": 0
+        },
+        {
+          "kind": "level",
+          "value": 6
+        },
+        {
+          "kind": "questNotBegun",
+          "value": 0,
+          "form": "032926"
+        }
+      ],
+      "enclosures": [
+        "0C1771"
+      ]
+    },
+    {
+      "key": "Reach",
+      "phase": 2,
+      "action": 0,
+      "letter": {
+        "id": "1302",
+        "editorID": "EA_LetterReach",
+        "title": "A Letter",
+        "text": "C.,\n\nThe Reach has been unusually quiet of late, and I find I don't care for it. Our friend in the Keep writes diligent, thorough reports that tell me nothing at all.\n\nYou will go to Markarth as what you appear to be, a sellsword in want of work. You'll find the city has no shortage of people at one another's throats. See that they stay there. How you manage it is your own affair; I shall judge you by the state of Markarth when you leave it.\n\nOur friend in the Keep is not to know you are mine. He would only want to help.\n\nBurn this.\n\n— E."
+      },
+      "conditions": [],
+      "enclosures": []
+    },
+    {
+      "key": "Interval",
+      "phase": 2,
+      "action": 1,
+      "letter": {
+        "id": "1303",
+        "editorID": "EA_LetterInterval",
+        "title": "A Note",
+        "text": "C.,\n\nI have nothing for you at present. Use the time. Your magic is an embarrassment and your history isn't much better, and I'd like both improved before I next have need of you.\n\n— E."
+      },
+      "conditions": [
+        {
+          "kind": "phaseWeight",
+          "value": 2
+        }
+      ],
+      "enclosures": []
+    },
+    {
+      "key": "College",
+      "phase": 3,
+      "action": 1,
+      "letter": {
+        "id": "1304",
+        "editorID": "EA_LetterCollege",
+        "title": "A Letter",
+        "text": "C.,\n\nYou will go to Winterhold and present yourself to the College as a prospective student. Our friends keep an adviser there, whose standing among the masters I would like to understand rather better than his own reports allow. Learn what weight he carries, and who listens to him.\n\nYou are a student and nothing more. You will not tell the adviser who sent you. He has no need to know, and I suspect he wouldn't take it well.\n\nTwo books accompany this. Read them before you arrive; the masters will assume you have. If you come across anything on the Collapse, read that too.\n\n— E."
+      },
+      "conditions": [
+        {
+          "kind": "daysInPhase",
+          "value": 7
+        },
+        {
+          "kind": "magic",
+          "value": 20
+        }
+      ],
+      "enclosures": [
+        "0E0D68",
+        "0E7F31"
+      ]
+    },
+    {
+      "key": "Adviser",
+      "phase": 4,
+      "action": 3,
+      "letter": {
+        "id": "1305",
+        "editorID": "EA_LetterAdviser",
+        "title": "A Letter",
+        "text": "C.,\n\nI have read your report twice. Whatever the adviser believes he is doing at the College, he is not doing it on my authority, and I won't have the house's name attached to it.\n\nYou are authorised to see that he does not leave Winterhold. I trust I needn't explain what that means.\n\nAfterwards there will be a great deal of talk, and none of it will be yours.\n\nBurn this.\n\n— E."
+      },
+      "conditions": [
+        {
+          "kind": "questBegun",
+          "value": 0,
+          "form": "01F257"
+        }
+      ],
+      "enclosures": []
+    },
+    {
+      "key": "Declined",
+      "phase": 4,
+      "action": 0,
+      "letter": {
+        "id": "1306",
+        "editorID": "EA_LetterDeclined",
+        "title": "A Note",
+        "text": "C.,\n\nYou turned down the Arch-Mage's chair. Good. Everyone watches an Arch-Mage, and you are no use to me watched.\n\n— E."
+      },
+      "conditions": [
+        {
+          "kind": "stageDone",
+          "value": 200,
+          "form": "01F258"
+        },
+        {
+          "kind": "globalAtLeast",
+          "value": 1,
+          "plugin": "At Your Own Pace - College of Winterhold.esp",
+          "local": 2067
+        }
+      ],
+      "enclosures": []
+    },
+    {
+      "key": "Accepted",
+      "phase": 4,
+      "action": 0,
+      "letter": {
+        "id": "1307",
+        "editorID": "EA_LetterAccepted",
+        "title": "A Note",
+        "text": "C.,\n\nSo you're Arch-Mage. I didn't ask for that, and I'll be very interested to learn how you mean to remain useful to me now that every fool in the College is watching you.\n\n— E."
+      },
+      "conditions": [
+        {
+          "kind": "stageDone",
+          "value": 200,
+          "form": "01F258"
+        },
+        {
+          "kind": "playerInFaction",
+          "value": 0,
+          "form": "103372"
+        }
+      ],
+      "enclosures": []
+    }
+  ],
+  "wander": {
+    "id": "1340",
+    "editorID": "EA_LetterWander",
+    "title": "A Note",
+    "text": "C.,\n\nI understand you were outside Whiterun and Falkreath some days ago. I don't recall giving you leave. Perhaps you'll be good enough to explain what took you there. No, on reflection, don't. Return to Riverwood and stay there.\n\n— E."
+  },
+  "arcanaeum": {
+    "id": "1400",
+    "editorID": "EA_ArcanaeumBooks",
+    "books": [
+      "0EF2C0",
+      "0EA5B0",
+      "0EDDD5",
+      "01ACD4"
+    ]
+  },
+  "places": {
+    "inn": "01CB8C",
+    "bounds": [
+      "016772",
+      "01676F"
+    ]
+  },
+  "operations": {
+    "advance": 2007,
+    "removal": 3001
+  },
+  "packetBooks": [
+    "07EB03",
+    "07EB9E"
+  ],
+  "messages": {
+    "failure": [
+      {
+        "id": "900",
+        "editorID": "EA_ServiceFailure0",
+        "text": "That instruction has not been issued. Nothing has been filed."
+      },
+      {
+        "id": "901",
+        "editorID": "EA_ServiceFailure1",
+        "text": "That report has already been filed. Collect the reply through Check Correspondence."
+      },
+      {
+        "id": "902",
+        "editorID": "EA_ServiceFailure2",
+        "text": "The case cannot accept another paper. Nothing has been filed. If this persists, the case or its archive needs attention."
+      }
+    ],
+    "summary": {
+      "id": "930",
+      "editorID": "EA_StatusSummary",
+      "text": "THE CASE\nInstructions open: %.0f\nReports awaiting a reply: %.0f\nInstructions closed: %.0f\nCorrespondence waiting: %.0f"
+    }
+  }
+}

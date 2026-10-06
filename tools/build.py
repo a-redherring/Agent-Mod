@@ -13,7 +13,7 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-MODULES = ("EA_Core", "EA_Dispatch", "EA_Service", "EA_Accounts", "EA_Prototype")
+MODULES = ("EA_Core", "EA_Dispatch", "EA_Service", "EA_Accounts", "EA_Prototype", "EA_Start")
 CONFIG = json.loads((ROOT / "content/build-config.json").read_text(encoding="utf-8"))
 VERSION = CONFIG["version"]
 
@@ -114,10 +114,12 @@ def main():
     run(["dotnet", "run", "--no-restore", "--project", "tools/PluginBuilder", "--", ROOT])
     run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"])
     files = [(data / (name + ".esp"), name + ".esp") for name in MODULES]
+    # Alternate Perspective reads start registrations from this folder.
+    files += [(data / "SKSE/AlternatePerspective/ElenwenAgent.json", "SKSE/AlternatePerspective/ElenwenAgent.json")]
     files += [(p, "Scripts/" + p.name) for p in sorted(compiled.glob("EA_*.pex"))]
     files += [(p, "Source/Scripts/" + p.name) for p in sorted((ROOT / "Data/Source/Scripts").glob("EA_*.psc"))]
     files += [(ROOT / "README.md", "README.md")]
-    files += [(ROOT / "Elenwen_Agent_Mod_Build_Specification.md", "Elenwen_Agent_Mod_Build_Specification.md")]
+    files += [(ROOT / name, name) for name in ("Elenwen_Agent_Mod_Build_Specification.md", "Elenwen_Agent_Mod_Build_Specification_Continuation_01.md", "Elenwen_Agent_Revised_Implementation_Plan.md", "Elenwen_Agent_Campaign_Opening.md")]
     files += [(p, "docs/" + p.name) for p in sorted((ROOT / "docs").glob("*.md"))]
     files += [(ROOT / "build/record-map.json", "docs/record-map.json")]
     manifest = {
@@ -127,7 +129,7 @@ def main():
         "compiler_sha256": compiler_hash,
         "api_source": "Creation Kit sources supplied by builder" if args.papyrus_import else "project-authored compile-only API declarations",
         "plugins": [name + ".esp" for name in MODULES],
-        "build_inputs_sha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in [ROOT / "content/build-config.json", ROOT / "content/documents.json", ROOT / "content/record-ids.json", ROOT / "tools/PluginBuilder/Program.cs", ROOT / "tools/PluginBuilder/packages.lock.json"]},
+        "build_inputs_sha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in [ROOT / "content/build-config.json", ROOT / "content/documents.json", ROOT / "content/campaign.json", ROOT / "content/start.json", ROOT / "content/record-ids.json", ROOT / "content/retired-records.json", ROOT / "tools/PluginBuilder/Program.cs", ROOT / "tools/PluginBuilder/packages.lock.json"]},
         "sha256": {name: hashlib.sha256(path.read_bytes()).hexdigest() for path, name in files},
     }
     dist = ROOT / "dist"

@@ -6,8 +6,10 @@ EA_Service Property Service Auto
 EA_Accounts Property Accounts Auto
 Form Property Gold Auto
 Book Property Commission Auto
-Book Property FieldPapers Auto
 Container Property ArchiveBase Auto
+Activator Property BoxBase Auto
+MiscObject Property CaseItem Auto
+Message Property CaseMenu Auto
 Message Property CommissionMenu Auto
 Message Property MainMenu Auto
 Message Property AssignmentMenu Auto
@@ -19,13 +21,12 @@ Message Property UnavailableMessage Auto
 Message Property CollectedMessage Auto
 Message Property RepaymentMenu Auto
 Message Property ReturnedMessage Auto
-Message Property ReviewPendingMessage Auto
 Bool supplied = False
 ObjectReference activeBox
 
 Function UseBox(ObjectReference box)
     ; All player mutations run through this serialized physical interaction.
-    ; No console command is needed after the prototype box has been placed.
+    ; The box is set down from the dispatch case, or placed by console for prototype tests.
     GoToState("Busy")
     If activeBox == None
         activeBox = box
@@ -40,11 +41,16 @@ Function UseBox(ObjectReference box)
     Dispatch.Initialize()
     Service.Initialize()
     If !Core.IsInService()
+        ; Console path only: the Alternate Perspective start commissions through the packet.
         If CommissionMenu.Show() != 0
             GoToState("")
             Return
         EndIf
         Core.Commission()
+        Core.SetCoverStatus(True, False)
+        supplied = True
+        Game.GetPlayer().AddItem(Commission, 1, True)
+        Game.GetPlayer().AddItem(Gold, 100, True)
     EndIf
     If Dispatch.Archive == None
         Dispatch.Archive = box.PlaceAtMe(ArchiveBase, 1, True, False)
@@ -54,56 +60,29 @@ Function UseBox(ObjectReference box)
             Return
         EndIf
         Dispatch.Archive.MoveTo(box, 65.0, 0.0, 0.0)
+        If supplied
+            Dispatch.ArchiveDocument(Commission)
+        EndIf
     EndIf
-    If !supplied
-        supplied = True
-        Game.GetPlayer().AddItem(Commission, 1, True)
-        Game.GetPlayer().AddItem(FieldPapers, 1, True)
-        Game.GetPlayer().AddItem(Gold, 100, True)
-        Dispatch.ArchiveDocument(Commission)
-        Dispatch.ArchiveDocument(FieldPapers)
-    EndIf
-    Core.RefreshDeadlines(Utility.GetCurrentGameTime())
+    Service.BeginCampaign()
     Dispatch.ScheduleNext()
     Accounts.Audit()
-    Service.TryQueueEvaluation(Accounts.GetReviewConcern(), Accounts.IsReviewPending())
     Int selected = MainMenu.Show()
     Int assignment = -1
     If selected == 0
-        Service.CollectOrders()
-        Dispatch.RecoverDocument(Commission)
-        Dispatch.RecoverDocument(FieldPapers)
-    ElseIf selected == 1
-        assignment = AssignmentMenu.Show()
-        If assignment >= 0 && assignment < 6
+        assignment = Service.ChooseInstruction(AssignmentMenu)
+        If assignment >= 0
             ShowServiceResult(Service.FileReport(assignment))
         EndIf
-    ElseIf selected == 2
-        assignment = AssignmentMenu.Show()
-        If assignment >= 0 && assignment < 6
-            ShowServiceResult(Service.RequestExtension(assignment))
-        EndIf
-    ElseIf selected == 3
-        ShowServiceResult(Service.RequestSupplyAuthority())
-    ElseIf selected == 4
-        UseAccounts()
-    ElseIf selected == 5
+    ElseIf selected == 1
         CollectedMessage.Show(Dispatch.CollectResponses())
-        Service.CheckPacketNotice()
-    ElseIf selected == 6
-        Dispatch.RecoverFiledCopies()
-    ElseIf selected == 7
-        If Service.ShowSummary() == 0
-            assignment = AssignmentMenu.Show()
-            If assignment >= 0 && assignment < 6
-                Service.ShowAssignmentStatus(assignment)
-            EndIf
-        EndIf
-        If Service.CountState(4) == 6 && Service.GetEvaluationState() == 0 && Accounts.IsReviewPending()
-            ReviewPendingMessage.Show()
-        EndIf
+    ElseIf selected == 2
+        UseAccounts()
+    ElseIf selected == 3
+        Service.ShowSummary()
+    ElseIf selected == 4
+        UseCase(box)
     EndIf
-    Service.TryQueueEvaluation(Accounts.GetReviewConcern(), Accounts.IsReviewPending())
     GoToState("")
 EndFunction
 
@@ -141,6 +120,43 @@ Function UseAccounts()
         EndIf
     ElseIf selected == 3
         Accounts.ShowStatement()
+    EndIf
+EndFunction
+
+Function UseCase(ObjectReference box)
+    Int selected = CaseMenu.Show()
+    If selected == 0
+        If Dispatch.Archive != None
+            Dispatch.Archive.Activate(Game.GetPlayer())
+        EndIf
+    ElseIf selected == 1
+        Dispatch.RecoverFiledCopies()
+    ElseIf selected == 2
+        PackCase(box)
+    EndIf
+EndFunction
+
+Function PackCase(ObjectReference box)
+    ; Filed papers stay with the case; the archive is hidden until it is set down again.
+    Game.GetPlayer().AddItem(CaseItem, 1, True)
+    If Dispatch.Archive != None
+        Dispatch.Archive.Disable()
+    EndIf
+    If activeBox == box
+        activeBox = None
+    EndIf
+    box.Disable()
+    box.Delete()
+EndFunction
+
+Function Unpack(ObjectReference caseRef)
+    ; The case becomes the dispatch box where it was set down.
+    ObjectReference box = caseRef.PlaceAtMe(BoxBase, 1, True, False)
+    caseRef.Disable()
+    caseRef.Delete()
+    If Dispatch.Archive != None
+        Dispatch.Archive.MoveTo(box, 65.0, 0.0, 0.0)
+        Dispatch.Archive.Enable()
     EndIf
 EndFunction
 

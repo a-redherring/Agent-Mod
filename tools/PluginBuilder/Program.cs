@@ -10,7 +10,7 @@ using var buildConfig = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, "
 var version = buildConfig.RootElement.GetProperty("version").GetString();
 var output = Path.Combine(root, "build", "Data");
 Directory.CreateDirectory(output);
-var names = new[] { "EA_Core", "EA_Dispatch", "EA_Service", "EA_Accounts", "EA_Prototype" };
+var names = new[] { "EA_Core", "EA_Dispatch", "EA_Service", "EA_Accounts", "EA_Prototype", "EA_Start" };
 var mods = names.ToDictionary(n => n, n => new SkyrimMod(ModKey.FromNameAndExtension(n + ".esp"), SkyrimRelease.SkyrimSE));
 var forms = new Dictionary<string, FormKey>();
 FormKey Vanilla(uint id) => new(ModKey.FromNameAndExtension("Skyrim.esm"), id);
@@ -43,10 +43,22 @@ var dispatch = MakeQuest("EA_Dispatch", 0x800, "EA_DispatchQuest", "Embassy Corr
 var service = MakeQuest("EA_Service", 0x800, "EA_ServiceQuest", "Field Instructions");
 var accounts = MakeQuest("EA_Accounts", 0x800, "EA_AccountsQuest", "Operational Accounts");
 var prototype = MakeQuest("EA_Prototype", 0x801, "EA_PrototypeQuest", "Confidential Commission");
-var docs = JsonSerializer.Deserialize<List<Document>>(File.ReadAllText(Path.Combine(root, "content", "documents.json")), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-foreach (var doc in docs)
+var startData = JsonSerializer.Deserialize<StartContent>(File.ReadAllText(Path.Combine(root, "content", "start.json")), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+var start = MakeQuest("EA_Start", Convert.ToUInt32(startData.Quest.Id, 16), startData.Quest.EditorID, startData.Quest.Name);
+var json = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+var docs = JsonSerializer.Deserialize<List<Document>>(File.ReadAllText(Path.Combine(root, "content", "documents.json")), json)!;
+var campaign = JsonSerializer.Deserialize<Campaign>(File.ReadAllText(Path.Combine(root, "content", "campaign.json")), json)!;
+if (campaign.Instructions.Count == 0 || campaign.Instructions.Count > 32) throw new InvalidDataException("Service supports one to thirty-two instructions");
+if (campaign.Letters.Count > 64) throw new InvalidDataException("Service supports up to sixty-four letters");
+for (var i = 0; i < campaign.Instructions.Count; i++)
 {
-    var book = new Book(Key(doc.Module, Convert.ToUInt32(doc.Id, 16), doc.EditorID), SkyrimRelease.SkyrimSE)
+    // Instruction index is the assignment offset; the script derives one from the other.
+    if (campaign.Instructions[i].Assignment != 2001 + i) throw new InvalidDataException("Instructions must be numbered from 2001 without gaps");
+    if ((campaign.Instructions[i].AltReply == null) != (campaign.Instructions[i].Alt == null)) throw new InvalidDataException("An alternative reply needs its condition, and the reverse");
+}
+Book MakeBook(string module, Document doc)
+{
+    var book = new Book(Key(module, Convert.ToUInt32(doc.Id, 16), doc.EditorID), SkyrimRelease.SkyrimSE)
     {
         EditorID = doc.EditorID, Name = doc.Title, Type = Book.BookType.NoteOrScroll,
         Model = new Model { File = @"Clutter\Books\Note01.nif" },
@@ -54,8 +66,23 @@ foreach (var doc in docs)
         BookText = "<font face='$HandwrittenFont'><p align='left'>" + System.Net.WebUtility.HtmlEncode(doc.Text).Replace("\n", "<br>") + "</p></font>",
         Value = 0, Weight = 0
     };
-    mods[doc.Module].Books.Add(book);
+    mods[module].Books.Add(book);
+    return book;
 }
+foreach (var doc in docs) MakeBook(doc.Module, doc);
+foreach (var doc in startData.Documents) MakeBook("EA_Start", doc);
+foreach (var instruction in campaign.Instructions)
+{
+    MakeBook("EA_Service", instruction.Order);
+    MakeBook("EA_Service", instruction.Report);
+    MakeBook("EA_Service", instruction.Reply);
+    if (instruction.AltReply != null) MakeBook("EA_Service", instruction.AltReply);
+}
+foreach (var letter in campaign.Letters) MakeBook("EA_Service", letter.Letter);
+MakeBook("EA_Service", campaign.Wander);
+var arcanaeum = new FormList(Key("EA_Service", Convert.ToUInt32(campaign.Arcanaeum.Id, 16), campaign.Arcanaeum.EditorID), SkyrimRelease.SkyrimSE) { EditorID = campaign.Arcanaeum.EditorID };
+foreach (var book in campaign.Arcanaeum.Books) arcanaeum.Items.Add(new FormLink<ISkyrimMajorRecordGetter>(Vanilla(Convert.ToUInt32(book, 16))));
+mods["EA_Service"].FormLists.Add(arcanaeum);
 var archive = new Container(Key("EA_Dispatch", 0x801, "EA_DocumentArchive"), SkyrimRelease.SkyrimSE)
 {
     EditorID = "EA_DocumentArchive", Name = "Filed Correspondence", Flags = 0,
@@ -69,6 +96,13 @@ var box = new Mutagen.Bethesda.Skyrim.Activator(Key("EA_Prototype", 0x800, "EA_S
     VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 }
 };
 mods["EA_Prototype"].Activators.Add(box);
+var caseItem = new MiscItem(Key("EA_Prototype", Convert.ToUInt32(startData.Prototype.Case.Id, 16), startData.Prototype.Case.EditorID), SkyrimRelease.SkyrimSE)
+{
+    EditorID = startData.Prototype.Case.EditorID, Name = startData.Prototype.Case.Name,
+    Model = new Model { File = @"Clutter\Common\StrongBox01.nif" }, Value = 0, Weight = 2,
+    VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 }
+};
+mods["EA_Prototype"].MiscItems.Add(caseItem);
 Message MakeMessage(string module, uint id, string editorID, string text, params string[] buttons)
 {
     var message = new Message(Key(module, id, editorID), SkyrimRelease.SkyrimSE)
@@ -79,59 +113,39 @@ Message MakeMessage(string module, uint id, string editorID, string text, params
     mods[module].Messages.Add(message);
     return message;
 }
-MakeMessage("EA_Prototype", 0x810, "EA_CommissionMenu", "A sealed packet bears the mark agreed with Elenwen. Break the seal and resume your confidential duties?", "Open commission", "Leave");
-MakeMessage("EA_Prototype", 0x811, "EA_MainMenu", "Secure Embassy dispatch. Replies require one full day in transit. Recoverable copies of your orders are kept on file.", "Collect Orders", "File Report", "Request Extension", "Request Supply Authority", "Accounts", "Check Responses", "Recover filed copies", "Review status", "Leave");
-MakeMessage("EA_Prototype", 0x812, "EA_AssignmentMenu", "Select the instruction to which your paper refers.", "Read field protocol", "Deliver three Alto wines", "Deliver six blue flowers", "Deliver six firewood", "Deliver four leather strips", "Deliver six wheat", "Cancel");
-MakeMessage("EA_Prototype", 0x813, "EA_AccountsMenu", "Operational accounts: wine procurement, instruction 1002. Only one advance and one claim may be entered for this instruction.", "Collect authorized advance", "Submit claim / explanation", "Return outstanding funds", "Read statement", "Cancel");
-MakeMessage("EA_Prototype", 0x814, "EA_ClaimMenu", "Declare the expense you actually incurred. The form will be filed against the wine delivery. A personal cost must not be represented as an Embassy purchase.", "Supplies: 30 septims", "Supplies: 80 septims", "Personal gift: 30 septims", "Meal: 30 septims", "Cancel");
-MakeMessage("EA_Prototype", 0x815, "EA_ExplanationMenu", "Accounts requires an explanation of the meal. Select the accurate statement.", "Necessary supplier meeting", "Personal entertainment", "Cancel");
-MakeMessage("EA_Prototype", 0x816, "EA_FiledMessage", "The transaction has been entered. Correspondence, where required, will return after the next dispatch run.", "Close");
-MakeMessage("EA_Prototype", 0x817, "EA_UnavailableMessage", "The dispatch office could not be opened. Leave the box and try again. If the problem persists, consult the test profile Papyrus log.", "Close");
-MakeMessage("EA_Prototype", 0x818, "EA_CollectedMessage", "Responses collected: %.0f. Filed copies remain in the archive.", "Close");
-MakeMessage("EA_Accounts", 0x820, "EA_BalanceMessage", "Outstanding advance: %.0f septims\nAmount due to Accounts: %.0f septims\nExpenses allowed: %.0f septims\nCash reimbursed: %.0f septims", "Close");
+MakeMessage("EA_Prototype", 0x810, "EA_CommissionMenu", "A sealed packet bears the agreed mark. Break the seal and resume your confidential duties?", "Open commission", "Leave");
+MakeMessage("EA_Prototype", 0x811, "EA_MainMenu", "The dispatch case. Reports are answered a day after filing. Copies of everything are kept in the case.", "File Report", "Check Correspondence", "Accounts", "Review status", "Case and archive", "Leave");
+MakeMessage("EA_Prototype", 0x812, "EA_AssignmentMenu", "Which instruction does your report answer? Open instructions, in the order they were given; the number is on each order.\n\n1: %.0f   2: %.0f   3: %.0f   4: %.0f\n5: %.0f   6: %.0f   7: %.0f   8: %.0f\n\nA position showing 0 is empty.", "First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Cancel");
+MakeMessage("EA_Prototype", 0x813, "EA_AccountsMenu", "Accounts: the authorised advance and its claim. Only one advance and one claim may be entered.", "Collect authorised advance", "Submit claim / explanation", "Return outstanding funds", "Read statement", "Cancel");
+MakeMessage("EA_Prototype", 0x814, "EA_ClaimMenu", "Declare the expense you actually incurred. A personal cost must not be represented as an operational one.", "Fee: 500 septims", "Fee and expenses: 650 septims", "A gift: 60 septims", "A meal: 40 septims", "Cancel");
+MakeMessage("EA_Prototype", 0x815, "EA_ExplanationMenu", "Accounts requires an explanation of the meal. Select the accurate statement.", "A necessary meeting", "A personal expense", "Cancel");
+MakeMessage("EA_Prototype", 0x816, "EA_FiledMessage", "Filed. A reply, where one is due, will be in the case after a full day.", "Close");
+MakeMessage("EA_Prototype", 0x817, "EA_UnavailableMessage", "The case could not be opened. Leave it and try again. If the problem persists, consult the test profile's Papyrus log.", "Close");
+MakeMessage("EA_Prototype", 0x818, "EA_CollectedMessage", "Correspondence collected: %.0f. Copies remain in the case.", "Close");
+MakeMessage("EA_Accounts", 0x820, "EA_BalanceMessage", "Outstanding advance: %.0f septims\nOwed to Accounts: %.0f septims\nExpenses allowed: %.0f septims\nReimbursed: %.0f septims", "Close");
 MakeMessage("EA_Prototype", 0x819, "EA_RepaymentMenu", "Choose how much to return. The payment is limited to the balance outstanding and the gold you carry.", "Up to 10 septims", "Up to 25 septims", "All I can repay", "Cancel");
-MakeMessage("EA_Prototype", 0x81A, "EA_ReturnedMessage", "Returned: %.0f septims\nStill outstanding: %.0f septims\n\nYour receipt is filed with Accounts.", "Close");
-MakeMessage("EA_Prototype", 0x81B, "EA_ReviewPendingMessage", "The six duties are complete. The closing review awaits your Accounts decision or meal explanation. Resolve the claim through Accounts and collect its response.", "Close");
-MakeMessage("EA_Service", 0x900, "EA_ServiceFailure0", "This instruction has not been collected. Choose Collect Orders. Instructions 1004-1006 become available after the first three completion responses have been collected.", "Close");
-MakeMessage("EA_Service", 0x901, "EA_ServiceFailure1", "The report has already been filed or the instruction is closed. Check Responses for any outstanding acknowledgment.", "Close");
-MakeMessage("EA_Service", 0x902, "EA_ServiceFailure2", "Read the private field papers in your inventory before filing this acknowledgment. Missing papers can be recovered at dispatch.", "Close");
-MakeMessage("EA_Service", 0x903, "EA_ServiceFailure3", "An extension request is already awaiting its response. Check Responses after a full day in transit.", "Close");
-MakeMessage("EA_Service", 0x904, "EA_ServiceFailure4", "A further extension has already been refused. Complete the work and file the report; overdue work is still accepted.", "Close");
-MakeMessage("EA_Service", 0x905, "EA_ServiceFailure5", "Supply authority is already awaiting its response. Collect the authorization before requesting an advance from Accounts.", "Close");
-MakeMessage("EA_Service", 0x906, "EA_ServiceFailure6", "Prior supply authority is already held for instruction 1002. Collect the advance under Accounts while the wine duty remains open.", "Close");
-MakeMessage("EA_Service", 0x907, "EA_ServiceFailure7", "Dispatch cannot accept another record. No supplies have been taken. Leave the box and try again; if the problem persists, the dispatch or archive requires attention.", "Close");
-MakeMessage("EA_Service", 0x910, "EA_MissingSupply0", "Read the private field papers before filing this acknowledgment. Missing papers can be recovered at dispatch.", "Close");
-MakeMessage("EA_Service", 0x911, "EA_MissingSupply1", "This consignment is short by %.0f bottles of Alto wine. Bring the required supplies to the dispatch box. Nothing has been taken.", "Close");
-MakeMessage("EA_Service", 0x912, "EA_MissingSupply2", "This consignment is short by %.0f blue mountain flowers. Bring the required supplies to the dispatch box. Nothing has been taken.", "Close");
-MakeMessage("EA_Service", 0x913, "EA_MissingSupply3", "This consignment is short by %.0f pieces of firewood. Bring the required supplies to the dispatch box. Nothing has been taken.", "Close");
-MakeMessage("EA_Service", 0x914, "EA_MissingSupply4", "This consignment is short by %.0f leather strips. Bring the required supplies to the dispatch box. Nothing has been taken.", "Close");
-MakeMessage("EA_Service", 0x915, "EA_MissingSupply5", "This consignment is short by %.0f measures of wheat. Bring the required supplies to the dispatch box. Nothing has been taken.", "Close");
-MakeMessage("EA_Service", 0x920, "EA_AssignmentStatus0", "Instruction %.0f has not been collected. Choose Collect Orders. The second packet opens after all three responses to the first packet have been collected.", "Close");
-MakeMessage("EA_Service", 0x921, "EA_AssignmentStatus1", "Instruction %.0f is active.\nDays remaining: %.1f\n\nFile your report and any required supplies through dispatch.", "Close");
-MakeMessage("EA_Service", 0x922, "EA_AssignmentStatus2", "Instruction %.0f is overdue.\nDays past the deadline: %.1f\n\nThe work is still required. File it or request your first extension; an extension applies only when its approval is collected.", "Close");
-MakeMessage("EA_Service", 0x923, "EA_AssignmentStatus3", "Instruction %.0f: report filed.\n\nCheck Responses after the full day in transit. The consignment cannot be filed a second time.", "Close");
-MakeMessage("EA_Service", 0x924, "EA_AssignmentStatus4", "Instruction %.0f is complete.\n\nThe acknowledgment has been collected. Copies remain in the archive.", "Close");
-MakeMessage("EA_Service", 0x930, "EA_StatusSummary", "DISPATCH REGISTER\nActive: %.0f    Overdue: %.0f\nReports filed: %.0f    Completed: %.0f / 6\nReplies ready: %.0f    In transit: %.0f\n\nThe second packet opens after the first three duties are acknowledged. A closing assessment follows all six duties and any pending Accounts decision.", "Inspect instruction", "Close");
-MakeMessage("EA_Service", 0x931, "EA_PacketReady", "The first packet is complete. Three further instructions are ready. Choose Collect Orders when you are ready to begin; their deadlines start on collection.", "Close");
-MakeMessage("EA_Service", 0x932, "EA_EvaluationQueued", "The closing docket has been filed. Elenwen's assessment will arrive after one full day. Collect it through Check Responses.", "Close");
-MakeMessage("EA_Accounts", 0x900, "EA_AccountsFailure0", "The eighty-septim advance has already been issued. It cannot be collected again. Consult the Accounts statement for the remaining balance.", "Close");
-MakeMessage("EA_Accounts", 0x901, "EA_AccountsFailure1", "Accounts has suspended further advances. Resolve the outstanding liability shown on your statement.", "Close");
-MakeMessage("EA_Accounts", 0x902, "EA_AccountsFailure2", "The wine procurement instruction must be collected and still open before an advance can be issued. An advance cannot be drawn after the delivery report is filed.", "Close");
-MakeMessage("EA_Accounts", 0x903, "EA_AccountsFailure3", "Prior supply authority has not been collected. Request Supply Authority at dispatch, allow a full day, then collect the written authorization.", "Close");
-MakeMessage("EA_Accounts", 0x904, "EA_AccountsFailure4", "Deliver the three Alto wines and file instruction 1002 before claiming its expense. This claim does not cover the other duties.", "Close");
-MakeMessage("EA_Accounts", 0x905, "EA_AccountsFailure5", "Your claim or explanation is already awaiting a response. Check Responses after its full day in transit.", "Close");
-MakeMessage("EA_Accounts", 0x906, "EA_AccountsFailure6", "The claim for instruction 1002 is already settled. A second claim cannot be submitted.", "Close");
-MakeMessage("EA_Accounts", 0x907, "EA_AccountsFailure7", "No new claim can be accepted at this stage. If the meal claim was returned, choose Submit claim / explanation and provide the requested explanation.", "Close");
-MakeMessage("EA_Accounts", 0x908, "EA_AccountsFailure8", "There is no outstanding advance or Accounts debt to repay.", "Close");
-MakeMessage("EA_Accounts", 0x909, "EA_AccountsFailure9", "You have no septims available to return. Your outstanding balance remains on the Accounts statement.", "Close");
-MakeMessage("EA_Accounts", 0x90A, "EA_AccountsFailure10", "Accounts cannot enter this transaction. No funds have been transferred. Check the dispatch and archive before trying again.", "Close");
-for (var i = 0; i < 6; i++)
+MakeMessage("EA_Prototype", 0x81A, "EA_ReturnedMessage", "Returned: %.0f septims\nStill outstanding: %.0f septims\n\nThe receipt is in the case.", "Close");
+foreach (var m in campaign.Messages.Failure) MakeMessage("EA_Service", Convert.ToUInt32(m.Id, 16), m.EditorID, m.Text, "Close");
+MakeMessage("EA_Service", Convert.ToUInt32(campaign.Messages.Summary.Id, 16), campaign.Messages.Summary.EditorID, campaign.Messages.Summary.Text, "Close");
+foreach (var instruction in campaign.Instructions) MakeMessage("EA_Service", Convert.ToUInt32(instruction.NotYet.Id, 16), instruction.NotYet.EditorID, instruction.NotYet.Text, "Close");
+foreach (var m in startData.Prototype.Messages) MakeMessage("EA_Prototype", Convert.ToUInt32(m.Id, 16), m.EditorID, m.Text, m.Buttons);
+foreach (var m in startData.Messages) MakeMessage("EA_Start", Convert.ToUInt32(m.Id, 16), m.EditorID, m.Text, m.Buttons);
+MakeMessage("EA_Accounts", 0x900, "EA_AccountsFailure0", "The advance has already been issued. It cannot be collected again. The statement shows what remains.", "Close");
+MakeMessage("EA_Accounts", 0x901, "EA_AccountsFailure1", "Accounts has suspended further advances. Settle the liability shown on your statement.", "Close");
+MakeMessage("EA_Accounts", 0x902, "EA_AccountsFailure2", "The instruction this advance is for is not open. An advance cannot be drawn once its report is filed.", "Close");
+MakeMessage("EA_Accounts", 0x903, "EA_AccountsFailure3", "No advance has been authorised.", "Close");
+MakeMessage("EA_Accounts", 0x904, "EA_AccountsFailure4", "File the report on the hire before claiming its cost. This claim covers nothing else.", "Close");
+MakeMessage("EA_Accounts", 0x905, "EA_AccountsFailure5", "Your claim or explanation is already awaiting a reply. Check the case after a full day.", "Close");
+MakeMessage("EA_Accounts", 0x906, "EA_AccountsFailure6", "The claim is already settled. A second claim cannot be entered.", "Close");
+MakeMessage("EA_Accounts", 0x907, "EA_AccountsFailure7", "No new claim can be accepted now. If the meal was returned, choose Submit claim / explanation and explain it.", "Close");
+MakeMessage("EA_Accounts", 0x908, "EA_AccountsFailure8", "There is no outstanding advance or debt to repay.", "Close");
+MakeMessage("EA_Accounts", 0x909, "EA_AccountsFailure9", "You have no septims to return. The balance remains on the statement.", "Close");
+MakeMessage("EA_Accounts", 0x90A, "EA_AccountsFailure10", "Accounts cannot enter this. Nothing has been transferred. Check the case and its archive before trying again.", "Close");
+for (var i = 0; i < campaign.Instructions.Count; i++)
 {
-    var objectives = new[] { "Read the field papers, then file an acknowledgment", "Deliver three bottles of Alto wine through dispatch", "Deliver six blue mountain flowers through dispatch", "Deliver six pieces of firewood through dispatch", "Deliver four leather strips through dispatch", "Deliver six measures of wheat through dispatch" };
-    service.Objectives.Add(new QuestObjective { Index = (ushort)(10 + i), DisplayText = objectives[i] });
-    service.Objectives.Add(new QuestObjective { Index = (ushort)(20 + i), DisplayText = "Collect the response to instruction " + (1001 + i) });
+    service.Objectives.Add(new QuestObjective { Index = (ushort)(100 + i), DisplayText = campaign.Instructions[i].Objective });
+    service.Objectives.Add(new QuestObjective { Index = (ushort)(200 + i), DisplayText = "Collect the reply to instruction " + campaign.Instructions[i].Assignment });
 }
-service.Objectives.Add(new QuestObjective { Index = 30, DisplayText = "Collect Elenwen's closing assessment" });
 ScriptObjectProperty Link(string name, FormKey target) => new()
 {
     Name = name, Flags = ScriptProperty.Flag.Edited,
@@ -140,9 +154,29 @@ ScriptObjectProperty Link(string name, FormKey target) => new()
 ScriptObjectListProperty Links(string name, params string[] targets)
 {
     var property = new ScriptObjectListProperty { Name = name, Flags = ScriptProperty.Flag.Edited };
-    foreach (var target in targets) property.Objects.Add(Link("", forms[target]));
+    foreach (var target in targets) property.Objects.Add(Link("", target == "" ? FormKey.Null : forms[target]));
     return property;
 }
+ScriptIntProperty Int(string name, int value) => new() { Name = name, Flags = ScriptProperty.Flag.Edited, Data = value };
+ScriptIntListProperty Ints(string name, IEnumerable<int> values)
+{
+    var property = new ScriptIntListProperty { Name = name, Flags = ScriptProperty.Flag.Edited };
+    property.Data.AddRange(values);
+    return property;
+}
+ScriptStringListProperty Strings(string name, IEnumerable<string> values)
+{
+    var property = new ScriptStringListProperty { Name = name, Flags = ScriptProperty.Flag.Edited };
+    property.Data.AddRange(values);
+    return property;
+}
+ScriptObjectListProperty FormLinks(string name, IEnumerable<FormKey> targets)
+{
+    var property = new ScriptObjectListProperty { Name = name, Flags = ScriptProperty.Flag.Edited };
+    foreach (var target in targets) property.Objects.Add(Link("", target));
+    return property;
+}
+ScriptObjectListProperty VanillaLinks(string name, IEnumerable<uint> targets) => FormLinks(name, targets.Select(Vanilla));
 ScriptEntry Script(string name, params ScriptProperty[] properties)
 {
     var entry = new ScriptEntry { Name = name, Flags = ScriptEntry.Flag.Local };
@@ -152,44 +186,113 @@ ScriptEntry Script(string name, params ScriptProperty[] properties)
 ScriptObjectProperty Ref(string property, string editorID) => Link(property, forms[editorID]);
 core.VirtualMachineAdapter!.Scripts.Add(Script("EA_Core"));
 dispatch.VirtualMachineAdapter!.Scripts.Add(Script("EA_Dispatch", Ref("Core", "EA_CoreQuest")));
+// Conditions are one flat table; instructions and letters own consecutive ranges of it.
+var kinds = new Dictionary<string, int>
+{
+    ["nights"] = 1, ["residenceDays"] = 2, ["visited"] = 3, ["deliver"] = 4, ["holds"] = 5, ["stageDone"] = 6,
+    ["questBegun"] = 7, ["questNotBegun"] = 8, ["playerInFaction"] = 9, ["actorInFaction"] = 10, ["actorHolds"] = 11,
+    ["actorDead"] = 12, ["actorAlive"] = 13, ["globalAtLeast"] = 14, ["earned"] = 15, ["level"] = 16, ["magic"] = 17,
+    ["daysInPhase"] = 18, ["phaseWeight"] = 19, ["present"] = 20, ["questCompleted"] = 21, ["stageAtLeast"] = 22
+};
+var conditions = new List<Condition>();
+int AddConditions(IEnumerable<Condition> list) { var first = conditions.Count; conditions.AddRange(list); return first; }
+FormKey ConditionForm(string? form) => form == null ? FormKey.Null : form == "LIST" ? arcanaeum.FormKey : Vanilla(Convert.ToUInt32(form, 16));
+var condStart = new List<int>(); var condCount = new List<int>(); var requireCond = new List<int>(); var altCond = new List<int>();
+foreach (var instruction in campaign.Instructions)
+{
+    condStart.Add(AddConditions(instruction.Conditions)); condCount.Add(instruction.Conditions.Count);
+    requireCond.Add(instruction.Require == null ? -1 : AddConditions(new[] { instruction.Require }));
+    altCond.Add(instruction.Alt == null ? -1 : AddConditions(new[] { instruction.Alt }));
+}
+var letterStart = new List<int>(); var letterCount = new List<int>();
+var enclosures = new List<string>(); var enclosureStart = new List<int>(); var enclosureCount = new List<int>();
+foreach (var letter in campaign.Letters)
+{
+    letterStart.Add(AddConditions(letter.Conditions)); letterCount.Add(letter.Conditions.Count);
+    enclosureStart.Add(letter.Enclosures.Count == 0 ? -1 : enclosures.Count); enclosureCount.Add(letter.Enclosures.Count);
+    enclosures.AddRange(letter.Enclosures);
+}
+if (conditions.Count > 128) throw new InvalidDataException("Service supports up to 128 conditions");
+foreach (var c in conditions) if (!kinds.ContainsKey(c.Kind)) throw new InvalidDataException("Unknown condition kind: " + c.Kind);
+var instructions = campaign.Instructions;
 service.VirtualMachineAdapter!.Scripts.Add(Script("EA_Service",
     Ref("Core", "EA_CoreQuest"), Ref("Dispatch", "EA_DispatchQuest"),
-    Links("Orders", "EA_OrderProtocol", "EA_OrderWine", "EA_OrderFlowers", "EA_OrderFirewood", "EA_OrderLeather", "EA_OrderWheat"),
-    Links("Reports", "EA_ReportProtocol", "EA_ReportWine", "EA_ReportFlowers", "EA_ReportFirewood", "EA_ReportLeather", "EA_ReportWheat"),
-    Links("Responses", "EA_ResponseProtocol", "EA_ResponseWine", "EA_ResponseFlowers", "EA_ResponseFirewood", "EA_ResponseLeather", "EA_ResponseWheat"),
-    Links("ExtensionRequests", "EA_ExtensionRequest", "EA_ExtensionRequestWine", "EA_ExtensionRequestFlowers", "EA_ExtensionRequestFirewood", "EA_ExtensionRequestLeather", "EA_ExtensionRequestWheat"),
-    Links("ApprovedExtensions", "EA_ExtensionApproved", "EA_ExtensionApprovedWine", "EA_ExtensionApprovedFlowers", "EA_ExtensionApprovedFirewood", "EA_ExtensionApprovedLeather", "EA_ExtensionApprovedWheat"),
-    Links("DeniedExtensions", "EA_ExtensionDenied", "EA_ExtensionDeniedWine", "EA_ExtensionDeniedFlowers", "EA_ExtensionDeniedFirewood", "EA_ExtensionDeniedLeather", "EA_ExtensionDeniedWheat"),
-    Links("PromptResponses", "EA_ResponsePromptProtocol", "EA_ResponsePromptWine", "EA_ResponsePromptFlowers", "EA_ResponsePromptFirewood", "EA_ResponsePromptLeather", "EA_ResponsePromptWheat"),
-    Links("LateResponses", "EA_ResponseLateProtocol", "EA_ResponseLateWine", "EA_ResponseLateFlowers", "EA_ResponseLateFirewood", "EA_ResponseLateLeather", "EA_ResponseLateWheat"),
-    Links("FailureMessages", "EA_ServiceFailure0", "EA_ServiceFailure1", "EA_ServiceFailure2", "EA_ServiceFailure3", "EA_ServiceFailure4", "EA_ServiceFailure5", "EA_ServiceFailure6", "EA_ServiceFailure7"),
-    Links("MissingMessages", "EA_MissingSupply0", "EA_MissingSupply1", "EA_MissingSupply2", "EA_MissingSupply3", "EA_MissingSupply4", "EA_MissingSupply5"),
-    Links("StatusMessages", "EA_AssignmentStatus0", "EA_AssignmentStatus1", "EA_AssignmentStatus2", "EA_AssignmentStatus3", "EA_AssignmentStatus4"),
-    Ref("SummaryMessage", "EA_StatusSummary"), Ref("PacketReadyMessage", "EA_PacketReady"), Ref("EvaluationQueuedMessage", "EA_EvaluationQueued"),
-    Ref("EvaluationRequest", "EA_EvaluationRequest"), Links("Evaluations", "EA_EvaluationGood", "EA_EvaluationMixed", "EA_EvaluationPoor"),
-    Ref("AuthorityRequest", "EA_AuthorityRequest"),
-    Ref("AuthorityApproved", "EA_AuthorityApproved"), Link("Wine", Vanilla(0x3133B)), Link("Flowers", Vanilla(0x77E1C)),
-    Link("Firewood", Vanilla(0x6F993)), Link("LeatherStrips", Vanilla(0x800E4)), Link("Wheat", Vanilla(0x4B0BA))));
+    Links("Orders", instructions.Select(i => i.Order.EditorID).ToArray()), Links("Reports", instructions.Select(i => i.Report.EditorID).ToArray()),
+    Links("Replies", instructions.Select(i => i.Reply.EditorID).ToArray()), Links("AltReplies", instructions.Select(i => i.AltReply?.EditorID ?? "").ToArray()),
+    Ints("Phases", instructions.Select(i => i.Phase)), Ints("CondStart", condStart), Ints("CondCount", condCount),
+    Ints("RequireCond", requireCond), Ints("AltCond", altCond), Ints("Weights", instructions.Select(i => i.Weight)),
+    Ints("AltWeights", instructions.Select(i => i.AltWeight)), Ints("AltTrust", instructions.Select(i => i.AltTrust)),
+    Links("NotYetMessages", instructions.Select(i => i.NotYet.EditorID).ToArray()),
+    Links("Letters", campaign.Letters.Select(l => l.Letter.EditorID).ToArray()), Ints("LetterPhases", campaign.Letters.Select(l => l.Phase)),
+    Ints("LetterCondStart", letterStart), Ints("LetterCondCount", letterCount), Ints("LetterActions", campaign.Letters.Select(l => l.Action)),
+    Ints("EnclosureStart", enclosureStart), Ints("EnclosureCount", enclosureCount), VanillaLinks("Enclosures", enclosures.Select(e => Convert.ToUInt32(e, 16))),
+    Ref("WanderLetter", campaign.Wander.EditorID),
+    Ints("CondKinds", conditions.Select(c => kinds[c.Kind])), FormLinks("CondForms", conditions.Select(c => ConditionForm(c.Form))),
+    FormLinks("CondOtherForms", conditions.Select(c => ConditionForm(c.Other))), Ints("CondValues", conditions.Select(c => c.Value)),
+    Strings("CondPlugins", conditions.Select(c => c.Plugin ?? "")), Ints("CondFormIDs", conditions.Select(c => c.Local ?? 0)),
+    Link("Inn", Vanilla(Convert.ToUInt32(campaign.Places.Inn, 16))), VanillaLinks("Bounds", campaign.Places.Bounds.Select(b => Convert.ToUInt32(b, 16))),
+    Int("AdvanceOperation", campaign.Operations.Advance), Int("RemovalOperation", campaign.Operations.Removal),
+    Links("FailureMessages", campaign.Messages.Failure.Select(m => m.EditorID).ToArray()), Ref("SummaryMessage", campaign.Messages.Summary.EditorID)));
 accounts.VirtualMachineAdapter!.Scripts.Add(Script("EA_Accounts",
     Ref("Core", "EA_CoreQuest"), Ref("Dispatch", "EA_DispatchQuest"), Link("Gold", Vanilla(0xF)),
     Ref("AdvanceReceipt", "EA_AdvanceReceipt"), Ref("ReturnReceipt", "EA_ReturnReceipt"), Ref("AuditNotice", "EA_AuditNotice"),
     Links("ClaimForms", "EA_ClaimSupplies", "EA_ClaimExtravagant", "EA_ClaimGift", "EA_ClaimMeal"),
     Links("Decisions", "EA_ClaimApproved", "EA_ClaimPartial", "EA_ClaimDenied", "EA_ClaimReturned"),
     Ref("ExplanationForm", "EA_ExplanationForm"), Ref("PersonalExplanationForm", "EA_ExplanationPersonal"),
-    Links("FailureMessages", "EA_AccountsFailure0", "EA_AccountsFailure1", "EA_AccountsFailure2", "EA_AccountsFailure3", "EA_AccountsFailure4", "EA_AccountsFailure5", "EA_AccountsFailure6", "EA_AccountsFailure7", "EA_AccountsFailure8", "EA_AccountsFailure9", "EA_AccountsFailure10"),
-    Ref("MealPartialDecision", "EA_MealPartialDecision"), Ref("BalanceMessage", "EA_BalanceMessage")));
+    Links("FailureMessages", Enumerable.Range(0, 11).Select(i => "EA_AccountsFailure" + i).ToArray()),
+    Ref("MealPartialDecision", "EA_MealPartialDecision"), Ref("BalanceMessage", "EA_BalanceMessage"),
+    // The hire of the Dunmer: a 500-septim advance; claims of 500, 650, 60 and 40.
+    Int("OperationID", campaign.Operations.Advance), Int("AdvanceAmount", 500), Ints("ClaimAmounts", new[] { 500, 650, 60, 40 }),
+    Int("AllowedAmount", 500), Int("ExplainedAllowance", 20)));
 prototype.VirtualMachineAdapter!.Scripts.Add(Script("EA_Prototype",
     Ref("Core", "EA_CoreQuest"), Ref("Dispatch", "EA_DispatchQuest"), Ref("Service", "EA_ServiceQuest"),
     Ref("Accounts", "EA_AccountsQuest"), Link("Gold", Vanilla(0xF)), Ref("Commission", "EA_Commission"),
-    Ref("FieldPapers", "EA_FieldPapersBook"), Ref("ArchiveBase", "EA_DocumentArchive"),
+    Ref("ArchiveBase", "EA_DocumentArchive"),
     Ref("CommissionMenu", "EA_CommissionMenu"), Ref("MainMenu", "EA_MainMenu"), Ref("AssignmentMenu", "EA_AssignmentMenu"),
     Ref("AccountsMenu", "EA_AccountsMenu"), Ref("ClaimMenu", "EA_ClaimMenu"), Ref("ExplanationMenu", "EA_ExplanationMenu"),
-    Ref("RepaymentMenu", "EA_RepaymentMenu"), Ref("ReturnedMessage", "EA_ReturnedMessage"), Ref("ReviewPendingMessage", "EA_ReviewPendingMessage"),
-    Ref("FiledMessage", "EA_FiledMessage"), Ref("UnavailableMessage", "EA_UnavailableMessage"), Ref("CollectedMessage", "EA_CollectedMessage")));
+    Ref("RepaymentMenu", "EA_RepaymentMenu"), Ref("ReturnedMessage", "EA_ReturnedMessage"),
+    Ref("FiledMessage", "EA_FiledMessage"), Ref("UnavailableMessage", "EA_UnavailableMessage"), Ref("CollectedMessage", "EA_CollectedMessage"),
+    Ref("BoxBase", "EA_SecureDispatch"), Ref("CaseItem", startData.Prototype.Case.EditorID), Ref("CaseMenu", "EA_CaseMenu")));
+caseItem.VirtualMachineAdapter!.Scripts.Add(Script("EA_DispatchCase", Ref("Controller", "EA_PrototypeQuest")));
+// Alternate Perspective starts this quest; stage 10 is its start-up stage and moves the player at once.
+foreach (var stage in startData.Quest.Stages)
+{
+    var entry = new QuestLogEntry { Entry = stage.Log, Flags = 0 };
+    if (stage.Complete) entry.Flags = QuestLogEntry.Flag.CompleteQuest;
+    start.Stages.Add(new QuestStage { Index = (ushort)stage.Index, Flags = stage.StartUp ? QuestStage.Flag.StartUpStage : 0, LogEntries = { entry } });
+}
+foreach (var objective in startData.Quest.Objectives)
+    start.Objectives.Add(new QuestObjective { Index = (ushort)objective.Index, DisplayText = objective.Text });
+start.Aliases.Add(new QuestAlias { ID = 0, Type = QuestAlias.TypeEnum.Location, Name = "Northwatch", SpecificLocation = new FormLinkNullable<ILocationGetter>(Vanilla(0x19285)) });
+start.Aliases.Add(new QuestAlias { ID = 1, Name = "Arrival", Location = new LocationAliasReference { AliasID = 0, RefType = new FormLinkNullable<ILocationReferenceTypeGetter>(Vanilla(0x10F63C)) } });
+start.Aliases.Add(new QuestAlias { ID = 2, Name = "Player", ForcedReference = new FormLinkNullable<IPlacedGetter>(Vanilla(0x14)) });
+start.NextAliasID = 3;
+var startScript = (QuestAdapter)start.VirtualMachineAdapter!;
+startScript.Scripts.Add(Script("EA_Opening",
+    Ref("Core", "EA_CoreQuest"), Ref("Dispatch", "EA_DispatchQuest"), Ref("Service", "EA_ServiceQuest"),
+    Link("NorthwatchFaction", Vanilla(0xC0637)), Ref("SealedPacket", "EA_SealedPacket"),
+    Links("PacketPapers", "EA_ArrivalLetter", "EA_CivilianPapers", "EA_ConditionalRelease", "EA_DispatchInstructions"),
+    VanillaLinks("PacketBooks", campaign.PacketBooks.Select(b => Convert.ToUInt32(b, 16))),
+    Ref("DispatchCase", startData.Prototype.Case.EditorID), Link("Gold", Vanilla(0xF)), Link("Dagger", Vanilla(0x1397E)),
+    Int("Allowance", 100)));
+startScript.FileName = "EA_Opening";
+startScript.ExtraBindDataVersion = 2;
+startScript.Fragments.Add(new QuestScriptFragment { Stage = 10, StageIndex = 0, Unknown2 = 1, ScriptName = "EA_Opening", FragmentName = "Fragment_10" });
+var packetBook = mods["EA_Start"].Books.First(b => b.EditorID == "EA_SealedPacket");
+packetBook.VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 };
+packetBook.VirtualMachineAdapter.Scripts.Add(Script("EA_SealedPacket", Ref("Opening", startData.Quest.EditorID)));
+var registration = Path.Combine(output, "SKSE", "AlternatePerspective");
+Directory.CreateDirectory(registration);
+File.WriteAllText(Path.Combine(registration, "ElenwenAgent.json"), JsonSerializer.Serialize(startData.AlternatePerspective, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }) + "\n");
 box.VirtualMachineAdapter!.Scripts.Add(Script("EA_DispatchBox", Ref("Controller", "EA_PrototypeQuest")));
-var papers = mods["EA_Core"].Books.First(b => b.EditorID == "EA_FieldPapersBook");
-papers.VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 };
-papers.VirtualMachineAdapter.Scripts.Add(Script("EA_FieldPapers", Ref("Core", "EA_CoreQuest")));
+// The player alias reports arrivals and nights; Service decides what they count for.
+service.Aliases.Add(new QuestAlias { ID = 0, Name = "Player", ForcedReference = new FormLinkNullable<IPlacedGetter>(Vanilla(0x14)) });
+service.NextAliasID = 1;
+((QuestAdapter)service.VirtualMachineAdapter!).Aliases.Add(new QuestFragmentAlias
+{
+    Property = new ScriptObjectProperty { Object = new FormLink<ISkyrimMajorRecordGetter>(service.FormKey), Alias = 0 },
+    Version = 5, ObjectFormat = 2, Scripts = { Script("EA_ServicePlayer", Ref("Service", "EA_ServiceQuest")) }
+});
 // Explicit IDs form the save contract. Fail instead of silently allocating new IDs.
 var recordMap = new SortedDictionary<string, string>();
 foreach (var (name, mod) in mods)
@@ -209,3 +312,20 @@ foreach (var (name, mod) in mods)
 }
 File.WriteAllText(Path.Combine(root, "build", "record-map.json"), JsonSerializer.Serialize(recordMap, new JsonSerializerOptions { WriteIndented = true }) + "\n");
 record Document(string Module, string Id, string EditorID, string Title, string Text);
+record MessageText(string Id, string EditorID, string Text, string[] Buttons);
+record Condition(string Kind, string? Form, string? Other, int Value, string? Plugin, int? Local);
+record Instruction(int Assignment, string Key, int Phase, string Objective, Document Order, Document Report, Document Reply, Document? AltReply,
+    MessageText NotYet, List<Condition> Conditions, Condition? Require, Condition? Alt, int Weight, int AltWeight, int AltTrust);
+record LetterSpec(string Key, int Phase, int Action, Document Letter, List<Condition> Conditions, List<string> Enclosures);
+record Arcanaeum(string Id, string EditorID, List<string> Books);
+record Places(string Inn, List<string> Bounds);
+record Operations(int Advance, int Removal);
+record CampaignMessages(List<MessageText> Failure, MessageText Summary);
+record Campaign(List<Instruction> Instructions, List<LetterSpec> Letters, Document Wander, Arcanaeum Arcanaeum, Places Places, Operations Operations,
+    List<string> PacketBooks, CampaignMessages Messages);
+record StartStage(int Index, bool StartUp, bool Complete, string Log);
+record StartObjective(int Index, string Text);
+record StartQuest(string Id, string EditorID, string Name, List<StartStage> Stages, List<StartObjective> Objectives);
+record StartItem(string Id, string EditorID, string Name);
+record StartPrototype(StartItem Case, List<MessageText> Messages);
+record StartContent(StartQuest Quest, List<Document> Documents, List<MessageText> Messages, StartPrototype Prototype, JsonElement AlternatePerspective);

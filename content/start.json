@@ -1,0 +1,87 @@
+{
+  "quest": {
+    "id": "800",
+    "editorID": "EA_StartQuest",
+    "name": "Released",
+    "stages": [
+      {
+        "index": 10,
+        "startUp": true,
+        "log": "I was taken from Imperial territory under Dominion authority and brought north to Northwatch Keep. I don't know whose order put me there. I know whose order got me out.\n\nElenwen questioned me herself before the end. Then the release came, under her seal: conditional, and revocable. My belongings were returned, and I was given civilian papers, a little money and a sealed packet. I was not ordered to report to the Embassy, and the garrison was not told what I am.\n\nI should read the packet before I go any further."
+      },
+      {
+        "index": 20,
+        "complete": true,
+        "log": "The packet holds my orders. I am to go to Riverwood, take a room at the Sleeping Giant Inn and keep it, and make my living however I can without drawing notice. I am not to leave Whiterun or Falkreath holds. I will be told when I am needed.\n\nThe case in the packet is for my reports. It is to be set down where I live."
+      }
+    ],
+    "objectives": [
+      {
+        "index": 10,
+        "text": "Read the sealed packet"
+      }
+    ]
+  },
+  "documents": [
+    {
+      "id": "810",
+      "editorID": "EA_SealedPacket",
+      "title": "Sealed Packet",
+      "text": "Plain wax. No name on the outside.\n\nInside: a letter, civilian papers, a copy of a release, instructions for a dispatch case, two books, a purse, and the case itself."
+    },
+    {
+      "id": "811",
+      "editorID": "EA_ArrivalLetter",
+      "title": "A Letter",
+      "text": "C.,\n\nBy the time this reaches you, the keep will have returned your belongings and put you outside its gate. Do not mistake that for liberty.\n\nYou are to go to Riverwood, in Whiterun Hold, and take a room at the Sleeping Giant Inn. Keep it. Earn your living however a freelancer earns his: cut wood, hire out your sword, I really don't mind which, provided none of it brings you to the attention of a Jarl's steward. You are not to travel beyond Whiterun and Falkreath without my leave.\n\nTwo books accompany this. Read them. The Reach will not explain itself to you, and I haven't the time to do it for it. If you come across The City of Stone, read that as well; it is vulgar, but it is accurate.\n\nYou will hear from me when I have a use for you. Until then, I would much prefer not to hear from you at all.\n\n— E."
+    },
+    {
+      "id": "812",
+      "editorID": "EA_CivilianPapers",
+      "title": "Civilian Papers",
+      "text": "The bearer, a citizen of Cyrodiil, is permitted to travel within the province of Skyrim and to seek lawful employment there.\n\nName and description as given by the bearer.\nOccupation: none entered.\n\nCountersigned at the border."
+    },
+    {
+      "id": "813",
+      "editorID": "EA_DispatchInstructions",
+      "title": "Instructions for the Dispatch Case",
+      "text": "The case is to be set down where you live, not carried about. Set down, it opens into a dispatch box. Pack it before you move.\n\nFiled copies stay with the case. Correspondence for you is left in it; collect it there. Reports are filed through it and answered in it, a day later."
+    },
+    {
+      "id": "815",
+      "editorID": "EA_ConditionalRelease",
+      "title": "Order of Conditional Release",
+      "text": "By authority of the First Emissary of the Aldmeri Dominion to the province of Skyrim.\n\nThe prisoner held at Northwatch Keep under sealed instruction is released from custody, his effects to be returned to him.\n\nThis release is conditional and may be revoked without notice. The original is retained.\n\nBy my hand and seal,\n\nElenwen\nFirst Emissary"
+    }
+  ],
+  "messages": [],
+  "prototype": {
+    "case": {
+      "id": "830",
+      "editorID": "EA_DispatchCaseItem",
+      "name": "Sealed Dispatch Case"
+    },
+    "messages": [
+      {
+        "id": "81D",
+        "editorID": "EA_CaseMenu",
+        "text": "The dispatch case. Filed copies are kept with it.",
+        "buttons": [
+          "Open filed correspondence",
+          "Recover filed copies",
+          "Pack the case",
+          "Cancel"
+        ]
+      }
+    ]
+  },
+  "alternatePerspective": [
+    {
+      "mod": "EA_Start.esp",
+      "text": "Elenwen's Agent",
+      "description": "Released outside Northwatch Keep under sealed instructions. You are already in Elenwen's service.",
+      "color": "0x6B8E5A",
+      "id": "0x800"
+    }
+  ]
+}

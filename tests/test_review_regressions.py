@@ -2,7 +2,7 @@
 import unittest
 from pathlib import Path
 
-from papyrus_vm import fixture, Inventory, Menu
+from papyrus_vm import OPERATION, fixture, Inventory, Menu
 
 ASSEMBLY = Path(__file__).resolve().parents[1] / "build/Data/Scripts"
 
@@ -12,37 +12,41 @@ class ReviewRegressions(unittest.TestCase):
         self.vm, self.core, self.dispatch, self.service, self.accounts = fixture(ASSEMBLY)
 
     def deliver(self):
-        self.vm.player.items["Wine"] = 3
-        self.assertTrue(self.service.call("FileReport", 1))
+        self.assertTrue(self.core.call("RecordFact", OPERATION, 1))
+        self.assertTrue(self.core.call("FileAssignment", OPERATION))
 
     def advance(self):
-        self.service.call("RequestSupplyAuthority")
-        self.vm.day += 1
-        self.dispatch.call("CollectResponses")
+        self.core.call("GrantAuthority", OPERATION, 5, 2, 0.0)
         self.assertTrue(self.accounts.call("IssueAdvance"))
 
-    def test_zero_transaction_does_not_grant_authority_or_extension(self):
-        before = list(self.core.vars["assignmentdue"])
-        self.service.call("ReceiveResponse", 0, 1002, 4)
-        self.service.call("ReceiveResponse", 0, 1001, 2)
-        self.assertEqual(self.core.call("GetAuthority", 1002, 5), 0)
-        self.assertEqual(self.core.vars["assignmentdue"], before)
+    def paused(self):
+        """A deadline assignment for the suspension tests: due on day 11, at the given index."""
+        self.assertTrue(self.core.call("RegisterAssignment", 5001, 3, 11.0))
+        return self.core.call("FindAssignment", 5001)
 
-    def test_response_callback_cannot_bypass_transit_or_collection(self):
-        self.service.call("RequestSupplyAuthority")
-        tx = self.service.vars["authoritytransaction"]
-        self.service.call("ReceiveResponse", tx, 1002, 4)
-        self.assertEqual(self.core.call("GetAuthority", 1002, 5), 0)
-        self.vm.day += 1
-        self.service.call("ReceiveResponse", tx, 1002, 4)
-        self.assertEqual(self.core.call("GetAuthority", 1002, 5), 0)
+    def test_zero_transaction_completes_nothing_and_pays_nothing(self):
+        self.service.call("BeginCampaign")
+        self.service.call("ReceiveResponse", 0, 2001, 1)
+        self.assertEqual(self.core.call("GetAssignmentState", 2001), 1)
+        self.deliver()
+        self.accounts.call("ReceiveResponse", 0, OPERATION, 1)
+        self.assertEqual(self.vm.player.items["Gold"], 0)
+
+    def test_letter_callback_cannot_bypass_collection(self):
+        self.service.call("BeginCampaign")
+        self.service.vars["nights"] = 3
+        self.service.call("Evaluate")
+        tx = self.service.vars["lettertransactions"][0]
+        self.assertGreater(tx, 0)
+        self.service.call("ReceiveResponse", tx, 2900, 0)
+        self.assertFalse(self.service.vars["letterdone"][0])
         self.dispatch.call("CollectResponses")
-        self.assertEqual(self.core.call("GetAuthority", 1002, 5), 2)
+        self.assertTrue(self.service.vars["letterdone"][0])
 
     def test_accounts_callback_cannot_pay_early(self):
         self.deliver()
         self.accounts.call("SubmitClaim", 0)
-        self.accounts.call("ReceiveResponse", self.accounts.vars["claimtransaction"], 1002, 1)
+        self.accounts.call("ReceiveResponse", self.accounts.vars["claimtransaction"], OPERATION, 1)
         self.assertEqual(self.vm.player.items["Gold"], 0)
         self.vm.day += 1
         self.dispatch.call("CollectResponses")
@@ -50,24 +54,10 @@ class ReviewRegressions(unittest.TestCase):
 
     def test_advance_requires_prior_not_emergency_or_standing_authority(self):
         for mode in (1, 3):
-            self.core.call("GrantAuthority", 1002, 5, mode, 0.0)
+            self.core.call("GrantAuthority", OPERATION, 5, mode, 0.0)
             self.assertFalse(self.accounts.call("IssueAdvance"))
-        self.assertTrue(self.service.call("RequestSupplyAuthority"))
-
-    def test_deposited_supplies_are_not_retrievable_from_paper_archive(self):
-        self.deliver()
-        self.assertEqual(self.vm.player.items["Wine"], 0)
-        self.assertEqual(self.dispatch.vars["::archive_var"].items["Wine"], 0)
-
-    def test_final_extension_denial_cannot_fill_dispatch_queue(self):
-        for _ in range(2):
-            self.assertTrue(self.service.call("RequestExtension", 0))
-            self.vm.day += 1
-            self.dispatch.call("CollectResponses")
-        count = self.dispatch.vars["count"]
-        for _ in range(150):
-            self.assertFalse(self.service.call("RequestExtension", 0))
-        self.assertEqual(self.dispatch.vars["count"], count)
+        self.core.call("GrantAuthority", OPERATION, 5, 2, 0.0)
+        self.assertTrue(self.accounts.call("IssueAdvance"))
 
     def test_returned_claim_does_not_prevent_audit_forever(self):
         self.advance()
@@ -96,17 +86,18 @@ class ReviewRegressions(unittest.TestCase):
         self.assertEqual(self.accounts.vars["operationaldebt"], 50)
 
     def test_nested_deadline_suspension_ends_only_after_last_resume(self):
+        index = self.paused()
         self.core.call("SuspendDeadlines")
         self.vm.day += 2
         self.core.call("SuspendDeadlines")
         self.vm.day += 20
         self.core.call("ResumeDeadlines")
         self.core.call("RefreshDeadlines", self.vm.day)
-        self.assertEqual(self.core.call("GetAssignmentState", 1001), 1)
-        self.assertEqual(self.core.vars["assignmentdue"][0], 11)
+        self.assertEqual(self.core.call("GetAssignmentState", 5001), 1)
+        self.assertEqual(self.core.vars["assignmentdue"][index], 11)
         self.vm.day += 2
         self.core.call("ResumeDeadlines")
-        self.assertEqual(self.core.vars["assignmentdue"][0], 35)
+        self.assertEqual(self.core.vars["assignmentdue"][index], 35)
 
     def test_new_assignment_during_pause_keeps_only_remaining_duration(self):
         self.core.call("SuspendDeadlines")
@@ -118,14 +109,16 @@ class ReviewRegressions(unittest.TestCase):
         self.assertEqual(self.core.vars["assignmentdue"][index], self.vm.day + 10)
 
     def test_extension_during_pause_does_not_add_elapsed_time_twice(self):
+        index = self.paused()
         self.core.call("SuspendDeadlines")
         self.vm.day += 20
-        self.core.call("ExtendAssignment", 1001, 5.0)
+        self.core.call("ExtendAssignment", 5001, 5.0)
         self.core.call("ResumeDeadlines")
-        self.assertEqual(self.core.vars["assignmentdue"][0], 36)
+        self.assertEqual(self.core.vars["assignmentdue"][index], 36)
 
     def test_timer_has_minimum_interval_and_no_stale_notification(self):
         self.deliver()
+        self.accounts.call("SubmitClaim", 0)
         self.vm.day = 1.99999
         self.dispatch.call("ScheduleNext")
         self.assertGreaterEqual((self.dispatch.timer - self.vm.day) * 24, 0.0999)
@@ -138,21 +131,15 @@ class ReviewRegressions(unittest.TestCase):
         self.assertNotEqual(Inventory(), Inventory())
 
     def controller(self):
+        self.core.vars["serviceactive"] = False
         p = self.vm.instance("EA_Prototype")
         for key, value in {"Core": self.core, "Dispatch": self.dispatch, "Service": self.service, "Accounts": self.accounts}.items():
             p.prop(key, value)
-        for key in ("Gold", "Commission", "FieldPapers", "ArchiveBase"):
+        for key in ("Gold", "Commission", "ArchiveBase", "BoxBase", "CaseItem"):
             p.prop(key, key)
-        for key in ("CommissionMenu", "MainMenu", "AssignmentMenu", "AccountsMenu", "ClaimMenu", "ExplanationMenu", "FiledMessage", "UnavailableMessage", "CollectedMessage", "RepaymentMenu", "ReturnedMessage", "ReviewPendingMessage"):
+        for key in ("CommissionMenu", "MainMenu", "AssignmentMenu", "AccountsMenu", "ClaimMenu", "ExplanationMenu", "FiledMessage", "UnavailableMessage", "CollectedMessage", "RepaymentMenu", "ReturnedMessage", "CaseMenu"):
             p.prop(key, Menu())
         return p
-
-    def test_reading_papers_before_collecting_orders_still_counts(self):
-        self.vm, self.core, self.dispatch, self.service, self.accounts = fixture(ASSEMBLY, collect_orders=False)
-        papers = self.vm.instance("EA_FieldPapers").prop("Core", self.core)
-        papers.call("OnRead")
-        self.service.call("CollectOrders")
-        self.assertTrue(self.service.call("FileReport", 0))
 
     def test_failed_framework_start_does_not_pay_or_leave_controller_busy(self):
         p = self.controller()
@@ -166,7 +153,7 @@ class ReviewRegressions(unittest.TestCase):
         self.assertEqual(self.vm.player.items["Gold"], 100)
 
     def test_cancel_is_a_silent_no_op(self):
-        for main, submenu, cancel in ((1, "AssignmentMenu", 6), (2, "AssignmentMenu", 6)):
+        for main, submenu, cancel in ((0, "AssignmentMenu", 8), (2, "AccountsMenu", 4)):
             with self.subTest(main=main):
                 p = self.controller()
                 p.vars["::mainmenu_var"].choices.append(main)
@@ -174,6 +161,7 @@ class ReviewRegressions(unittest.TestCase):
                 p.call("UseBox", Inventory())
                 self.assertEqual(p.vars["::unavailablemessage_var"].shown, [])
                 self.assertEqual(self.dispatch.vars["count"], 0)
+                self.assertTrue(all(not m.shown for m in self.service.vars["::failuremessages_var"]))
 
     def test_non_player_activation_is_ignored(self):
         p = self.controller()
@@ -200,23 +188,11 @@ class ReviewRegressions(unittest.TestCase):
         tx = self.accounts.vars["claimtransaction"]
         index = self.dispatch.call("FindTransaction", tx)
         self.dispatch.vars["states"][index] = 2
-        self.accounts.call("ReceiveResponse", tx, 1002, 1)
+        self.accounts.call("ReceiveResponse", tx, OPERATION, 1)
         self.assertEqual(self.vm.player.items["Gold"], 0)
         self.core.prop("DebugEnabled", True)
         self.dispatch.call("DebugRecoverPending", tx)
         self.assertEqual(self.vm.player.items["Gold"], 30)
-
-    def test_recovery_reconciles_journal_after_core_completion(self):
-        self.deliver()
-        self.vm.day += 1
-        tx = self.service.vars["reporttransactions"][1]
-        index = self.dispatch.call("FindTransaction", tx)
-        self.dispatch.vars["states"][index] = 2
-        self.core.call("CompleteAssignment", 1002)
-        self.core.prop("DebugEnabled", True)
-        self.assertTrue(self.dispatch.call("DebugRecoverPending", tx))
-        self.assertTrue(self.service.objectives[("setobjectivecompleted", 11)])
-        self.assertTrue(self.service.objectives[("setobjectivecompleted", 21)])
 
     def test_audit_still_defers_during_real_return_transit(self):
         self.advance()
@@ -267,10 +243,10 @@ class ReviewRegressions(unittest.TestCase):
         while self.dispatch.vars["documentcount"] < 127:
             self.assertTrue(self.dispatch.call("ArchiveDocument", "Filler" + str(self.dispatch.vars["documentcount"])))
         before = self.dispatch.vars["count"]
-        self.assertFalse(self.dispatch.call("Queue", 500, 1001, 1, "newout", "newreply", self.service, 1.0))
+        self.assertFalse(self.dispatch.call("Queue", 500, 2001, 1, "newout", "newreply", self.service, 1.0))
         self.assertEqual(self.dispatch.vars["count"], before)
         self.assertEqual(self.dispatch.vars["::archive_var"].items["newout"], 0)
-        self.assertTrue(self.dispatch.call("Queue", 501, 1001, 1, "Orders0", "newreply", self.service, 1.0))
+        self.assertTrue(self.dispatch.call("Queue", 501, 2001, 1, "Filler0", "newreply", self.service, 1.0))
         self.assertEqual(self.dispatch.vars["documentcount"], 128)
         self.dispatch.call("RecoverFiledCopies")
         self.assertEqual(self.vm.player.items["newreply"], 0)

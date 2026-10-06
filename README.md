@@ -1,30 +1,52 @@
 # Elenwen Agent — Skyrim SE/AE technical prototype
 
-**Version 0.1.2-prototype. This is an installable development build, not the completed mod described in [the specification](Elenwen_Agent_Mod_Build_Specification.md). It has been compiled and tested outside Skyrim; it has not been run in the game.**
+**Version 0.4.0-prototype. This is an installable development build, not the completed mod described in [the specification](Elenwen_Agent_Mod_Build_Specification.md), its [Continuation 01](Elenwen_Agent_Mod_Build_Specification_Continuation_01.md) and the [Revised Implementation Plan](Elenwen_Agent_Revised_Implementation_Plan.md). The story it follows is set out in [the campaign opening](Elenwen_Agent_Campaign_Opening.md). It has been compiled and tested outside Skyrim; it has not been run in the game.**
 
 The repository began with the design specification only. This implementation builds its first paper-based service loop using real ESP records and compiled Papyrus scripts. No Skyrim installation, Creation Kit, Alternate Perspective plugin, Sinister Serana plugin, or installed load order was available for record inspection or playtesting.
 
 ## Included
 
-- A physical secure dispatch activator and a persistent, non-respawning document archive.
-- A confidential commission, private field papers, and a one-time 100-septim allowance.
-- Six finite instructions in two packets. The first covers field protocol, three Alto wines, and six blue mountain flowers. The second adds six firewood, four leather strips, and six wheat. Supplies are actually removed from inventory when filed.
-- Seventy readable orders, reports, requests, decisions, assessments, and receipts. Extensions identify their assignment; meal explanations preserve the chosen declaration. Responses take one game day and must be collected physically.
-- Ten-day deadlines, overdue state with one trust consequence, and a five-day extension followed by refusal of a second extension.
-- Core authorization scoped to operation and decision category, including emergency review functions for later modules.
-- A single wine-procurement accounts case: authorized 80-septim advance, declared claims, all four outcomes, explanations, return of funds, a 14-day audit, and liability/probation. Recognized costs settle the advance before any reimbursement.
-- A dispatch status register with active/overdue/filed/completed counts, ready/in-transit replies, and per-instruction remaining days. Specific feedback explains missing supplies, permissions, pending requests, and settled claims.
-- Elenwen replies differently to prompt, ordinary, and previously overdue work; Accounts letters address the chosen expense. A delayed closing assessment follows both packets and any pending claim decision.
-- Partial repayments of up to 10 or 25 septims, or all affordable outstanding funds, with confirmation of the actual payment and remaining balance.
-- Replay protection for commissioning, orders, deliveries, responses, advances, and claim payments; recovery of lost paper copies.
+- **An Alternate Perspective start, "Elenwen's Agent".** Cotta was taken from Imperial territory and held at Northwatch Keep. Elenwen questioned him herself and then released him, conditionally. He begins outside the keep. The journal tells the rest; there is no custom scene. Northwatch's garrison leaves him alone until he leaves the keep, and its own quest is unaffected.
+- **Her sealed packet** holds:
+  - her residence order;
+  - civilian papers and the conditional release;
+  - the dispatch-case instructions;
+  - two books to read, *The Madmen of the Reach* and *The Bear of Markarth*;
+  - a 100-septim allowance;
+  - the dispatch case itself.
 
-All public text is SFW. Hidden trust and creditworthiness are not displayed. Core requires only `Skyrim.esm`; no SKSE or optional mod is needed for this prototype. No vanilla records are overridden. These ESPs are intentionally **not ESL-flagged**.
+  Opening the packet commissions the service and begins the campaign.
+- **A campaign in four phases**, carried by 21 instructions (2001–2021) and 8 letters. Each instruction stays open until it is reported, with no deadline. A report is accepted only when the game's own records support it. Otherwise it is refused with a reason, and nothing is filed. Every instruction rests on vanilla content.
+  1. **Riverwood.** He is told to live at the Sleeping Giant Inn and to freelance for his living. His recon jobs are:
+     - the inn's guests and its proprietor;
+     - which neighbours pray to Talos;
+     - the street preacher in Whiterun;
+     - soldiers on the roads;
+     - the dead agent on the hillside. Sanyon's orders count whenever they are found.
+
+     Nights slept at the inn, days in residence and places visited are counted. Leaving Whiterun and Falkreath holds delays his release and costs trust. There is no recall.
+  2. **Markarth.** Once his residence has served its purpose, the release letter sends him to hire Jenassa (Accounts advances her fee) and to keep the Reach burning:
+     - *The Forsworn Conspiracy* and Madanach's fate;
+     - the Namira coven;
+     - Ogmund's amulet for Ondolemar;
+     - the Talos shrine, reported only to her;
+     - Calcelmo.
+  3. **An interval** with no assignments, while he brushes up his magic.
+  4. **The College of Winterhold.** He reports at each College beat, steals an Arcanaeum book, and investigates Winterhold. A letter gives him authority to remove the adviser, and he declines the Arch-Mage's chair. Some conditions use *At Your Own Pace - College of Winterhold* and *College of Winterhold - Quest Expansion*. Both are optional and are looked up at run time, never as masters.
+- **Her letters follow a tradecraft.** They are addressed to "C." and signed "— E."; they name no institutions, and they refer to targets by description ("the proprietor", "the old man in the mine"). Some arrive with vanilla books to read. She writes rarely; she is a busy mer.
+- **A portable dispatch case.** Set down outside the inventory, it opens into the dispatch box; it can be packed up again. Filed correspondence travels with it.
+- **Accounts** advances Jenassa's fee and settles one declared claim, with its four outcomes, explanations, the return of funds, a 14-day audit and liability.
+- Replay protection for commissioning, reports, letters, advances and claim payments, and recovery of lost paper copies.
+
+All public text is SFW. Hidden trust and creditworthiness are not displayed. Every plugin masters only `Skyrim.esm` and other EA plugins, and none overrides a vanilla record. The start option appears only with Alternate Perspective, which itself needs SKSE and JContainers; the EA scripts use no SKSE functions. These ESPs are intentionally **not ESL-flagged**.
+
+**The vanilla FormIDs the campaign uses come from published references and have not been checked against `Skyrim.esm`.** These are its quests, actors, factions, books, items and locations. See [manual game validation](docs/TESTING.md).
 
 ## Install and try it
 
 1. Use a separate Skyrim Special Edition / Anniversary Edition **test profile and fresh save**. LE and VR are not supported targets. SE/AE runtime compatibility has not been playtested.
-2. Install `dist/ElenwenAgent-0.1.2-prototype.zip` through MO2 or Vortex. The ZIP root is the Data directory. For manual installation, copy its ESPs and `Scripts` directory into the test installation's Data folder.
-3. Enable this order after the game's official masters:
+2. Install `dist/ElenwenAgent-0.4.0-prototype.zip` through MO2 or Vortex. The ZIP root is the Data directory.
+3. Install [Alternate Perspective](https://www.nexusmods.com/skyrimspecialedition/mods/50307) 4.x with its requirements (SKSE and JContainers). The package's `SKSE/AlternatePerspective/ElenwenAgent.json` registers the start; `EA_Start.esp` does not list Alternate Perspective as a master. Enable this order after the game's official masters and Alternate Perspective:
 
    ```text
    EA_Core.esp
@@ -32,36 +54,28 @@ All public text is SFW. Hidden trust and creditworthiness are not displayed. Cor
    EA_Service.esp
    EA_Accounts.esp
    EA_Prototype.esp
+   EA_Start.esp
    ```
 
-4. Stand in a convenient safe interior. Open the game console and run:
+4. Start a new game and choose **Elenwen's Agent** at Alternate Perspective's start menu. Read the journal, then read the **Sealed Packet** in your inventory.
+5. Go to Riverwood and take a room at the Sleeping Giant. Drop the **Sealed Dispatch Case** there; after a moment it becomes the dispatch box. Its menu has:
+   - **File Report**, which lists up to eight open instructions, ready ones first;
+   - **Check Correspondence**, where replies arrive a full day after filing;
+   - **Accounts**;
+   - **Review status**;
+   - **Case and archive**, to open filed correspondence or pack the case up.
+6. Live there, freelance and sleep at the inn. The instructions are open from the start and are reported when their conditions are met. The release letter follows after about two weeks of residence, some earnings and some experience.
 
-   ```text
-   help "EA_SecureDispatch" 4
-   player.placeatme <the ACTI FormID returned above> 1
-   ```
+*Without Alternate Perspective* (prototype testing):
+1. Open the console in a safe interior and run `help "EA_SecureDispatch" 4`.
+2. Run `player.placeatme <the ACTI FormID returned> 1`. The local ID is `000800` in `EA_Prototype.esp`.
+3. Open the commission there. This skips the start and begins the campaign.
 
-   Replace the placeholder with the actual eight-digit FormID. The local ID is `000800` in `EA_Prototype.esp`; its load-order prefix varies. Place **one** box.
-
-5. Activate it, open the commission, and choose **Collect Orders**. Read the field papers in your inventory; reading them before collecting orders also counts. A second strongbox beside the dispatch box contains archived correspondence. Delivered supplies are consigned immediately and cannot be taken back from this paper archive.
-6. File the protocol acknowledgment. Obtain three bottles of standard Alto wine and six blue mountain flowers for the other reports. Return after 24 game hours and choose **Check Responses**.
-7. To test Accounts, request supply authority **before filing the wine delivery**, wait a day, collect the authorization, then collect the advance under **Accounts**. After delivering wine, submit one of the declared claim forms. Each claim/explanation needs its own return dispatch.
-
-8. After collecting all three first-packet acknowledgments, choose **Collect Orders** again to open the second packet. Its ten-day deadlines begin on collection. Deliver six firewood, four leather strips, and six wheat, then collect their responses.
-9. Use **Review status** to inspect the register and individual instructions. Under **Accounts → Return outstanding funds**, choose a partial payment or all affordable outstanding funds.
-10. After all six completion responses and any pending Accounts decision have been collected, a closing review is sent automatically. Wait another full game day and collect Elenwen's assessment. A returned meal claim must first be explained and settled. The assessment reflects the record when the review was sent; later actions do not rewrite it.
-
-Supply cost forms are the player's **declarations**; this build does not track vendor transactions. Only one claim is allowed for instruction 1002. Use separate fresh test saves to exercise the four different outcomes. The six assignments do not regenerate. The second packet has no separate advance, claim, or completion reward; its orders explicitly authorize use of the initial allowance.
-
-After fourteen days, Accounts audits an unreturned advance even if its response is left uncollected or its explanation unanswered. Actual return transit defers the audit until the response arrives. A valid later claim can still discharge recognized costs against the audited liability.
-
-**Recover filed copies** restores missing documents, including archive copies, without repeating their quest or monetary effects. Reprints may coexist with originals dropped elsewhere; all EA papers have zero resale value.
-
-Do not remove these plugins from a save you intend to keep. There is no supported upgrade or uninstall migration yet, including from 0.1.0 or 0.1.1 to 0.1.2. Runtime arrays changed in this revision. Use a fresh test save for this revision. To discard a test, disable the package and use a save from before installation, or start a new game.
+Do not remove these plugins from a save you intend to keep. There is no supported upgrade or uninstall migration, including from any earlier build to 0.4.0. Use a fresh test save for this revision.
 
 ## Not yet implemented
 
-The bespoke Alternate Perspective start, actual civilian accommodation and Establish Cover assignment, repeatable service backlog, curated NPC relationship locks and behavioral hooks, courier integrations, Mantella integration, and all main-quest / Dawnguard / Dark Brotherhood / Civil War / Serana routes remain unfinished. `EA_Prototype.esp` is a development entry point, not `EA_Start.esp`.
+Hand-placed world objects, the vanilla courier (letters arrive in the dispatch case instead), compromised-cover reply variants, the Elenwen dialogue corpus (Revision Phase C), anything after the College, curated NPC relationship locks and behavioral hooks, courier integrations, Mantella integration, and all main-quest / Dawnguard / Dark Brotherhood / Civil War / Serana routes remain unfinished. `EA_Prototype.esp` is a development entry point, not `EA_Start.esp`.
 
 No compatibility patch or empty placeholder ESP has been manufactured. The specification requires inspecting installed records first. See [implementation status and conflict work](docs/IMPLEMENTATION_STATUS.md) and [manual game validation](docs/TESTING.md).
 
@@ -96,4 +110,4 @@ This switches to the supplied base scripts instead of the declarations. A succes
 
 The test interpreter executes Caprica's emitted assembly with simulated game natives. It does **not** establish Skyrim save compatibility, VM scheduling, physical placement, mesh appearance, or UI correctness. Those checks still require the game and Creation Kit.
 
-Source layout: `Data/Source/Scripts` holds Papyrus; `content/documents.json` holds authored papers; `tools/PluginBuilder` builds plugin records; `tests` verifies the compiled logic and binaries. See [architecture and API](docs/ARCHITECTURE.md) for state conventions and limitations.
+Source layout: `Data/Source/Scripts` holds Papyrus; `content/campaign.json` holds the instructions, letters and their conditions; `content/documents.json` holds the other papers; `tools/PluginBuilder` builds plugin records; `tests` verifies the compiled logic and binaries. See [architecture and API](docs/ARCHITECTURE.md) for state conventions and limitations.
