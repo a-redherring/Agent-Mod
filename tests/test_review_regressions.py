@@ -13,7 +13,7 @@ class ReviewRegressions(unittest.TestCase):
 
     def deliver(self):
         self.vm.player.items["Wine"] = 3
-        self.assertTrue(self.service.call("FileReport", 1, -1))
+        self.assertTrue(self.service.call("FileReport", 1))
 
     def advance(self):
         self.service.call("RequestSupplyAuthority")
@@ -152,7 +152,7 @@ class ReviewRegressions(unittest.TestCase):
         papers = self.vm.instance("EA_FieldPapers").prop("Core", self.core)
         papers.call("OnRead")
         self.service.call("CollectOrders")
-        self.assertTrue(self.service.call("FileReport", 0, -1))
+        self.assertTrue(self.service.call("FileReport", 0))
 
     def test_failed_framework_start_does_not_pay_or_leave_controller_busy(self):
         p = self.controller()

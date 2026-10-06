@@ -1,18 +1,15 @@
-"""Behavioral coverage for authored packets, circulation, judgement and Accounts, using compiled Papyrus."""
+"""Behavioral coverage for authored packets, circulation, visits, leads and Accounts, using compiled Papyrus."""
 import pickle
 import unittest
 from pathlib import Path
 
-from papyrus_vm import PACKETS, Inventory, Menu, fixture
+from papyrus_vm import PACKETS, Inventory, Menu, Place, fixture
 
 ASSEMBLY = Path(__file__).resolve().parents[1] / 'build/Data/Scripts'
 COUNT = len(PACKETS)
-CASES = [i for i, p in enumerate(PACKETS) if 'case' in p]
-PLAIN = [i for i, p in enumerate(PACKETS) if 'case' not in p]
-
-
-def sound(index):
-    return PACKETS[index]['case']['sound']
+VISITS = [i for i, p in enumerate(PACKETS) if 'visit' in p]
+LEADS = [i for i, p in enumerate(PACKETS) if 'lead' in p]
+PLAIN = [i for i, p in enumerate(PACKETS) if 'visit' not in p]
 
 
 class AdditionTests(unittest.TestCase):
@@ -29,25 +26,25 @@ class AdditionTests(unittest.TestCase):
     def open_packets(self):
         return [i for i in range(COUNT) if self.state(i) in (1, 2)]
 
-    def read_case(self, index):
-        papers = self.vm.instance('EA_CaseFile').prop('Core', self.core).prop('AssignmentID', 1001 + index)
-        papers.call('OnRead')
+    def go(self, index):
+        """Arrive at the packet's named place and, for a lead, begin its vanilla quest."""
+        key = PACKETS[index]['key']
+        if 'visit' in PACKETS[index]:
+            self.service.call('RecordVisit', self.vm.places[key])
+        if 'lead' in PACKETS[index]:
+            self.vm.leads[key].running = True
 
     def stock(self, index):
         packet = PACKETS[index]
         if 'supply' in packet:
             self.vm.player.items[packet['key']] += packet['supply']['count']
 
-    def file(self, index, conclusion=None):
+    def file(self, index):
         if index == 0:
             self.core.call('RecordFieldPapersRead')
         self.stock(index)
-        if 'case' in PACKETS[index]:
-            self.read_case(index)
-            conclusion = sound(index) if conclusion is None else conclusion
-        else:
-            conclusion = -1
-        self.assertTrue(self.service.call('FileReport', index, conclusion), index)
+        self.go(index)
+        self.assertTrue(self.service.call('FileReport', index), index)
 
     def first_packet(self):
         for i in range(3):
@@ -62,8 +59,8 @@ class AdditionTests(unittest.TestCase):
             self.arrive()
             self.service.call('CollectOrders')
 
-    def complete_all(self, late=(), wrong=()):
-        """File every packet as it is issued; listed packets are filed late or misjudged."""
+    def complete_all(self, late=()):
+        """File every packet as it is issued; listed packets are filed late."""
         maximum = 0
         for _ in range(COUNT * 2):
             if self.service.call('CountState', 4) == COUNT:
@@ -72,12 +69,12 @@ class AdditionTests(unittest.TestCase):
             batch = self.open_packets()
             for i in batch:
                 if i not in late:
-                    self.file(i, (sound(i) + 1) % 3 if i in wrong else None)
+                    self.file(i)
             overdue = [i for i in batch if i in late]
             if overdue:
                 self.vm.day += max(self.core.call('GetDaysRemaining', 1001 + i) for i in overdue) + 0.01
                 for i in overdue:
-                    self.file(i, (sound(i) + 1) % 3 if i in wrong else None)
+                    self.file(i)
             self.arrive()
             self.service.call('CollectOrders')
         self.assertEqual(self.service.call('CountState', 4), COUNT)
@@ -172,17 +169,20 @@ class AdditionTests(unittest.TestCase):
     # Named items
 
     def test_named_item_is_required_and_substitutes_are_refused(self):
-        for index, substitute in ((1, 'AltoWine'), (2, 'SomeOtherBook')):
+        for index, substitute in ((1, 'AltoWine'), (PACKETS.index(next(p for p in PACKETS if p['key'] == 'Blades')), 'SomeOtherBook')):
             with self.subTest(index=index):
+                self.setUp()
+                self.open_until(index)
+                count = self.dispatch.vars['count']
                 required = PACKETS[index]['supply']['count']
                 self.vm.player.items[substitute] = 10
-                self.assertFalse(self.service.call('FileReport', index, -1))
-                self.assertEqual(self.service.vars['lasterror'], 10)
+                self.assertFalse(self.service.call('FileReport', index))
+                self.assertEqual(self.service.vars['lasterror'], 9)
                 self.service.call('ShowFailure')
                 supply = self.service.vars['::supplyindex_var'][index]
                 self.assertEqual(self.service.vars['::missingmessages_var'][supply].shown[-1][0], required)
                 self.assertEqual(self.vm.player.items[substitute], 10)
-                self.assertEqual(self.dispatch.vars['count'], 0)
+                self.assertEqual(self.dispatch.vars['count'], count)
 
     def test_supplies_check_quantity_consume_once_and_keep_surplus(self):
         for index in [i for i in PLAIN if 'supply' in PACKETS[i]]:
@@ -192,84 +192,106 @@ class AdditionTests(unittest.TestCase):
                 key, required = PACKETS[index]['key'], PACKETS[index]['supply']['count']
                 supply = self.service.vars['::supplyindex_var'][index]
                 self.vm.player.items[key] = required - 1
-                self.assertFalse(self.service.call('FileReport', index, -1))
+                self.assertFalse(self.service.call('FileReport', index))
                 self.service.call('ShowFailure')
                 self.assertEqual(self.service.vars['::missingmessages_var'][supply].shown[-1][0], 1)
                 self.vm.player.items[key] = required + 2
-                self.assertTrue(self.service.call('FileReport', index, -1))
+                self.assertTrue(self.service.call('FileReport', index))
                 self.assertEqual(self.vm.player.items[key], 2)
-                self.assertFalse(self.service.call('FileReport', index, -1))
+                self.assertFalse(self.service.call('FileReport', index))
                 self.assertEqual(self.vm.player.items[key], 2)
                 self.assertEqual(self.dispatch.vars['::archive_var'].items[key], 0)
                 self.arrive()
                 self.assertEqual(self.state(index), 4)
                 self.assertTrue(self.service.objectives[('setobjectivecompleted', 200 + index)])
 
-    # Case papers and conclusions
+    # Named places and leads
 
-    def test_case_papers_are_issued_with_the_order_and_recoverable_once(self):
-        index = CASES[0]
-        case = 'Case' + PACKETS[index]['key']
-        self.assertEqual(self.vm.player.items[case], 0)
-        self.open_until(index)
-        self.assertEqual(self.vm.player.items[case], 1)
-        self.assertEqual(self.dispatch.vars['::archive_var'].items[case], 1)
-        self.vm.player.items[case] = 0
-        self.dispatch.vars['::archive_var'].items[case] = 0
-        self.service.call('CollectOrders')
-        self.service.call('CollectOrders')
-        self.dispatch.call('RecoverFiledCopies')
-        self.assertEqual(self.vm.player.items[case], 1)
-        self.assertEqual(self.dispatch.vars['::archive_var'].items[case], 1)
-
-    def test_conclusion_requires_read_papers_and_supplies_before_it_is_asked(self):
-        index = CASES[0]
+    def test_visit_counts_only_after_the_order_and_only_at_the_named_place(self):
+        index = next(i for i in VISITS if i >= 3)  # not among the first three orders
         key = PACKETS[index]['key']
+        self.service.call('RecordVisit', self.vm.places[key])
         self.open_until(index)
         self.stock(index)
-        self.assertFalse(self.service.call('IsReadyForConclusion', index))
-        self.assertFalse(self.service.call('FileReport', index, sound(index)))
+        self.vm.leads.get(key) and setattr(self.vm.leads[key], 'running', True)
+        self.assertFalse(self.service.call('FileReport', index), 'a visit before the order does not count')
         self.assertEqual(self.service.vars['lasterror'], 8)
-        self.assertEqual(self.vm.player.items[key], 1)
-        self.read_case(index)
-        self.vm.player.items[key] = 0
-        self.assertFalse(self.service.call('IsReadyForConclusion', index))
-        self.stock(index)
-        self.assertTrue(self.service.call('IsReadyForConclusion', index))
-        for missing in (-1, 3):
-            self.assertFalse(self.service.call('FileReport', index, missing))
-            self.assertEqual(self.service.vars['lasterror'], 9)
-        self.assertEqual(self.vm.player.items[key], 1)
-        self.assertEqual(self.state(index), 1)
+        self.service.call('ShowFailure')
+        visit = self.service.vars['::visitindex_var'][index]
+        self.assertEqual(len(self.service.vars['::visitmessages_var'][visit].shown), 1)
+        self.service.call('RecordVisit', Place('Elsewhere'))
+        self.service.call('RecordVisit', None)
+        self.assertFalse(self.service.call('HasVisited', index))
+        self.service.call('RecordVisit', Place('Inside', parent=self.vm.places[key]))
+        self.assertTrue(self.service.call('HasVisited', index), 'a place inside the named one counts')
+        self.assertTrue(self.service.call('FileReport', index))
 
-    def test_reading_papers_for_an_unissued_case_records_nothing(self):
-        index = CASES[0]
-        self.read_case(index)
+    def test_alias_forwards_every_arrival_to_service(self):
+        index = VISITS[0]
         self.open_until(index)
-        self.assertFalse(self.core.call('HasFact', 1001 + index))
+        player = self.vm.instance('EA_ServicePlayer').prop('Service', self.service)
+        player.call('OnLocationChange', None, self.vm.places[PACKETS[index]['key']])
+        self.assertTrue(self.service.call('HasVisited', index))
 
-    def test_every_case_selects_sound_or_misjudged_response(self):
-        for index in CASES:
-            for conclusion in range(3):
-                with self.subTest(index=index, conclusion=conclusion):
-                    self.setUp()
-                    self.open_until(index)
-                    trust = self.core.vars['professionaltrust']
-                    self.file(index, conclusion)
-                    self.arrive()
-                    key = PACKETS[index]['key']
-                    self.assertEqual(self.state(index), 4)
-                    if conclusion == sound(index):
-                        self.assertEqual(self.vm.player.items[f'PromptResponses{index}'], 1)
-                        self.assertEqual(self.vm.player.items['Misjudged' + key], 0)
-                        self.assertEqual(self.core.vars['professionaltrust'], trust + 1)
-                    else:
-                        self.assertEqual(self.vm.player.items['Misjudged' + key], 1)
-                        self.assertEqual(self.vm.player.items[f'PromptResponses{index}'], 0)
-                        self.assertEqual(self.core.vars['professionaltrust'], trust - 1)
+    def test_visit_after_the_report_is_filed_changes_nothing(self):
+        index = VISITS[0]
+        self.open_until(index)
+        self.file(index)
+        self.arrive()
+        self.service.vars['visited'][index] = False
+        self.service.call('RecordVisit', self.vm.places[PACKETS[index]['key']])
+        self.assertFalse(self.service.call('HasVisited', index))
 
-    def test_sound_conclusion_keeps_prompt_ordinary_and_late_tone(self):
-        index = CASES[0]
+    def test_lead_waits_for_its_vanilla_quest_and_never_advances_it(self):
+        for completed in (False, True):
+            with self.subTest(completed=completed):
+                self.setUp()
+                index = LEADS[0]
+                key = PACKETS[index]['key']
+                self.open_until(index)
+                self.service.call('RecordVisit', self.vm.places[key])
+                self.assertFalse(self.service.call('FileReport', index))
+                self.assertEqual(self.service.vars['lasterror'], 10)
+                self.service.call('ShowFailure')
+                lead = self.service.vars['::leadindex_var'][index]
+                self.assertEqual(len(self.service.vars['::leadmessages_var'][lead].shown), 1)
+                quest = self.vm.leads[key]
+                self.assertFalse(quest.running or quest.completed, 'the instruction never starts the vanilla quest')
+                if completed:
+                    quest.completed = True
+                else:
+                    quest.running = True
+                self.assertTrue(self.service.call('FileReport', index))
+
+    def test_every_lead_names_a_place_and_every_instruction_rests_on_something(self):
+        for index, packet in enumerate(PACKETS):
+            with self.subTest(index=index):
+                if 'lead' in packet:
+                    self.assertIn('visit', packet)
+                self.assertTrue(index == 0 or 'visit' in packet or 'supply' in packet)
+
+    def test_controller_shows_where_to_go_and_files_nothing_until_then(self):
+        index = VISITS[0]
+        self.open_until(index)
+        position = self.open_packets().index(index)
+        self.stock(index)
+        p = self.controller()
+        p.vars['::mainmenu_var'].choices.append(1)
+        p.vars['::assignmentmenu_var'].choices.append(position)
+        count = self.dispatch.vars['count']
+        p.call('UseBox', Inventory())
+        visit = self.service.vars['::visitindex_var'][index]
+        self.assertEqual(len(self.service.vars['::visitmessages_var'][visit].shown), 1)
+        self.assertEqual(self.dispatch.vars['count'], count)
+        self.go(index)
+        p.vars['::mainmenu_var'].choices.append(1)
+        p.vars['::assignmentmenu_var'].choices.append(position)
+        p.call('UseBox', Inventory())
+        self.assertEqual(self.state(index), 3)
+        self.assertEqual(len(p.vars['::filedmessage_var'].shown), 1)
+
+    def test_visit_packets_keep_prompt_ordinary_and_late_tone(self):
+        index = VISITS[0]
         for offset, expected in ((0, 'PromptResponses'), (5.01, 'Responses'), (10.01, 'LateResponses')):
             with self.subTest(offset=offset):
                 self.setUp()
@@ -278,35 +300,6 @@ class AdditionTests(unittest.TestCase):
                 self.file(index)
                 self.arrive()
                 self.assertEqual(self.vm.player.items[f'{expected}{index}'], 1)
-
-    def test_controller_asks_for_conclusion_only_when_ready_and_cancel_is_silent(self):
-        index = CASES[0]
-        self.open_until(index)
-        position = self.open_packets().index(index)
-        menu = self.service.vars['::conclusionmenus_var'][0]
-        p = self.controller()
-        p.vars['::mainmenu_var'].choices.append(1)
-        p.vars['::assignmentmenu_var'].choices.append(position)
-        p.call('UseBox', Inventory())
-        self.assertEqual(len(self.service.vars['::failuremessages_var'][8].shown), 1)
-        self.assertEqual(menu.shown, [])
-        self.read_case(index)
-        self.stock(index)
-        count = self.dispatch.vars['count']
-        p.vars['::mainmenu_var'].choices.append(1)
-        p.vars['::assignmentmenu_var'].choices.append(position)
-        menu.choices.append(3)
-        p.call('UseBox', Inventory())
-        self.assertEqual(len(menu.shown), 1)
-        self.assertEqual(self.dispatch.vars['count'], count)
-        self.assertEqual(self.vm.player.items[PACKETS[index]['key']], 1)
-        self.assertEqual(len(p.vars['::filedmessage_var'].shown), 0)
-        p.vars['::mainmenu_var'].choices.append(1)
-        p.vars['::assignmentmenu_var'].choices.append(position)
-        menu.choices.append(sound(index))
-        p.call('UseBox', Inventory())
-        self.assertEqual(self.state(index), 3)
-        self.assertEqual(len(p.vars['::filedmessage_var'].shown), 1)
 
     # Register, status and replies
 
@@ -402,7 +395,7 @@ class AdditionTests(unittest.TestCase):
         self.assertFalse(self.service.call('RequestExtension', 1))
         self.assertEqual(self.service.vars['lasterror'], 4)
         self.file(1)
-        self.assertFalse(self.service.call('FileReport', 1, -1))
+        self.assertFalse(self.service.call('FileReport', 1))
         self.assertEqual(self.service.vars['lasterror'], 1)
 
     def test_full_series_with_every_extension_fits_dispatch_capacity(self):
@@ -537,11 +530,11 @@ class AdditionTests(unittest.TestCase):
         self.assertEqual(self.dispatch.call('CollectResponses'), 0)
         self.assertEqual(self.vm.player.items['Gold'], gold)
 
-    def test_evaluation_counts_late_and_misjudged_reports(self):
-        for late, wrong, expected in (((), (), 0), ((1,), (), 1), ((), (CASES[0],), 1), ((1, 2), (), 2), ((1,), (CASES[-1],), 2), ((CASES[0],), (CASES[0],), 2)):
-            with self.subTest(late=late, wrong=wrong):
+    def test_evaluation_counts_late_reports(self):
+        for late, expected in (((), 0), ((1,), 1), ((VISITS[0],), 1), ((1, 2), 2), ((1, LEADS[-1]), 2)):
+            with self.subTest(late=late):
                 self.setUp()
-                self.complete_all(late, wrong)
+                self.complete_all(late)
                 self.assertTrue(self.queue_review())
                 self.arrive()
                 self.assertEqual(self.vm.player.items[f'Evaluations{expected}'], 1)
@@ -617,14 +610,13 @@ class AdditionTests(unittest.TestCase):
     def test_circulation_and_review_survive_interpreter_state_serialization(self):
         self.advance()
         self.accounts.call('ReturnAmount', 25)
-        index = CASES[0]
+        index = LEADS[0]
         self.open_until(index)
-        self.read_case(index)
+        self.go(index)
         self.vm, self.core, self.dispatch, self.service, self.accounts = pickle.loads(pickle.dumps((self.vm, self.core, self.dispatch, self.service, self.accounts)))
         self.assertEqual(self.accounts.call('GetOutstanding'), 55)
-        self.stock(index)
-        self.assertTrue(self.service.call('IsReadyForConclusion', index))
-        self.assertTrue(self.service.call('FileReport', index, sound(index)))
+        self.assertTrue(self.service.call('HasVisited', index))
+        self.assertTrue(self.service.call('FileReport', index))
         self.complete_all()
         self.assertTrue(self.queue_review())
         self.vm, self.core, self.dispatch, self.service, self.accounts = pickle.loads(pickle.dumps((self.vm, self.core, self.dispatch, self.service, self.accounts)))

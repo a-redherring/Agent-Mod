@@ -9,6 +9,7 @@ Bool serviceActive = False
 Bool coverEstablished = False
 Bool coverCompromised = False
 Bool fieldPapersRead = False
+EA_Module opening
 Int professionalTrust = 50
 Int nextTransaction = 1
 Int[] assignmentIDs
@@ -75,6 +76,17 @@ EndFunction
 
 Bool Function HasCompromisedCover()
     Return coverCompromised
+EndFunction
+
+Function SetOpening(EA_Module module)
+    ; A start module registers itself so the dispatch controller need not master it.
+    If serviceActive
+        opening = module
+    EndIf
+EndFunction
+
+EA_Module Function GetOpening()
+    Return opening
 EndFunction
 
 Function RecordFieldPapersRead()

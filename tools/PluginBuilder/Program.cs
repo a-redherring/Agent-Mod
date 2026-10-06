@@ -10,7 +10,7 @@ using var buildConfig = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, "
 var version = buildConfig.RootElement.GetProperty("version").GetString();
 var output = Path.Combine(root, "build", "Data");
 Directory.CreateDirectory(output);
-var names = new[] { "EA_Core", "EA_Dispatch", "EA_Service", "EA_Accounts", "EA_Prototype" };
+var names = new[] { "EA_Core", "EA_Dispatch", "EA_Service", "EA_Accounts", "EA_Prototype", "EA_Start" };
 var mods = names.ToDictionary(n => n, n => new SkyrimMod(ModKey.FromNameAndExtension(n + ".esp"), SkyrimRelease.SkyrimSE));
 var forms = new Dictionary<string, FormKey>();
 FormKey Vanilla(uint id) => new(ModKey.FromNameAndExtension("Skyrim.esm"), id);
@@ -43,6 +43,8 @@ var dispatch = MakeQuest("EA_Dispatch", 0x800, "EA_DispatchQuest", "Embassy Corr
 var service = MakeQuest("EA_Service", 0x800, "EA_ServiceQuest", "Field Instructions");
 var accounts = MakeQuest("EA_Accounts", 0x800, "EA_AccountsQuest", "Operational Accounts");
 var prototype = MakeQuest("EA_Prototype", 0x801, "EA_PrototypeQuest", "Confidential Commission");
+var startData = JsonSerializer.Deserialize<StartContent>(File.ReadAllText(Path.Combine(root, "content", "start.json")), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+var start = MakeQuest("EA_Start", Convert.ToUInt32(startData.Quest.Id, 16), startData.Quest.EditorID, startData.Quest.Name);
 var json = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 var docs = JsonSerializer.Deserialize<List<Document>>(File.ReadAllText(Path.Combine(root, "content", "documents.json")), json)!;
 var packets = JsonSerializer.Deserialize<List<Packet>>(File.ReadAllText(Path.Combine(root, "content", "packets.json")), json)!;
@@ -51,7 +53,7 @@ for (var p = 0; p < packets.Count; p++)
 {
     // Packet index is the assignment offset; the script derives one from the other.
     if (packets[p].Assignment != 1001 + p) throw new InvalidDataException("Packets must be numbered from 1001 without gaps");
-    if (packets[p].Case is { } check && (check.Sound < 0 || check.Sound > 2 || check.Menu.Buttons.Length != 4)) throw new InvalidDataException("A case needs three conclusions and Cancel");
+    if (packets[p].Lead != null && packets[p].Visit == null) throw new InvalidDataException("A lead also names the place it starts from");
 }
 Book MakeBook(string module, Document doc)
 {
@@ -67,15 +69,10 @@ Book MakeBook(string module, Document doc)
     return book;
 }
 foreach (var doc in docs) MakeBook(doc.Module, doc);
+foreach (var doc in startData.Documents) MakeBook("EA_Start", doc);
 foreach (var packet in packets)
 {
     foreach (var doc in packet.Documents.Values) MakeBook("EA_Service", doc);
-    if (packet.Case is { } c)
-    {
-        MakeBook("EA_Service", c.Misjudged);
-        var file = MakeBook("EA_Service", c.File);
-        file.VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 };
-    }
 }
 var archive = new Container(Key("EA_Dispatch", 0x801, "EA_DocumentArchive"), SkyrimRelease.SkyrimSE)
 {
@@ -90,6 +87,13 @@ var box = new Mutagen.Bethesda.Skyrim.Activator(Key("EA_Prototype", 0x800, "EA_S
     VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 }
 };
 mods["EA_Prototype"].Activators.Add(box);
+var caseItem = new MiscItem(Key("EA_Prototype", Convert.ToUInt32(startData.Prototype.Case.Id, 16), startData.Prototype.Case.EditorID), SkyrimRelease.SkyrimSE)
+{
+    EditorID = startData.Prototype.Case.EditorID, Name = startData.Prototype.Case.Name,
+    Model = new Model { File = @"Clutter\Common\StrongBox01.nif" }, Value = 0, Weight = 2,
+    VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 }
+};
+mods["EA_Prototype"].MiscItems.Add(caseItem);
 Message MakeMessage(string module, uint id, string editorID, string text, params string[] buttons)
 {
     var message = new Message(Key(module, id, editorID), SkyrimRelease.SkyrimSE)
@@ -101,7 +105,7 @@ Message MakeMessage(string module, uint id, string editorID, string text, params
     return message;
 }
 MakeMessage("EA_Prototype", 0x810, "EA_CommissionMenu", "A sealed packet bears the mark agreed with Elenwen. Break the seal and resume your confidential duties?", "Open commission", "Leave");
-MakeMessage("EA_Prototype", 0x811, "EA_MainMenu", "Secure Embassy dispatch. Replies require one full day in transit. Recoverable copies of your orders are kept on file.", "Collect Orders", "File Report", "Request Extension", "Request Supply Authority", "Accounts", "Check Responses", "Recover filed copies", "Review status", "Leave");
+MakeMessage("EA_Prototype", 0x811, "EA_MainMenu", "Secure Embassy dispatch. Replies require one full day in transit. Recoverable copies of your orders are kept on file.", "Collect Orders", "File Report", "Request Extension", "Request Supply Authority", "Accounts", "Check Responses", "Case and archive", "Review status", "Leave");
 MakeMessage("EA_Prototype", 0x812, "EA_AssignmentMenu", "Select the instruction to which your paper refers. Open instructions are listed in the order they were issued; the number is on each order.\n\nFirst: %.0f\nSecond: %.0f\nThird: %.0f\n\nA position showing 0 is empty.", "First instruction", "Second instruction", "Third instruction", "Cancel");
 MakeMessage("EA_Prototype", 0x813, "EA_AccountsMenu", "Operational accounts: spiced wine purchase, instruction 1002. Only one advance and one claim may be entered for this instruction.", "Collect authorized advance", "Submit claim / explanation", "Return outstanding funds", "Read statement", "Cancel");
 MakeMessage("EA_Prototype", 0x814, "EA_ClaimMenu", "Declare the expense you actually incurred. The form will be filed against the spiced wine delivery. A personal cost must not be represented as an Embassy purchase.", "Wine: 30 septims", "Wine: 80 septims", "Personal gift: 30 septims", "Meal: 30 septims", "Cancel");
@@ -121,12 +125,13 @@ MakeMessage("EA_Service", 0x904, "EA_ServiceFailure4", "A further extension has 
 MakeMessage("EA_Service", 0x905, "EA_ServiceFailure5", "Supply authority is already awaiting its response. Collect the authorization before requesting an advance from Accounts.", "Close");
 MakeMessage("EA_Service", 0x906, "EA_ServiceFailure6", "Prior supply authority is already held for instruction 1002. Collect the advance under Accounts while the wine purchase remains open.", "Close");
 MakeMessage("EA_Service", 0x907, "EA_ServiceFailure7", "Dispatch cannot accept another record. No supplies have been taken. Leave the box and try again; if the problem persists, the dispatch or archive requires attention.", "Close");
-MakeMessage("EA_Service", 0x908, "EA_ServiceFailure8", "Read the case papers issued with this instruction before filing a conclusion. Missing papers can be recovered at dispatch.", "Close");
-MakeMessage("EA_Service", 0x909, "EA_ServiceFailure9", "This report requires one conclusion. Nothing has been filed.", "Close");
+foreach (var m in startData.Prototype.Messages) MakeMessage("EA_Prototype", Convert.ToUInt32(m.Id, 16), m.EditorID, m.Text, m.Buttons);
+foreach (var m in startData.Messages) MakeMessage("EA_Start", Convert.ToUInt32(m.Id, 16), m.EditorID, m.Text, m.Buttons);
 foreach (var packet in packets)
 {
     if (packet.Supply is { } supply) MakeMessage("EA_Service", Convert.ToUInt32(supply.Message.Id, 16), supply.Message.EditorID, supply.Message.Text, "Close");
-    if (packet.Case is { } c) MakeMessage("EA_Service", Convert.ToUInt32(c.Menu.Id, 16), c.Menu.EditorID, c.Menu.Text, c.Menu.Buttons);
+    if (packet.Visit is { } visit) MakeMessage("EA_Service", Convert.ToUInt32(visit.Message.Id, 16), visit.Message.EditorID, visit.Message.Text, "Close");
+    if (packet.Lead is { } lead) MakeMessage("EA_Service", Convert.ToUInt32(lead.Message.Id, 16), lead.Message.EditorID, lead.Message.Text, "Close");
 }
 MakeMessage("EA_Service", 0x920, "EA_AssignmentStatus0", "Instruction %.0f has not been collected. Choose Collect Orders.", "Close");
 MakeMessage("EA_Service", 0x921, "EA_AssignmentStatus1", "Instruction %.0f is active.\nDays remaining: %.1f\n\nFile your report, with any required supplies or conclusion, through dispatch.", "Close");
@@ -164,7 +169,6 @@ ScriptObjectListProperty Links(string name, params string[] targets)
     foreach (var target in targets) property.Objects.Add(Link("", forms[target]));
     return property;
 }
-ScriptIntProperty Int(string name, int value) => new() { Name = name, Flags = ScriptProperty.Flag.Edited, Data = value };
 ScriptIntListProperty Ints(string name, IEnumerable<int> values)
 {
     var property = new ScriptIntListProperty { Name = name, Flags = ScriptProperty.Flag.Edited };
@@ -188,21 +192,24 @@ core.VirtualMachineAdapter!.Scripts.Add(Script("EA_Core"));
 dispatch.VirtualMachineAdapter!.Scripts.Add(Script("EA_Dispatch", Ref("Core", "EA_CoreQuest")));
 string[] Part(string part) => packets.Select(p => p.Documents[part].EditorID).ToArray();
 var supplied = packets.Where(p => p.Supply != null).Select(p => p.Supply!).ToList();
-var cases = packets.Where(p => p.Case != null).Select(p => p.Case!).ToList();
+var visits = packets.Where(p => p.Visit != null).Select(p => p.Visit!).ToList();
+var leads = packets.Where(p => p.Lead != null).Select(p => p.Lead!).ToList();
 var supplyIndex = 0;
-var caseIndex = 0;
+var visitIndex = 0;
+var leadIndex = 0;
 service.VirtualMachineAdapter!.Scripts.Add(Script("EA_Service",
     Ref("Core", "EA_CoreQuest"), Ref("Dispatch", "EA_DispatchQuest"),
     Links("Orders", Part("order")), Links("Reports", Part("report")), Links("Responses", Part("response")),
     Links("ExtensionRequests", Part("extensionRequest")), Links("ApprovedExtensions", Part("extensionApproved")),
     Links("DeniedExtensions", Part("extensionDenied")), Links("PromptResponses", Part("prompt")), Links("LateResponses", Part("late")),
-    Links("FailureMessages", Enumerable.Range(0, 10).Select(i => "EA_ServiceFailure" + i).ToArray()),
+    Links("FailureMessages", Enumerable.Range(0, 8).Select(i => "EA_ServiceFailure" + i).ToArray()),
     Ints("SupplyIndex", packets.Select(p => p.Supply == null ? -1 : supplyIndex++)),
     VanillaLinks("Supplies", supplied.Select(s => Convert.ToUInt32(s.Form, 16))), Ints("SupplyCounts", supplied.Select(s => s.Count)),
     Links("MissingMessages", supplied.Select(s => s.Message.EditorID).ToArray()),
-    Ints("CaseIndex", packets.Select(p => p.Case == null ? -1 : caseIndex++)),
-    Links("CaseFiles", cases.Select(c => c.File.EditorID).ToArray()), Links("ConclusionMenus", cases.Select(c => c.Menu.EditorID).ToArray()),
-    Ints("SoundConclusions", cases.Select(c => c.Sound)), Links("MisjudgedResponses", cases.Select(c => c.Misjudged.EditorID).ToArray()),
+    Ints("VisitIndex", packets.Select(p => p.Visit == null ? -1 : visitIndex++)),
+    VanillaLinks("Locations", visits.Select(v => Convert.ToUInt32(v.Location, 16))), Links("VisitMessages", visits.Select(v => v.Message.EditorID).ToArray()),
+    Ints("LeadIndex", packets.Select(p => p.Lead == null ? -1 : leadIndex++)),
+    VanillaLinks("Leads", leads.Select(l => Convert.ToUInt32(l.Quest, 16))), Links("LeadMessages", leads.Select(l => l.Message.EditorID).ToArray()),
     Links("StatusMessages", "EA_AssignmentStatus0", "EA_AssignmentStatus1", "EA_AssignmentStatus2", "EA_AssignmentStatus3", "EA_AssignmentStatus4"),
     Ref("SummaryMessage", "EA_StatusSummary"), Ref("PacketReadyMessage", "EA_PacketReady"), Ref("EvaluationQueuedMessage", "EA_EvaluationQueued"),
     Ref("EvaluationRequest", "EA_EvaluationRequest"), Links("Evaluations", "EA_EvaluationGood", "EA_EvaluationMixed", "EA_EvaluationPoor"),
@@ -223,16 +230,56 @@ prototype.VirtualMachineAdapter!.Scripts.Add(Script("EA_Prototype",
     Ref("CommissionMenu", "EA_CommissionMenu"), Ref("MainMenu", "EA_MainMenu"), Ref("AssignmentMenu", "EA_AssignmentMenu"),
     Ref("AccountsMenu", "EA_AccountsMenu"), Ref("ClaimMenu", "EA_ClaimMenu"), Ref("ExplanationMenu", "EA_ExplanationMenu"),
     Ref("RepaymentMenu", "EA_RepaymentMenu"), Ref("ReturnedMessage", "EA_ReturnedMessage"), Ref("ReviewPendingMessage", "EA_ReviewPendingMessage"),
-    Ref("FiledMessage", "EA_FiledMessage"), Ref("UnavailableMessage", "EA_UnavailableMessage"), Ref("CollectedMessage", "EA_CollectedMessage")));
+    Ref("FiledMessage", "EA_FiledMessage"), Ref("UnavailableMessage", "EA_UnavailableMessage"), Ref("CollectedMessage", "EA_CollectedMessage"),
+    Ref("BoxBase", "EA_SecureDispatch"), Ref("CaseItem", startData.Prototype.Case.EditorID), Ref("OpeningMenu", "EA_OpeningMenu"), Ref("CaseMenu", "EA_CaseMenu")));
+caseItem.VirtualMachineAdapter!.Scripts.Add(Script("EA_DispatchCase", Ref("Controller", "EA_PrototypeQuest")));
+// Alternate Perspective starts this quest; stage 10 is its start-up stage and moves the player at once.
+foreach (var stage in startData.Quest.Stages)
+{
+    var entry = new QuestLogEntry { Entry = stage.Log, Flags = 0 };
+    if (stage.Complete) entry.Flags = QuestLogEntry.Flag.CompleteQuest;
+    start.Stages.Add(new QuestStage { Index = (ushort)stage.Index, Flags = stage.StartUp ? QuestStage.Flag.StartUpStage : 0, LogEntries = { entry } });
+}
+foreach (var objective in startData.Quest.Objectives)
+    start.Objectives.Add(new QuestObjective { Index = (ushort)objective.Index, DisplayText = objective.Text });
+start.Aliases.Add(new QuestAlias { ID = 0, Type = QuestAlias.TypeEnum.Location, Name = "Northwatch", SpecificLocation = new FormLinkNullable<ILocationGetter>(Vanilla(0x19285)) });
+start.Aliases.Add(new QuestAlias { ID = 1, Name = "Arrival", Location = new LocationAliasReference { AliasID = 0, RefType = new FormLinkNullable<ILocationReferenceTypeGetter>(Vanilla(0x10F63C)) } });
+start.Aliases.Add(new QuestAlias { ID = 2, Name = "Player", ForcedReference = new FormLinkNullable<IPlacedGetter>(Vanilla(0x14)) });
+start.NextAliasID = 3;
+var startScript = (QuestAdapter)start.VirtualMachineAdapter!;
+startScript.Scripts.Add(Script("EA_Opening",
+    Ref("Core", "EA_CoreQuest"), Ref("Dispatch", "EA_DispatchQuest"), Link("NorthwatchFaction", Vanilla(0xC0637)),
+    VanillaLinks("GuildFactions", new uint[] { 0x48362, 0x1F259, 0x29DA9, 0xC13C7 }),
+    Ref("SealedPacket", "EA_SealedPacket"), Ref("ArrivalLetter", "EA_ArrivalLetter"), Ref("CivilianPapers", "EA_CivilianPapers"),
+    Ref("DispatchInstructions", "EA_DispatchInstructions"), Ref("ReportForm", "EA_EstablishmentForm"), Ref("FieldPapers", "EA_FieldPapersBook"),
+    Links("Reports", startData.Documents.Where(d => d.EditorID.StartsWith("EA_EstablishmentReport")).Select(d => d.EditorID).ToArray()),
+    Links("Responses", startData.Documents.Where(d => d.EditorID.StartsWith("EA_EstablishmentResponse")).Select(d => d.EditorID).ToArray()),
+    Ref("DispatchCase", startData.Prototype.Case.EditorID), Link("Gold", Vanilla(0xF)), Link("Dagger", Vanilla(0x1397E)),
+    Ref("OccupationMenu", "EA_OccupationMenu"), Ref("LodgingMenu", "EA_LodgingMenu"), Ref("AttestationMenu", "EA_AttestationMenu"),
+    Ref("FiledMessage", "EA_EstablishmentFiled"), Ref("ClosedMessage", "EA_EstablishmentClosed"), Ref("IncomeMessage", "EA_EstablishmentIncome"),
+    Links("EvidenceMessages", startData.Messages.Where(m => m.EditorID.StartsWith("EA_EstablishmentEvidence")).Select(m => m.EditorID).ToArray()),
+    Links("LodgingMessages", "EA_LodgingEvidenceRoom", "EA_LodgingEvidenceHouse", "EA_LodgingEvidenceQuarters")));
+startScript.FileName = "EA_Opening";
+startScript.ExtraBindDataVersion = 2;
+startScript.Fragments.Add(new QuestScriptFragment { Stage = 10, StageIndex = 0, Unknown2 = 1, ScriptName = "EA_Opening", FragmentName = "Fragment_10" });
+var packetBook = mods["EA_Start"].Books.First(b => b.EditorID == "EA_SealedPacket");
+packetBook.VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 };
+packetBook.VirtualMachineAdapter.Scripts.Add(Script("EA_SealedPacket", Ref("Opening", startData.Quest.EditorID)));
+var registration = Path.Combine(output, "SKSE", "AlternatePerspective");
+Directory.CreateDirectory(registration);
+File.WriteAllText(Path.Combine(registration, "ElenwenAgent.json"), JsonSerializer.Serialize(startData.AlternatePerspective, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }) + "\n");
 box.VirtualMachineAdapter!.Scripts.Add(Script("EA_DispatchBox", Ref("Controller", "EA_PrototypeQuest")));
 var papers = mods["EA_Core"].Books.First(b => b.EditorID == "EA_FieldPapersBook");
 papers.VirtualMachineAdapter = new VirtualMachineAdapter { Version = 5, ObjectFormat = 2 };
 papers.VirtualMachineAdapter.Scripts.Add(Script("EA_FieldPapers", Ref("Core", "EA_CoreQuest")));
-foreach (var packet in packets.Where(p => p.Case != null))
+// The player alias reports arrivals; Service decides which open instruction they satisfy.
+service.Aliases.Add(new QuestAlias { ID = 0, Name = "Player", ForcedReference = new FormLinkNullable<IPlacedGetter>(Vanilla(0x14)) });
+service.NextAliasID = 1;
+((QuestAdapter)service.VirtualMachineAdapter!).Aliases.Add(new QuestFragmentAlias
 {
-    var file = mods["EA_Service"].Books.First(b => b.EditorID == packet.Case!.File.EditorID);
-    file.VirtualMachineAdapter!.Scripts.Add(Script("EA_CaseFile", Ref("Core", "EA_CoreQuest"), Int("AssignmentID", packet.Assignment)));
-}
+    Property = new ScriptObjectProperty { Object = new FormLink<ISkyrimMajorRecordGetter>(service.FormKey), Alias = 0 },
+    Version = 5, ObjectFormat = 2, Scripts = { Script("EA_ServicePlayer", Ref("Service", "EA_ServiceQuest")) }
+});
 // Explicit IDs form the save contract. Fail instead of silently allocating new IDs.
 var recordMap = new SortedDictionary<string, string>();
 foreach (var (name, mod) in mods)
@@ -254,5 +301,12 @@ File.WriteAllText(Path.Combine(root, "build", "record-map.json"), JsonSerializer
 record Document(string Module, string Id, string EditorID, string Title, string Text);
 record MessageText(string Id, string EditorID, string Text, string[] Buttons);
 record Supply(string Form, string Name, int Count, MessageText Message);
-record Case(int Sound, Document File, MessageText Menu, Document Misjudged);
-record Packet(int Assignment, string Key, string Family, string Objective, Dictionary<string, Document> Documents, Supply? Supply, Case? Case);
+record Visit(string Location, MessageText Message);
+record Lead(string Quest, MessageText Message);
+record StartStage(int Index, bool StartUp, bool Complete, string Log);
+record StartObjective(int Index, string Text);
+record StartQuest(string Id, string EditorID, string Name, List<StartStage> Stages, List<StartObjective> Objectives);
+record StartItem(string Id, string EditorID, string Name);
+record StartPrototype(StartItem Case, List<MessageText> Messages);
+record StartContent(StartQuest Quest, List<Document> Documents, List<MessageText> Messages, StartPrototype Prototype, JsonElement AlternatePerspective);
+record Packet(int Assignment, string Key, string Family, string Objective, Dictionary<string, Document> Documents, Supply? Supply, Visit? Visit, Lead? Lead);

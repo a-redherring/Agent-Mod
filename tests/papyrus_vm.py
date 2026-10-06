@@ -70,7 +70,33 @@ class Script:
 
 @dataclass(eq=False)
 class Inventory:
+    """A container or placed reference. The player is one, with factions and a position."""
     items: Counter = field(default_factory=Counter)
+    factions: set = field(default_factory=set)
+    at: object = None
+    enabled: bool = True
+    deleted: bool = False
+    base: object = None
+
+
+@dataclass(eq=False)
+class Alias:
+    reference: object = None
+
+
+@dataclass(eq=False)
+class Place:
+    """A vanilla Location; parent models Location.IsChild."""
+    name: str
+    parent: object = None
+
+
+@dataclass(eq=False)
+class VanillaQuest:
+    """A vanilla quest the scripts only read."""
+    name: str
+    running: bool = False
+    completed: bool = False
 
 
 @dataclass(eq=False)
@@ -87,9 +113,14 @@ class Instance:
         # Skyrim supplies this variable implicitly; Caprica need not declare it.
         self.vars["::state"] = ""
         self.timer = None
+        self.update = None
+        self.stages = []
+        self.aliases = {}
         self.objectives = {}
         self.running = False
         self.can_start = True
+        # A script on a placed object is also that object; its reference natives act here.
+        self.ref = Inventory()
 
     def prop(self, name, value):
         self.vars["::" + name.lower() + "_var"] = value
@@ -108,6 +139,8 @@ class VM:
         self.player = Inventory()
         self.notifications = []
         self.traces = []
+        self.stats = Counter()
+        self.activations = []
 
     def instance(self, script):
         return Instance(self, script)
@@ -128,14 +161,50 @@ class VM:
                     args[3].items[args[0]] += args[1]
                 return
             if name == "placeatme":
-                return Inventory()
+                return Inventory(base=args[0], at=obj)
             if name == "moveto":
+                obj.at = args[0]
                 return
+            if name == "addtofaction":
+                obj.factions.add(args[0])
+                return
+            if name == "removefromfaction":
+                obj.factions.discard(args[0])
+                return
+            if name == "isinfaction":
+                return args[0] in obj.factions
+            if name == "getdistance":
+                # Distance is 0 at the reference itself, otherwise "far"; tests set positions explicitly.
+                return 0.0 if obj.at is args[0] or obj is args[0] else 100000.0
+            if name in ("disable", "enable"):
+                obj.enabled = name == "enable"
+                return
+            if name == "delete":
+                obj.deleted = True
+                return
+            if name == "activate":
+                self.activations.append((obj, args[0]))
+                return True
+            if name == "stopcombatalarm":
+                return
+        if isinstance(obj, Alias) and name == "getreference":
+            return obj.reference
+        if isinstance(obj, Place) and name == "ischild":
+            parent = obj.parent
+            while parent is not None:
+                if parent is args[0]:
+                    return True
+                parent = parent.parent
+            return False
+        if isinstance(obj, VanillaQuest) and name in ("isrunning", "iscompleted"):
+            return obj.running if name == "isrunning" else obj.completed
         if isinstance(obj, Menu) and name == "show":
             obj.shown.append(args)
             return obj.choices.popleft() if obj.choices else 0
         if not isinstance(obj, Instance):
             raise RuntimeError(f"Unsupported native call: {obj!r}.{method}")
+        if name in ("placeatme", "disable", "enable", "delete", "moveto", "getdistance"):
+            return self.call(obj.ref, method, args)
         if name in ("onbeginstate", "onendstate"):
             return
         if name == "start":
@@ -145,6 +214,16 @@ class VM:
             return True
         if name == "isrunning":
             return obj.running
+        if name == "registerforsingleupdate":
+            obj.update = args[0]
+            return
+        if name == "setstage":
+            obj.stages.append(args[0])
+            return True
+        if name == "getstage":
+            return obj.stages[-1] if obj.stages else 0
+        if name == "getalias":
+            return obj.aliases.get(args[0])
         if name == "registerforsingleupdategametime":
             obj.timer = self.day + args[0] / 24
             return
@@ -229,6 +308,10 @@ class VM:
                 elif target == "debug.trace":
                     self.traces.append(values[0])
                     result = None
+                elif target == "game.querystat":
+                    result = self.stats[values[0]]
+                elif target == "utility.wait":
+                    result = None
                 elif target == "debug.notification":
                     self.notifications.append(values[0])
                     result = None
@@ -268,7 +351,8 @@ PACKETS = json.loads((Path(__file__).resolve().parents[1] / "content/packets.jso
 def fixture(directory, collect_orders=True):
     """Wire the scripts as the plugin does. Packet layout comes from content/packets.json.
 
-    Inventory items are named by packet key ("Wine", "Reserve"); case papers are "Case<key>".
+    Inventory items are named by packet key ("Wine", "Meadery"). Named places are Place objects
+    and leads are VanillaQuest objects, both found in vm.places and vm.leads by packet key.
     """
     vm = VM(directory)
     core = vm.instance("EA_Core")
@@ -278,20 +362,24 @@ def fixture(directory, collect_orders=True):
     for p in ("Orders", "Reports", "Responses", "PromptResponses", "LateResponses", "ExtensionRequests", "ApprovedExtensions", "DeniedExtensions"):
         service.prop(p, [f"{p}{i}" for i in range(len(PACKETS))])
     supplied = [p for p in PACKETS if "supply" in p]
-    cases = [p for p in PACKETS if "case" in p]
+    visits = [p for p in PACKETS if "visit" in p]
+    leads = [p for p in PACKETS if "lead" in p]
+    vm.places = {p["key"]: Place(p["key"]) for p in visits}
+    vm.leads = {p["key"]: VanillaQuest(p["key"]) for p in leads}
     service.prop("SupplyIndex", [supplied.index(p) if "supply" in p else -1 for p in PACKETS])
     service.prop("Supplies", [p["key"] for p in supplied])
     service.prop("SupplyCounts", [p["supply"]["count"] for p in supplied])
     service.prop("MissingMessages", [Menu() for _ in supplied])
-    service.prop("CaseIndex", [cases.index(p) if "case" in p else -1 for p in PACKETS])
-    service.prop("CaseFiles", ["Case" + p["key"] for p in cases])
-    service.prop("ConclusionMenus", [Menu() for _ in cases])
-    service.prop("SoundConclusions", [p["case"]["sound"] for p in cases])
-    service.prop("MisjudgedResponses", ["Misjudged" + p["key"] for p in cases])
+    service.prop("VisitIndex", [visits.index(p) if "visit" in p else -1 for p in PACKETS])
+    service.prop("Locations", [vm.places[p["key"]] for p in visits])
+    service.prop("VisitMessages", [Menu() for _ in visits])
+    service.prop("LeadIndex", [leads.index(p) if "lead" in p else -1 for p in PACKETS])
+    service.prop("Leads", [vm.leads[p["key"]] for p in leads])
+    service.prop("LeadMessages", [Menu() for _ in leads])
     for p in ("AuthorityRequest", "AuthorityApproved", "EvaluationRequest"):
         service.prop(p, p)
     service.prop("Evaluations", [f"Evaluations{i}" for i in range(3)])
-    for p, count in (("FailureMessages", 10), ("StatusMessages", 5)):
+    for p, count in (("FailureMessages", 8), ("StatusMessages", 5)):
         service.prop(p, [Menu() for _ in range(count)])
     for p in ("SummaryMessage", "PacketReadyMessage", "EvaluationQueuedMessage"):
         service.prop(p, Menu())

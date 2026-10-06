@@ -1,0 +1,308 @@
+{
+  "quest": {
+    "id": "800",
+    "editorID": "EA_StartQuest",
+    "name": "Establish Cover",
+    "stages": [
+      {
+        "index": 10,
+        "startUp": true,
+        "log": "I was brought into Skyrim under Dominion authority and handed to the garrison at Northwatch Keep with sealed instructions. They held my belongings while the transfer was confirmed.\n\nThe confirmation came from Elenwen. By her order I was released and my effects were returned. I was given civilian papers, a little money and a sealed packet. I was not ordered to report to the Embassy, and the garrison was not told what I am.\n\nI should read the packet before I go any further."
+      },
+      {
+        "index": 20,
+        "log": "Elenwen's instructions are plain. I am not to report to the Embassy. I am to make a life in Skyrim first: work that explains me, somewhere to live, money of my own, and nothing that ties me to her in public.\n\nWhen that life can stand scrutiny, I am to file an Establishment Report through the dispatch case. The case is to be set down in my lodgings, not carried about."
+      },
+      {
+        "index": 30,
+        "log": "I have filed the Establishment Report. Elenwen's assessment will come back through the dispatch case after a full day."
+      },
+      {
+        "index": 40,
+        "complete": true,
+        "log": "Elenwen has accepted my cover and sent the field papers. My service begins in earnest. Orders will come through the dispatch case."
+      }
+    ],
+    "objectives": [
+      {
+        "index": 10,
+        "text": "Read Elenwen's sealed packet"
+      },
+      {
+        "index": 20,
+        "text": "Find work that explains you: a guild, a trade, hunting, paid work or study"
+      },
+      {
+        "index": 21,
+        "text": "Secure lodgings"
+      },
+      {
+        "index": 22,
+        "text": "Earn money of your own"
+      },
+      {
+        "index": 23,
+        "text": "File the Establishment Report through the dispatch case"
+      },
+      {
+        "index": 30,
+        "text": "Collect Elenwen's assessment from the dispatch case"
+      }
+    ]
+  },
+  "documents": [
+    {
+      "id": "810",
+      "editorID": "EA_SealedPacket",
+      "title": "Sealed Packet",
+      "text": "Plain wax. No name on the outside.\n\nInside: a letter, civilian papers, a purse, instructions for a dispatch case, a blank report form, and the case itself."
+    },
+    {
+      "id": "811",
+      "editorID": "EA_ArrivalLetter",
+      "title": "Letter, Unsigned Seal",
+      "text": "You will have noticed that you are not at the Embassy. That is deliberate.\n\nNorthwatch has its instructions and nothing more. They know you as a transfer I chose to release. Let them go on knowing that.\n\nYou are to make a life in Skyrim. Find work that explains your travel and your questions. Find somewhere to live. Earn money that does not come from me. When that life would satisfy a curious neighbor, complete the enclosed report and file it through the case.\n\nDo not come to the Embassy. Do not use my name to open a door, settle a quarrel or lower a price. If you are asked who you are, you are what your papers say.\n\nThis is an assignment, not leave. I will know the difference.\n\nElenwen"
+    },
+    {
+      "id": "812",
+      "editorID": "EA_CivilianPapers",
+      "title": "Civilian Papers",
+      "text": "The bearer, a citizen of Cyrodiil, is permitted to travel within the province of Skyrim and to seek lawful employment there.\n\nName and description as given by the bearer.\nOccupation: none entered.\n\nCountersigned at Northwatch Keep. Released without condition."
+    },
+    {
+      "id": "813",
+      "editorID": "EA_DispatchInstructions",
+      "title": "Instructions for the Dispatch Case",
+      "text": "The case is to be set down in your lodgings, not carried about. Set down, it opens into a dispatch box. Pack it before you move.\n\nFiled copies stay with the case. Replies take a full day and are collected from it, not delivered to you.\n\nUntil your Establishment Report is accepted, the case will carry that report and nothing else."
+    },
+    {
+      "id": "814",
+      "editorID": "EA_EstablishmentForm",
+      "title": "Establishment Report (Blank)",
+      "text": "To be completed when the bearer's civilian position can withstand ordinary scrutiny, and filed through the dispatch case.\n\nDeclare:\n1. Your occupation, and the work done in it since arrival.\n2. Your lodgings.\n3. Money earned that was not issued to you.\n4. That you have not presented yourself as an officer of the Embassy.\n\nA declaration the facts do not support will not be accepted."
+    },
+    {
+      "id": "820",
+      "editorID": "EA_EstablishmentReportGuild",
+      "title": "Filed Establishment Report: Guild Membership",
+      "text": "Establishment Report\n\nOccupation: member of a recognized guild in Skyrim, admitted in the ordinary way.\nLodgings: as declared.\nIncome: earned since arrival, independent of the allowance.\n\nI have not presented myself as an officer of the Embassy.\n\nFiled by secure dispatch."
+    },
+    {
+      "id": "821",
+      "editorID": "EA_EstablishmentReportTrade",
+      "title": "Filed Establishment Report: Trade or Craft",
+      "text": "Establishment Report\n\nOccupation: a trade or craft practised in Skyrim, with goods made and sold since arrival.\nLodgings: as declared.\nIncome: earned since arrival, independent of the allowance.\n\nI have not presented myself as an officer of the Embassy.\n\nFiled by secure dispatch."
+    },
+    {
+      "id": "822",
+      "editorID": "EA_EstablishmentReportHunting",
+      "title": "Filed Establishment Report: Hunting and Provisioning",
+      "text": "Establishment Report\n\nOccupation: hunting and provisioning, with game taken and sold since arrival.\nLodgings: as declared.\nIncome: earned since arrival, independent of the allowance.\n\nI have not presented myself as an officer of the Embassy.\n\nFiled by secure dispatch."
+    },
+    {
+      "id": "823",
+      "editorID": "EA_EstablishmentReportWork",
+      "title": "Filed Establishment Report: Paid Work",
+      "text": "Establishment Report\n\nOccupation: paid work of the ordinary kind (bounties, escort, errands for hire), with work completed since arrival.\nLodgings: as declared.\nIncome: earned since arrival, independent of the allowance.\n\nI have not presented myself as an officer of the Embassy.\n\nFiled by secure dispatch."
+    },
+    {
+      "id": "824",
+      "editorID": "EA_EstablishmentReportStudy",
+      "title": "Filed Establishment Report: Study",
+      "text": "Establishment Report\n\nOccupation: study and private scholarship, with reading, instruction or spellwork undertaken since arrival.\nLodgings: as declared.\nIncome: earned since arrival, independent of the allowance.\n\nI have not presented myself as an officer of the Embassy.\n\nFiled by secure dispatch."
+    },
+    {
+      "id": "830",
+      "editorID": "EA_EstablishmentResponseGuild",
+      "title": "Assessment: Guild Membership",
+      "text": "Accepted. A guild gives you colleagues, and colleagues notice absences. Account for yours before anyone asks. The field papers are enclosed. Orders follow through the case.\n\nElenwen"
+    },
+    {
+      "id": "831",
+      "editorID": "EA_EstablishmentResponseTrade",
+      "title": "Assessment: Trade or Craft",
+      "text": "Accepted. A trade explains money, travel and an interest in other people's goods. Keep your prices ordinary. The field papers are enclosed. Orders follow through the case.\n\nElenwen"
+    },
+    {
+      "id": "832",
+      "editorID": "EA_EstablishmentResponseHunting",
+      "title": "Assessment: Hunting and Provisioning",
+      "text": "Accepted. Hunters go where they like and are asked very little. Do not mistake that for an ambition. The field papers are enclosed. Orders follow through the case.\n\nElenwen"
+    },
+    {
+      "id": "833",
+      "editorID": "EA_EstablishmentResponseWork",
+      "title": "Assessment: Paid Work",
+      "text": "Accepted. Paid work explains your arms and your travel, and it puts you among people who talk. Keep it from putting you in front of a magistrate. The field papers are enclosed. Orders follow through the case.\n\nElenwen"
+    },
+    {
+      "id": "834",
+      "editorID": "EA_EstablishmentResponseStudy",
+      "title": "Assessment: Study",
+      "text": "Accepted. A scholar may ask almost any question, provided it concerns the past. Use that. The field papers are enclosed. Orders follow through the case.\n\nElenwen"
+    }
+  ],
+  "messages": [
+    {
+      "id": "900",
+      "editorID": "EA_OccupationMenu",
+      "text": "Establishment Report. Declare the occupation that explains you.",
+      "buttons": [
+        "Guild membership",
+        "Trade or craft",
+        "Hunting and provisioning",
+        "Paid work",
+        "Study",
+        "Cancel"
+      ]
+    },
+    {
+      "id": "901",
+      "editorID": "EA_LodgingMenu",
+      "text": "Establishment Report. Declare your lodgings.",
+      "buttons": [
+        "A rented room",
+        "A house of my own",
+        "Guild quarters",
+        "Cancel"
+      ]
+    },
+    {
+      "id": "902",
+      "editorID": "EA_AttestationMenu",
+      "text": "Establishment Report. Before filing: you have not presented yourself as an officer of the Embassy?",
+      "buttons": [
+        "I have not",
+        "Cancel"
+      ]
+    },
+    {
+      "id": "903",
+      "editorID": "EA_EstablishmentFiled",
+      "text": "The Establishment Report has been entered. Elenwen's assessment will return after a full day. Collect it through Check Responses.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "904",
+      "editorID": "EA_EstablishmentClosed",
+      "text": "Your Establishment Report has already been filed. Collect the assessment through Check Responses after a full day.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "905",
+      "editorID": "EA_EstablishmentIncome",
+      "text": "Nothing yet shows money of your own: you have never carried more than you arrived with. Earn before you report.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "910",
+      "editorID": "EA_EstablishmentEvidenceGuild",
+      "text": "Your report names a guild that does not yet recognize you. Join one before you declare it.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "911",
+      "editorID": "EA_EstablishmentEvidenceTrade",
+      "text": "Nothing you have made since arriving would support a trade. Make your goods before you declare them.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "912",
+      "editorID": "EA_EstablishmentEvidenceHunting",
+      "text": "You have not hunted enough since arriving for anyone to call it your living.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "913",
+      "editorID": "EA_EstablishmentEvidenceWork",
+      "text": "You have completed no paid work since arriving. Finish a job before you declare the occupation.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "914",
+      "editorID": "EA_EstablishmentEvidenceStudy",
+      "text": "Nothing shows study since you arrived. Read, train or learn before you declare it.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "920",
+      "editorID": "EA_LodgingEvidenceRoom",
+      "text": "You have not slept in Skyrim since you arrived. Take a room before you declare one.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "921",
+      "editorID": "EA_LodgingEvidenceHouse",
+      "text": "You own no house. Declare the lodgings you actually have.",
+      "buttons": [
+        "Close"
+      ]
+    },
+    {
+      "id": "922",
+      "editorID": "EA_LodgingEvidenceQuarters",
+      "text": "Your declared guild gives you no quarters. Declare the lodgings you actually use.",
+      "buttons": [
+        "Close"
+      ]
+    }
+  ],
+  "prototype": {
+    "case": {
+      "id": "830",
+      "editorID": "EA_DispatchCaseItem",
+      "name": "Sealed Dispatch Case"
+    },
+    "messages": [
+      {
+        "id": "81C",
+        "editorID": "EA_OpeningMenu",
+        "text": "Secure dispatch. Until your Establishment Report is accepted, the case carries that report and nothing else. Replies require one full day.",
+        "buttons": [
+          "File Establishment Report",
+          "Check Responses",
+          "Case and archive",
+          "Leave"
+        ]
+      },
+      {
+        "id": "81D",
+        "editorID": "EA_CaseMenu",
+        "text": "The dispatch case. Filed copies are kept with it.",
+        "buttons": [
+          "Open filed correspondence",
+          "Recover filed copies",
+          "Pack the case",
+          "Cancel"
+        ]
+      }
+    ]
+  },
+  "alternatePerspective": [
+    {
+      "mod": "EA_Start.esp",
+      "text": "Elenwen's Agent",
+      "description": "Released outside Northwatch Keep under sealed instructions. You are already in Elenwen's service.",
+      "color": "0x6B8E5A",
+      "id": "0x800"
+    }
+  ]
+}

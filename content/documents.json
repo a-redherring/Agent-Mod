@@ -130,27 +130,27 @@
     "id": "85E",
     "editorID": "EA_EvaluationRequest",
     "title": "Filed Docket: Closing Review",
-    "text": "Instructions 1001-1011\n\nEvery instruction in this series is closed and its response collected. The filing dates, conclusions, and Accounts record are submitted for the First Emissary's review. Her response follows by the next dispatch.\n\nThis docket requests no payment or change in public standing."
+    "text": "Instructions 1001-1012\n\nEvery instruction in this series is closed and its response collected. The filing dates and Accounts record are submitted for the First Emissary's review. Her response follows by the next dispatch.\n\nThis docket requests no payment or change in public standing."
   },
   {
     "module": "EA_Service",
     "id": "85F",
     "editorID": "EA_EvaluationGood",
     "title": "Private Assessment: Dependable Service",
-    "text": "Instructions 1001-1011\n\nThe series is closed. The record shows no missed deadline, no rejected conclusion, and no adverse finding from Accounts.\n\nYou read what you were sent and did what it required. That is rarer than it should be. Your commission continues on its existing terms; this letter confers no rank and no further authority.\n\nElenwen"
+    "text": "Instructions 1001-1012\n\nThe series is closed. The record shows no missed deadline and no adverse finding from Accounts.\n\nYou did what you were told, when you were told. Your commission continues on its existing terms; this letter confers no rank and no further authority.\n\nElenwen"
   },
   {
     "module": "EA_Service",
     "id": "860",
     "editorID": "EA_EvaluationMixed",
     "title": "Private Assessment: Further Care Required",
-    "text": "Instructions 1001-1011\n\nThe series is closed and the work accepted. The record also shows one lapse: a missed deadline, a rejected conclusion, or an expense Accounts would not fully allow.\n\nOne lapse is a matter of care. Two would be a matter of judgement. Your commission continues; this letter confers no further authority.\n\nElenwen"
+    "text": "Instructions 1001-1012\n\nThe series is closed and the work accepted. The record also shows one lapse: a missed deadline, or an expense Accounts would not fully allow.\n\nOne lapse is a matter of care. Two would be a matter of reliability. Your commission continues; this letter confers no further authority.\n\nElenwen"
   },
   {
     "module": "EA_Service",
     "id": "861",
     "editorID": "EA_EvaluationPoor",
     "title": "Private Assessment: Formal Reprimand",
-    "text": "Instructions 1001-1011\n\nThe series is closed. I have accepted the work, but the record warrants a reprimand: more than one missed deadline or rejected conclusion, money still owed, an overdue advance, or a denied expense.\n\nAny sum shown as outstanding is to be returned through Accounts. Accepting your reports does not cancel it.\n\nYour commission continues. Future instructions will be read with this letter beside them.\n\nElenwen"
+    "text": "Instructions 1001-1012\n\nThe series is closed. I have accepted the work, but the record warrants a reprimand: more than one missed deadline, money still owed, an overdue advance, or a denied expense.\n\nAny sum shown as outstanding is to be returned through Accounts. Accepting your reports does not cancel it.\n\nYour commission continues. Future instructions will be read with this letter beside them.\n\nElenwen"
   }
 ]

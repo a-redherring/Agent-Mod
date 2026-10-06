@@ -9,7 +9,9 @@ from plugin_reader import records, scripts
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "build/Data"
 PACKETS = json.loads((ROOT / "content/packets.json").read_text())
-ORDER = ["Skyrim.esm", "EA_Core.esp", "EA_Dispatch.esp", "EA_Service.esp", "EA_Accounts.esp", "EA_Prototype.esp"]
+ORDER = ["Skyrim.esm", "EA_Core.esp", "EA_Dispatch.esp", "EA_Service.esp", "EA_Accounts.esp", "EA_Prototype.esp", "EA_Start.esp"]
+# Vanilla forms the opening binds: Northwatch, the four guild factions and the starting dagger.
+START_VANILLA = {0xC0637, 0x48362, 0x1F259, 0x29DA9, 0xC13C7, 0x1397E}
 
 
 class PluginTests(unittest.TestCase):
@@ -18,7 +20,7 @@ class PluginTests(unittest.TestCase):
         cls.plugins = {name: list(records((DATA / name).read_bytes())) for name in ORDER[1:]}
 
     def test_no_overrides_esl_flags_or_deleted_records(self):
-        allowed = {"TES4", "QUST", "BOOK", "MESG", "ACTI", "CONT"}
+        allowed = {"TES4", "QUST", "BOOK", "MESG", "ACTI", "CONT", "MISC"}
         for name, recs in self.plugins.items():
             with self.subTest(plugin=name):
                 header = recs[0]
@@ -54,11 +56,12 @@ class PluginTests(unittest.TestCase):
                         self.assertEqual(isinstance(value, list), declared[prop].endswith("[]"), prop)
                         self.assertTrue(value, (script, prop))
                     if script == "EA_Service":
-                        for prop in ("Orders", "Reports", "Responses", "PromptResponses", "LateResponses", "ExtensionRequests", "ApprovedExtensions", "DeniedExtensions", "SupplyIndex", "CaseIndex"):
+                        for prop in ("Orders", "Reports", "Responses", "PromptResponses", "LateResponses", "ExtensionRequests", "ApprovedExtensions", "DeniedExtensions", "SupplyIndex", "VisitIndex", "LeadIndex"):
                             self.assertEqual(len(props[prop]), len(PACKETS), prop)
                         supplies = sum("supply" in p for p in PACKETS)
-                        cases = sum("case" in p for p in PACKETS)
-                        for prop, count in (("Supplies", supplies), ("SupplyCounts", supplies), ("MissingMessages", supplies), ("CaseFiles", cases), ("ConclusionMenus", cases), ("SoundConclusions", cases), ("MisjudgedResponses", cases), ("FailureMessages", 10)):
+                        visits = sum("visit" in p for p in PACKETS)
+                        leads = sum("lead" in p for p in PACKETS)
+                        for prop, count in (("Supplies", supplies), ("SupplyCounts", supplies), ("MissingMessages", supplies), ("Locations", visits), ("VisitMessages", visits), ("Leads", leads), ("LeadMessages", leads), ("FailureMessages", 8)):
                             self.assertEqual(len(props[prop]), count, prop)
                     if script == "EA_Accounts":
                         self.assertEqual(len(props["ClaimForms"]), 4)
@@ -66,7 +69,8 @@ class PluginTests(unittest.TestCase):
 
     def test_vmad_references_resolve_and_have_no_optional_masters(self):
         # Gold, the note inventory art, and each packet's named item.
-        vanilla = {0xF, 0x97788} | {int(p["supply"]["form"], 16) for p in PACKETS if "supply" in p}
+        vanilla = {0xF, 0x97788} | START_VANILLA | {int(p["supply"]["form"], 16) for p in PACKETS if "supply" in p}
+        vanilla |= {int(p["visit"]["location"], 16) for p in PACKETS if "visit" in p} | {int(p["lead"]["quest"], 16) for p in PACKETS if "lead" in p}
         for name, recs in self.plugins.items():
             masters = [v.rstrip(b"\0").decode() for n, v in recs[0].fields if n == "MAST"] + [name]
             for record in recs:
@@ -86,10 +90,9 @@ class PluginTests(unittest.TestCase):
 
     def test_books_are_readable_zero_value_documents(self):
         documents = json.loads((ROOT / "content/documents.json").read_text())
+        documents += json.loads((ROOT / "content/start.json").read_text())["documents"]
         for packet in PACKETS:
             documents += list(packet["documents"].values())
-            if "case" in packet:
-                documents += [packet["case"]["file"], packet["case"]["misjudged"]]
         books = {r.editor_id: r for recs in self.plugins.values() for r in recs if r.kind == "BOOK"}
         self.assertEqual(len(books), len(documents))
         for doc in documents:
@@ -121,7 +124,7 @@ class PluginTests(unittest.TestCase):
         self.assertEqual(binary_map, expected)
 
     def test_vmad_targets_have_the_required_record_and_script_types(self):
-        types = {"Book": "BOOK", "Container": "CONT", "Message": "MESG"}
+        types = {"Book": "BOOK", "Container": "CONT", "Message": "MESG", "Activator": "ACTI", "MiscObject": "MISC"}
         for name, recs in self.plugins.items():
             masters = [v.rstrip(b"\0").decode() for n, v in recs[0].fields if n == "MAST"] + [name]
             for record in recs:
@@ -133,6 +136,10 @@ class PluginTests(unittest.TestCase):
                             continue
                         for form in value if isinstance(value, list) else [value]:
                             owner = masters[form >> 24]
+                            if owner == "Skyrim.esm":
+                                packet_vanilla = {int(p[k][f], 16) for p in PACKETS for k, f in (("visit", "location"), ("lead", "quest")) if k in p}
+                                self.assertIn(form & 0xFFFFFF, START_VANILLA | packet_vanilla, (script, prop))
+                                continue
                             target = next(r for r in self.plugins[owner][1:] if r.form_id & 0xFFFFFF == form & 0xFFFFFF)
                             if declared[prop].startswith("EA_"):
                                 self.assertEqual(target.kind, "QUST")
@@ -155,43 +162,53 @@ class PluginTests(unittest.TestCase):
                 if record.kind == "QUST":
                     flags = struct.unpack_from("<H", record.field("DNAM"))[0]
                     self.assertFalse(flags & 1)
-                    self.assertIsNone(record.field("ALST"))
+                    if record.editor_id not in ("EA_StartQuest", "EA_ServiceQuest"):
+                        self.assertIsNone(record.field("ALST"))
 
     def test_service_letter_arrays_keep_each_instruction_in_its_slot(self):
         recs = self.plugins['EA_Service.esp']
         quest = next(r for r in recs if r.editor_id == 'EA_ServiceQuest')
         props = dict(scripts(quest.field('VMAD')))['EA_Service']
-        documents = {d['editorID']: d for p in PACKETS for d in list(p['documents'].values()) + ([p['case']['file'], p['case']['misjudged']] if 'case' in p else [])}
+        documents = {d['editorID']: d for p in PACKETS for d in p['documents'].values()}
         for prop in ('Orders', 'Reports', 'Responses', 'PromptResponses', 'LateResponses', 'ExtensionRequests', 'ApprovedExtensions', 'DeniedExtensions'):
             for index, form in enumerate(props[prop]):
                 record = next(r for r in recs if r.form_id == form)
                 doc = documents[record.editor_id]
                 self.assertIn(str(1001 + index), doc['title'] + doc['text'], (prop, index))
         supplied = [p for p in PACKETS if 'supply' in p]
-        cases = [p for p in PACKETS if 'case' in p]
+        visits = [p for p in PACKETS if 'visit' in p]
+        leads = [p for p in PACKETS if 'lead' in p]
         self.assertEqual(props['SupplyIndex'], [supplied.index(p) if 'supply' in p else -1 for p in PACKETS])
-        self.assertEqual(props['CaseIndex'], [cases.index(p) if 'case' in p else -1 for p in PACKETS])
+        self.assertEqual(props['VisitIndex'], [visits.index(p) if 'visit' in p else -1 for p in PACKETS])
+        self.assertEqual(props['LeadIndex'], [leads.index(p) if 'lead' in p else -1 for p in PACKETS])
         self.assertEqual(props['Supplies'], [int(p['supply']['form'], 16) for p in supplied])
         self.assertEqual(props['SupplyCounts'], [p['supply']['count'] for p in supplied])
-        self.assertEqual(props['SoundConclusions'], [p['case']['sound'] for p in cases])
-        for prop, part in (('CaseFiles', 'file'), ('MisjudgedResponses', 'misjudged')):
-            for case, form in zip(cases, props[prop]):
-                record = next(r for r in recs if r.form_id == form)
-                self.assertEqual(record.editor_id, case['case'][part]['editorID'])
-                self.assertIn(str(case['assignment']), documents[record.editor_id]['title'], prop)
+        self.assertEqual(props['Locations'], [int(p['visit']['location'], 16) for p in visits])
+        self.assertEqual(props['Leads'], [int(p['lead']['quest'], 16) for p in leads])
 
-    def test_case_papers_carry_their_assignment_and_menus_offer_three_conclusions(self):
-        recs = self.plugins['EA_Service.esp']
-        for packet in [p for p in PACKETS if 'case' in p]:
-            with self.subTest(packet=packet['assignment']):
-                papers = next(r for r in recs if r.editor_id == packet['case']['file']['editorID'])
-                props = dict(scripts(papers.field('VMAD')))['EA_CaseFile']
-                self.assertEqual(props['AssignmentID'], packet['assignment'])
-                menu = next(r for r in recs if r.editor_id == packet['case']['menu']['editorID'])
-                buttons = [v.rstrip(b'\0').decode() for n, v in menu.fields if n == 'ITXT']
-                self.assertEqual(len(buttons), 4)
-                self.assertEqual(buttons[-1], 'Cancel')
-                self.assertIn(str(packet['assignment']), menu.field('DESC').decode())
+    def test_service_player_alias_reports_arrivals(self):
+        quest = next(r for r in self.plugins['EA_Service.esp'] if r.editor_id == 'EA_ServiceQuest')
+        self.assertEqual(struct.unpack('<I', quest.field('ALST'))[0], 0)
+        self.assertEqual(struct.unpack('<I', quest.field('ALFR'))[0], 0x14, 'the player')
+        self.assertIn(b'EA_ServicePlayer', quest.field('VMAD'))
+        self.assertIn('Event OnLocationChange', (ROOT / 'Data/Source/Scripts/EA_ServicePlayer.psc').read_text())
+
+    def test_start_quest_is_a_start_up_stage_with_northwatch_aliases_and_a_real_fragment(self):
+        quest = next(r for r in self.plugins["EA_Start.esp"] if r.editor_id == "EA_StartQuest")
+        stages = {struct.unpack_from("<H", v)[0]: v[2] for n, v in quest.fields if n == "INDX"}
+        self.assertEqual(stages, {10: 2, 20: 0, 30: 0, 40: 0}, "only stage 10 is the start-up stage")
+        self.assertEqual([struct.unpack("<I", v)[0] for n, v in quest.fields if n in ("ALLS", "ALST")], [0, 1, 2])
+        field = lambda kind: struct.unpack("<I", quest.field(kind))[0]
+        self.assertEqual(field("ALFL"), 0x019285, "NorthwatchKeepLocation in Skyrim.esm")
+        self.assertEqual(field("ALRT"), 0x10F63C, "MapMarkerRefType")
+        self.assertEqual(field("ALFA"), 0, "the marker is found in the Northwatch alias")
+        self.assertEqual(field("ALFR"), 0x14, "the player")
+        self.assertEqual(struct.unpack_from("<H", quest.field("DNAM"))[0] & 1, 0, "Alternate Perspective starts it")
+        vmad = quest.field("VMAD")
+        self.assertTrue(vmad.endswith(b"\x0a\x00EA_Opening\x0b\x00Fragment_10\x00\x00"))
+        self.assertIn("Function Fragment_10()", (ROOT / "Data/Source/Scripts/EA_Opening.psc").read_text())
+        registration = json.loads((DATA / "SKSE/AlternatePerspective/ElenwenAgent.json").read_text())
+        self.assertEqual([(e["mod"], int(e["id"], 16)) for e in registration], [("EA_Start.esp", quest.form_id & 0xFFFFFF)])
 
     def test_quest_objectives_follow_packet_positions(self):
         quest = next(r for r in self.plugins['EA_Service.esp'] if r.editor_id == 'EA_ServiceQuest')

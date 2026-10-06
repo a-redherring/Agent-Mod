@@ -1,5 +1,44 @@
 # Review record
 
+## Changes in 0.3.0, part 2: underling design and vanilla leads
+
+At the user's direction, the player now serves as an underling rather than an analyst.
+- **No more decoding.** The five case-paper instructions and their conclusion menus are removed. Orders now give directions without reasons, and replies keep the meaning to themselves.
+- **Named places.** A new player alias on the Service quest reports location changes. An arrival counts only after the order and before the report, at the named place or anywhere inside it.
+- **Leads into vanilla quests.** Three investigations lead into vanilla quests of Thalmor interest: The Forsworn Conspiracy, First Lessons and Missing in Action. Each waits for the vanilla quest to begin and only ever reads its state.
+- **Order.** The first lead is now the third instruction.
+- **Records.** 34 records were retired and 33 added. No retained ID moved and no retired ID was reused.
+- **Tests.** There are 127. New tests cover visits before and after the order, visits inside the named place, the alias forwarding arrivals, leads that were running or completed (and never changed), controller feedback, and tone on place instructions. Content tests forbid conclusions and explanatory replies, require at least three distinct leads, and keep the main quest out.
+- **Check on the tests.** Four deliberate faults, all compiled, were each caught: visits counted before the order, no visit required, no lead required, and places inside the named one ignored.
+
+## Changes in 0.3.0: revised plan, Phase A
+
+The Revised Implementation Plan now sets the build order. This revision builds its Phase A milestone, "Arrival and First Posting", as far as it can be built and checked without the game.
+
+- **Start.** A new `EA_Start.esp` and an Alternate Perspective registration file replace the console-placed box as the way into the game. Alternate Perspective 4.1.0 was inspected from its distributed sources before this work; findings are in IMPLEMENTATION_STATUS.md. The start quest's start-up stage moves the player to the Northwatch Keep map marker, using a location-alias reference built from public Skyrim.esm FormKeys. It extends a temporary, reversible faction courtesy so the garrison does not attack during the handoff. Nothing in MQ101, Helgen or Alternate Perspective is touched.
+- **Journal and packet.** The journal carries the recap the plan asks for. The sealed packet issues Elenwen's letter, civilian papers, case instructions, a blank report form, an allowance and the case, and only then starts the service.
+- **Establish Cover.** The cover accepts any of five occupations and three kinds of lodging. Each is checked against vanilla statistics or faction membership gained after the packet was opened, plus evidence of earned money. A refused report says why and files nothing. Elenwen's assessment depends on the occupation, arrives a day later with the field papers, and only then does the normal dispatch menu open.
+- **Dispatch case.** A portable dispatch case replaces fixed placement: dropped, it becomes the dispatch box; packed, it carries the archive.
+- **Core and controller.** Core gained an opening registration so the controller does not depend on the start plugin. The controller's prototype commission now presumes an existing cover.
+- **Records.** 33 records were added; no existing ID changed and no retired ID was reused.
+
+Tests: 125, up from 108.
+- 16 behaviour tests cover the opening:
+  - the handoff and its reversal;
+  - the packet issuing once;
+  - every occupation, with evidence from before arrival rejected;
+  - lodging, income, attestation and cancellation gates;
+  - acceptance after a full day, and replay;
+  - the cover-phase menu;
+  - the console path being unchanged;
+  - case unpacking and packing;
+  - serialization.
+- A plugin test pins the start quest's binary structure: the start-up stage flag, the three aliases and their vanilla targets, the fragment binding, and the registration matching the quest.
+
+Four deliberate faults were compiled in and each was caught: pre-arrival crafting counted, the Northwatch courtesy never removed, no cover gate in the controller, and income not required. Two first attempts did not compile, and one used an opcode the simulator lacks; those results were discarded and redone.
+
+Not established, and impossible here: whether the map marker fills and where it stands, whether the garrison's hostility comes from that faction, whether every statistic name is correct, which faction the Bards College actually grants, and how a dropped case behaves physically. TESTING.md steps A1–A8 record them.
+
 ## Changes in 0.2.0: Revision Phase B
 
 This revision applies Continuation 01's Revision Phase B (authored service pool) as far as it can be built and checked without the game.

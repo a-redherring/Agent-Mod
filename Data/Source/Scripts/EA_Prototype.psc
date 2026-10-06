@@ -8,6 +8,10 @@ Form Property Gold Auto
 Book Property Commission Auto
 Book Property FieldPapers Auto
 Container Property ArchiveBase Auto
+Activator Property BoxBase Auto
+MiscObject Property CaseItem Auto
+Message Property OpeningMenu Auto
+Message Property CaseMenu Auto
 Message Property CommissionMenu Auto
 Message Property MainMenu Auto
 Message Property AssignmentMenu Auto
@@ -25,7 +29,7 @@ ObjectReference activeBox
 
 Function UseBox(ObjectReference box)
     ; All player mutations run through this serialized physical interaction.
-    ; No console command is needed after the prototype box has been placed.
+    ; The box is set down from the dispatch case, or placed by console for prototype tests.
     GoToState("Busy")
     If activeBox == None
         activeBox = box
@@ -45,6 +49,8 @@ Function UseBox(ObjectReference box)
             Return
         EndIf
         Core.Commission()
+        ; The console path presumes an existing cover; a start module records its own.
+        Core.SetCoverStatus(True, False)
     EndIf
     If Dispatch.Archive == None
         Dispatch.Archive = box.PlaceAtMe(ArchiveBase, 1, True, False)
@@ -55,13 +61,20 @@ Function UseBox(ObjectReference box)
         EndIf
         Dispatch.Archive.MoveTo(box, 65.0, 0.0, 0.0)
     EndIf
-    If !supplied
+    EA_Module opening = Core.GetOpening()
+    If !supplied && opening == None
         supplied = True
         Game.GetPlayer().AddItem(Commission, 1, True)
         Game.GetPlayer().AddItem(FieldPapers, 1, True)
         Game.GetPlayer().AddItem(Gold, 100, True)
         Dispatch.ArchiveDocument(Commission)
         Dispatch.ArchiveDocument(FieldPapers)
+    EndIf
+    If opening != None && !Core.HasEstablishedCover()
+        ; Until the cover is accepted, the case carries the establishment report only.
+        UseOpeningMenu(opening, box)
+        GoToState("")
+        Return
     EndIf
     Core.RefreshDeadlines(Utility.GetCurrentGameTime())
     Dispatch.ScheduleNext()
@@ -76,7 +89,7 @@ Function UseBox(ObjectReference box)
     ElseIf selected == 1
         assignment = Service.ChooseInstruction(AssignmentMenu)
         If assignment >= 0
-            FileReport(assignment)
+            ShowServiceResult(Service.FileReport(assignment))
         EndIf
     ElseIf selected == 2
         assignment = Service.ChooseInstruction(AssignmentMenu)
@@ -91,7 +104,7 @@ Function UseBox(ObjectReference box)
         CollectedMessage.Show(Dispatch.CollectResponses())
         Service.CheckPacketNotice()
     ElseIf selected == 6
-        Dispatch.RecoverFiledCopies()
+        UseCase(box)
     ElseIf selected == 7
         If Service.ShowSummary() == 0
             assignment = Service.ChooseInstruction(AssignmentMenu)
@@ -144,15 +157,51 @@ Function UseAccounts()
     EndIf
 EndFunction
 
-Function FileReport(Int assignment)
-    ; A case report needs one conclusion, asked only once the papers and supplies are in order.
-    If Service.IsReadyForConclusion(assignment)
-        Int conclusion = Service.AskConclusion(assignment)
-        If conclusion >= 0
-            ShowServiceResult(Service.FileReport(assignment, conclusion))
+Function UseOpeningMenu(EA_Module opening, ObjectReference box)
+    Int selected = OpeningMenu.Show()
+    If selected == 0
+        opening.FileCoverReport()
+    ElseIf selected == 1
+        CollectedMessage.Show(Dispatch.CollectResponses())
+    ElseIf selected == 2
+        UseCase(box)
+    EndIf
+EndFunction
+
+Function UseCase(ObjectReference box)
+    Int selected = CaseMenu.Show()
+    If selected == 0
+        If Dispatch.Archive != None
+            Dispatch.Archive.Activate(Game.GetPlayer())
         EndIf
-    Else
-        ShowServiceResult(Service.FileReport(assignment, -1))
+    ElseIf selected == 1
+        Dispatch.RecoverFiledCopies()
+    ElseIf selected == 2
+        PackCase(box)
+    EndIf
+EndFunction
+
+Function PackCase(ObjectReference box)
+    ; Filed papers stay with the case; the archive is hidden until it is set down again.
+    Game.GetPlayer().AddItem(CaseItem, 1, True)
+    If Dispatch.Archive != None
+        Dispatch.Archive.Disable()
+    EndIf
+    If activeBox == box
+        activeBox = None
+    EndIf
+    box.Disable()
+    box.Delete()
+EndFunction
+
+Function Unpack(ObjectReference caseRef)
+    ; The case becomes the dispatch box where it was set down.
+    ObjectReference box = caseRef.PlaceAtMe(BoxBase, 1, True, False)
+    caseRef.Disable()
+    caseRef.Delete()
+    If Dispatch.Archive != None
+        Dispatch.Archive.MoveTo(box, 65.0, 0.0, 0.0)
+        Dispatch.Archive.Enable()
     EndIf
 EndFunction
 
