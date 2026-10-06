@@ -7,3 +7,4 @@ Bool Function SetStage(Int aiStage) Native
 Int Function GetStage() Native
 Alias Function GetAlias(Int aiAliasID) Native
 Bool Function IsCompleted() Native
+Bool Function GetStageDone(Int aiStage) Native

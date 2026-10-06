@@ -83,6 +83,27 @@ Bool Function Queue(Int transactionID, Int subjectID, Int outcome, Book outgoing
     Return True
 EndFunction
 
+Bool Function Send(Int transactionID, Int subjectID, Book letter, EA_Module receiver)
+    ; A letter that answers no report. It is in the case at once; collecting it runs the receiver once.
+    Initialize()
+    If !Core.IsInService() || !HasSpace() || transactionID <= 0 || FindTransaction(transactionID) >= 0
+        Return False
+    ElseIf letter == None || receiver == None || ReserveDocument(letter) < 0
+        Return False
+    EndIf
+    transactionIDs[count] = transactionID
+    subjects[count] = subjectID
+    outcomes[count] = 0
+    arrivalDays[count] = Utility.GetCurrentGameTime()
+    replies[count] = letter
+    receivers[count] = receiver
+    states[count] = 1
+    count += 1
+    Debug.Notification("Something has been left in the dispatch case.")
+    Core.Trace("Dispatch letter: " + transactionID)
+    Return True
+EndFunction
+
 Int Function CountResponses(Bool ready)
     Int result = 0
     Int i = 0

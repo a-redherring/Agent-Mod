@@ -1,15 +1,15 @@
 # Implementation status
 
-The original build specification, its Continuation 01 and the **Revised Implementation Plan** are the design authority. Where they conflict, the newest governs, and the revised plan sets the build order (phases A–I). This repository implements a bounded technical prototype of parts of baseline phases 0, 1, 3 and 4. It also covers the out-of-game parts of revised-plan Phase A (the start), and part of Phase C (authored jobs, built earlier as Continuation 01's Revision Phase B). **None of the specification's full in-game phase exit conditions has been certified.**
+The original build specification, its Continuation 01 and the **Revised Implementation Plan** are the design authority. Where they conflict, the newest governs, and the revised plan sets the build order (phases A–I). This repository implements a bounded technical prototype of parts of baseline phases 0, 1, 3 and 4. It also covers the out-of-game parts of revised-plan Phase A (the start) and the campaign designed in `Elenwen_Agent_Campaign_Opening.md`: Riverwood, Markarth, an interval and the College of Winterhold. **None of the specification's full in-game phase exit conditions has been certified.**
 
 | Module | Current implementation | Remaining work |
 | --- | --- | --- |
-| EA_Core | Persistent service, hidden trust, cover-state API, assignments, scoped authority, emergency review, deadline suspension | Migration, full facts/incidents model, roster query, shared expense/report API, production recovery |
-| EA_Dispatch | Delayed queue, physical reports/replies, archive, copy recovery, idempotent callbacks | World placement, couriers, sensitive-material routing, long-running queue retention, game save/load tests |
-| EA_Service | Twelve authored instructions in fixed circulation (three open at once), written for an underling: named places (counted on arrival after the order), named vanilla items, and three leads into vanilla quests of Thalmor interest. Also deadlines/extensions, supply authorization, status register, contextual replies and closing review | Eligibility rules and cooldowns, more leads (vampire casework, Dark Brotherhood contact, Civil War observation), world-placed objects, compromised-cover replies |
-| EA_Accounts | One operation, one advance and claim, four decisions, explanation, debt, partial repayment, audit and review findings | Multi-entry ledger, operation allocation, receipt integrations, broader garnishment/rewards, ongoing audits |
-| EA_Prototype | Console-placed test box and one-time supplies | Development harness only; remove from the eventual production profile |
-| EA_Start | Alternate Perspective start outside Northwatch (registration JSON, start-up stage, map-marker alias, reversible Northwatch courtesy), journal recap, sealed packet, Establish Cover with evidence-checked report, assessment, portable dispatch case | In-game validation; hand-placed lodgings or world objects; corrective follow-up if the plan wants one |
+| EA_Core | Persistent service, hidden trust, cover-state API, assignments (including class 4 standing instructions, 32 open), scoped authority, emergency review, deadline suspension | Migration, full facts/incidents model, roster query, shared expense/report API, production recovery |
+| EA_Dispatch | Delayed queue, physical reports/replies, unsolicited letters (`Send`), archive, copy recovery, idempotent callbacks | World placement, couriers, sensitive-material routing, long-running queue retention, game save/load tests |
+| EA_Service | The campaign: four phases, 21 instructions and 8 letters gated by conditions read from vanilla state (nights at the inn, residence days, visits, deliveries, quest stages and outcomes, factions, actors, level, magic skill, optional-plugin globals and quests). Alternative replies with trust and phase-weight effects, enclosed books, the Riverwood leash, the release with advance authority, the removal authority for the adviser, status counts | In-game validation of every vanilla FormID and stage; later arcs (Civil War, Dark Brotherhood, Dawnguard, main quest); compromised-cover replies; forged-letter hook |
+| EA_Accounts | One operation (hiring the Dunmer, 500-septim advance), one claim, four decisions, explanation, debt, partial repayment, audit. Operation and amounts are plugin properties | Multi-entry ledger, operation allocation, receipt integrations, broader garnishment/rewards, ongoing audits |
+| EA_Prototype | Dispatch case controller; console-placed test box with one-time commission and supplies | Development harness only; remove from the eventual production profile |
+| EA_Start | Alternate Perspective start outside Northwatch (registration JSON, start-up stage, map-marker alias, reversible Northwatch courtesy), journal recap of the prisoner premise, sealed packet with the residence order, civilian papers, conditional release, two books, allowance and portable dispatch case; opening it begins the campaign | In-game validation |
 | EA_Vice | Not built | Curated roster, permanent relationship restrictions, SFW behavior, verified optional integrations |
 | EA_CivilWar | Not built | Both enlistment paths, Season Unending and Neutral Stance conflict review |
 | EA_DarkBrotherhood | Not built | Elenwen-directed destruction, Maro liaison, isolated quest overrides |
@@ -24,44 +24,30 @@ The future vice roster is exactly Elenwen, Faralda, Brelyna, Karliah, Aranea Ien
 
 | Revised plan phase | Status |
 | --- | --- |
-| A. Start revision ("Arrival and First Posting") | Built and tested in the simulator: Northwatch start, journal recap, civilian equipment, packet, Establish Cover, Establishment Report, dispatch introduction, assessment, then the first instructions. **Not yet run in game** |
-| B. Elenwen style pass | Letters were written against the Continuation 01 voice guide. The vanilla dialogue corpus and internal style sheet need the game's dialogue export |
-| C. Authored service jobs | 12 of 20–30 built (below). Eligibility rules and cooldowns are not yet built; issue order is fixed |
-| D. Accounts refinement | The Accounts case is tied to the spiced wine job; claims have not yet been spread across more jobs |
+| A. Start revision ("Arrival and First Posting") | Built and tested in the simulator, revised for the prisoner premise: Northwatch release, journal recap, packet, dispatch case, then the Riverwood instructions. The Establish Cover report was removed in 0.4.0. **Not yet run in game** |
+| B. Elenwen style pass | Letters were rewritten against her vanilla lines (campaign doc, "Her voice") and follow the letter tradecraft rules. The full dialogue export is still needed for a final pass |
+| C. Authored service jobs | Replaced by the campaign: 21 instructions in three active phases |
+| D. Accounts refinement | The Accounts case is now the Dunmer's fee; claims are not yet spread across more jobs |
 | E–I | Not started; the main quest stays last |
 
-The plan's milestone list maps onto the build as follows. Steps 1–4 are the start-up stage, journal and packet. Step 5 is the Northwatch courtesy ending. Steps 6–8 are the Establishment Report checks. Step 9 is the assessment. Step 10 is Collect Orders, which issues instructions 1001–1003.
+## The campaign (0.4.0)
 
-## Job pool and the underling design (2026-10-06)
+`content/campaign.json` implements the design in `Elenwen_Agent_Campaign_Opening.md`.
 
-Two design decisions changed the job pool after 0.2.0:
-- **The player is an underling, not an analyst.** Orders give directions (who or what, and where), not reasons. Reports state what was done, and Elenwen's replies do not say what it meant. The 0.2.0 case papers and three-answer conclusions are removed and their records retired. This supersedes Continuation 01, section 5.1, which asked orders to answer at least three "why" questions.
-- **Investigations lead into vanilla quests the Thalmor care about.** The instruction sends the player toward the quest and waits until it has begun. It reads the vanilla quest's state and never changes it.
+| Phase | Instructions | Letters |
+| --- | --- | --- |
+| 1 Riverwood | 2001 Inn, 2002 Proprietor, 2003 Neighbours, 2004 Preacher, 2005 Roads, 2006 Hillside (Sanyon's orders) | Settled; Release (encloses *The Red Eagle*, grants the advance authority) |
+| 2 Markarth | 2007 Dunmer (hire Jenassa), 2008 Market, 2009 OldMan (Madanach freed, or killed as the alternative), 2010 Feast, 2011 Skald (amulet to Ondolemar), 2012 Shrine, 2013 Translator (Calcelmo, optional) | Reach; Interval (when the phase weight is reached) |
+| 3 Interval | none | College (after seven days and magic skill 20; encloses two books) |
+| 4 College | 2014 Admission, 2015 Saarthal, 2016 Books, 2017 Monk, 2018 Eye, 2019 Library (an Arcanaeum book), 2020 Town, 2021 Lesson (CQE only) | Adviser (removal authority), Declined (At Your Own Pace: Tolfdir made Arch-Mage), Accepted |
 
-| # | Instruction | Kind | Rests on |
-| --- | --- | --- | --- |
-| 1001 | Field Protocol | administrative | Reading the field papers |
-| 1002 | Solitude Spiced Wine | procurement (Accounts case) | 3 bottles |
-| 1003 | Trouble in Markarth | **lead** | Markarth, then *The Forsworn Conspiracy* begun |
-| 1004 | A Public History | procurement | *The Rise and Fall of the Blades* |
-| 1005 | Honningbrew | verification | Honningbrew Meadery, 2 bottles |
-| 1006 | The College of Winterhold | **lead** | Winterhold, then *First Lessons* begun |
-| 1007 | A Title in Circulation | procurement | *The Rising Threat, Vol. I* |
-| 1008 | A Book from Whiterun | procurement | Whiterun, *The Book of the Dragonborn* |
-| 1009 | For the Table | personal favor | 6 jazbay grapes |
-| 1010 | A Family in Whiterun | **lead** | Whiterun, then *Missing in Action* begun |
-| 1011 | The Windhelm Caravan | verification | Windhelm stables, 1 moon sugar |
-| 1012 | Paper | administrative | 1 roll of paper |
-
-**Candidate leads for later phases.** These are not built, because they belong to unbuilt modules or need their policy first:
-- Aventus Aretino's Black Sacrament in Windhelm, leading to Dark Brotherhood contact (Phase E);
-- vampire attacks and Fort Dawnguard rumours (Phase G);
-- observing either Civil War camp without enlisting (Phase F);
-- Heimskr's Talos preaching in Whiterun, which has no vanilla quest and would need an EA-authored follow-up.
-
-The main quest is never a lead target.
-
-**Known tension.** *Missing in Action* ends with Thorald Gray-Mane freed from Northwatch. The 1010 reply forbids going near Northwatch, but the vanilla quest still allows it. How Elenwen reacts if the player does it is left for a later module.
+**Implemented differently from the design, or not at all:**
+- **Courier.** Orders and letters arrive in the dispatch case, not by the vanilla courier; no courier integration exists.
+- **Unsolicited finds.** All of a phase's instructions are issued when the phase begins, and conditions are checked when a report is filed, not from the order. Something done early (Sanyon's orders found before Riverwood ends) therefore counts. There is no separate unsolicited report.
+- **Remark letters** on suggested reading were dropped. Suggested books are named in letters and never checked.
+- **Ancano** is covered by removal authority only; EA never kills or changes him, and the vanilla College quests decide his fate.
+- **Optional plugins.** At Your Own Pace and College of Winterhold - Quest Expansion are read with `Game.GetFormFromFile`, never as masters. Their local IDs (`000813`, `000870`) and behaviour were read from their archives and are untested in game. Without CQE, instruction 2021 is never issued; without AYOP, the Declined letter waits on a global that never resolves.
+- **Vanilla FormIDs** (listed in ARCHITECTURE.md) come from Mutagen FormKeys lists and the Fandom wiki. None has been checked against Skyrim.esm, and neither have the quest stages the conditions use.
 
 ## Conflict inspection required before quest work
 
@@ -95,4 +81,4 @@ To unblock these modules, provide the installed game version and a load-order ex
 
 ## Release gate
 
-The next milestone is a clean in-game run of the prototype's paper loop, including the Phase B item and case checks in TESTING.md, with xEdit validation and save/load, death/reload, double-activation, and lost-document tests. Production release additionally requires every quest route and compatibility test in the original specification. An automated build or passing simulated test is not a substitute for those gates.
+The next milestone is a clean in-game run of the start and the Riverwood phase, then Markarth and the College, following TESTING.md, with xEdit validation and save/load, death/reload, double-activation, and lost-document tests. Production release additionally requires every quest route and compatibility test in the original specification. An automated build or passing simulated test is not a substitute for those gates.

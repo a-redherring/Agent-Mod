@@ -271,3 +271,12 @@ Their records are retired under the existing contract.
 - the Madanach, Verulus and Jenassa actor references;
 - the main-quest stage at which Delphine reveals herself;
 - AP, At Your Own Pace and Quest Expansion behaviour in a real load order.
+
+## Build deviations (0.4.0)
+
+The 0.4.0 build differs from the text above in these points:
+- **Riverwood reading.** The residence order encloses *The Madmen of the Reach* and *The Bear of Markarth*, and suggests *The City of Stone*.
+- **Release.** The release letter encloses *The Red Eagle*.
+- **Delivery.** Orders and letters arrive in the dispatch case, not by the vanilla courier.
+- **Unsolicited finds.** There is no separate unsolicited report. Each phase's instructions are issued when the phase begins, and conditions are checked when the report is filed, so a find made before it was asked for is recognised then.
+- **Remark letters** on suggested reading were dropped.

@@ -85,8 +85,12 @@ def scripts(data):
                 value = obj()
             elif kind == 3:
                 value = number("<i")
+            elif kind == 2:
+                value = string()
             elif kind == 11:
                 value = [obj() for _ in range(number("<I"))]
+            elif kind == 12:
+                value = [string() for _ in range(number("<I"))]
             elif kind == 13:
                 value = [number("<i") for _ in range(number("<I"))]
             else:

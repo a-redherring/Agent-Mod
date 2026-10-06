@@ -1,156 +1,107 @@
 [
   {
     "module": "EA_Core",
-    "id": "801",
-    "editorID": "EA_FieldPapersBook",
-    "title": "Field Papers: Private Instructions",
-    "text": "PRIVATE\n\nYou already hold my commission. Conduct yourself as a civilian. These papers confer no public rank. Do not claim Embassy protection to settle a private quarrel.\n\nRead these papers and file an acknowledgment with your orders. Reports travel with the next dispatch; replies require a full day.\n\nOrdinary observation is permitted. Disclosure, political commitments, and the removal of persons are separate decisions. Permission concerning one case says nothing about another.\n\nYour work precedes any distinction Skyrim may later confer upon you. Remember that.\n\nElenwen"
-  },
-  {
-    "module": "EA_Core",
     "id": "802",
     "editorID": "EA_Commission",
     "title": "Confidential Commission",
     "text": "For the bearer alone\n\nYour existing appointment as a confidential field officer remains in force. Maintain your civilian identity and report by the agreed channel. The enclosed one hundred septims are an initial allowance, not an advance against a claim.\n\nDo not present yourself as a uniformed member of my delegation, promise favors in my name, or treat personal acquaintance as operational authority. Further instructions await at the secure box. Audiences are by summons.\n\nElenwen\nFirst Emissary"
   },
   {
-    "module": "EA_Service",
-    "id": "81C",
-    "editorID": "EA_AuthorityRequest",
-    "title": "Filed Request: Supply Advance",
-    "text": "Instruction 1002\n\nI request authority to draw an eighty-septim advance for the spiced wine purchase. The allowable expense remains thirty septims. Unused funds will be returned within fourteen days of collection.\n\nFiled by secure dispatch."
-  },
-  {
-    "module": "EA_Service",
-    "id": "81D",
-    "editorID": "EA_AuthorityApproved",
-    "title": "Authorization 1002: Supply Advance",
-    "text": "Instruction 1002 only\n\nYou may draw eighty septims from Accounts while the purchase remains open. This is an advance, not an increase in the thirty-septim allowance.\n\nIt grants no authority to disclose protected information, make political commitments, or remove any person.\n\nElenwen"
-  },
-  {
     "module": "EA_Accounts",
     "id": "810",
     "editorID": "EA_AdvanceReceipt",
     "title": "Accounts: Advance Receipt",
-    "text": "Instruction 1002\n\nEighty septims issued as an operational advance. Approved costs settle this sum before any cash reimbursement. Return the unused balance within fourteen days.\n\nPersonal spending from the advance remains payable by the bearer."
+    "text": "Five hundred septims issued as an operational advance, against the hire of a sword. Recognised costs settle this sum before any reimbursement. Return the unused balance within fourteen days.\n\nPersonal spending from the advance remains payable by the bearer.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "811",
     "editorID": "EA_ReturnReceipt",
     "title": "Accounts: Funds Returned",
-    "text": "Funds were received against the bearer's outstanding advance and operational liability. The current balance is available at the dispatch box.\n\nThis acknowledgment does not authorize another advance."
+    "text": "Funds were received against the bearer's outstanding advance and liability. The current balance is shown on the statement.\n\nThis receipt does not authorise another advance.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "812",
     "editorID": "EA_AuditNotice",
     "title": "Accounts: Overdue Advance",
-    "text": "Instruction 1002\n\nThe fourteen-day accounting period has expired. Unreturned funds are now the bearer's liability, and further advances are suspended while money remains due.\n\nReturn the funds through dispatch. A valid later claim may discharge recognized costs against this balance."
+    "text": "The fourteen-day period for the advance has expired. Unreturned funds are now the bearer's liability, and further advances are suspended while money remains due.\n\nReturn the funds through the case. A valid later claim may discharge recognised costs against this balance.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "813",
     "editorID": "EA_ClaimSupplies",
-    "title": "Claim 1002: Wine, Thirty Septims",
-    "text": "Declared cost: thirty septims. Purpose: purchase of the delivered Solitude spiced wine. Payee: seller declared by the bearer.\n\nThis declaration is submitted for Accounts review. It is not independent proof of a purchase."
+    "title": "Claim: Hire Fee, Five Hundred Septims",
+    "text": "Declared cost: five hundred septims. Purpose: the hire of a sword, as instructed. Payee: declared by the bearer.\n\nSubmitted for review. A declaration is not proof of payment.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "814",
     "editorID": "EA_ClaimExtravagant",
-    "title": "Claim 1002: Wine, Eighty Septims",
-    "text": "Declared cost: eighty septims. Purpose: purchase of the delivered Solitude spiced wine. Payee: seller declared by the bearer.\n\nThis exceeds the written thirty-septim allowance and requires review."
+    "title": "Claim: Hire Fee and Expenses, Six Hundred and Fifty Septims",
+    "text": "Declared cost: six hundred and fifty septims. Purpose: the hire of a sword, with expenses on the road. Payee: declared by the bearer.\n\nThis exceeds the authorised fee and requires review.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "815",
     "editorID": "EA_ClaimGift",
-    "title": "Claim 1002: Personal Gift",
-    "text": "Declared cost: thirty septims. Purpose: a personal gift the bearer associates with the wine purchase.\n\nNo instruction required this gift. Its inclusion is expressly disclosed."
+    "title": "Claim: A Gift",
+    "text": "Declared cost: sixty septims. Purpose: a gift to the hired sword.\n\nNo instruction required it. Its inclusion is disclosed.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "816",
     "editorID": "EA_ClaimMeal",
-    "title": "Claim 1002: Meal",
-    "text": "Declared cost: thirty septims. Purpose: a meal during the wine purchase.\n\nThe connection to the instruction has not been explained. No reimbursement is presumed."
+    "title": "Claim: A Meal",
+    "text": "Declared cost: forty septims. Purpose: a meal on the road.\n\nIts connection to the instruction has not been explained.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "817",
     "editorID": "EA_ClaimApproved",
-    "title": "Accounts Decision: Approved",
-    "text": "Instruction 1002\n\nThe declared thirty-septim expense is allowed. Recognized costs first settle an advance or audited liability; any balance due to the bearer is paid on collection. This decision may be used once only.\n\nThe cost stayed within the instruction. That is the standard.\n\nElenwen"
+    "title": "Accounts Decision: Allowed",
+    "text": "The declared fee is allowed. Recognised costs first settle the advance or any liability; any balance due to the bearer is paid on collection.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "818",
     "editorID": "EA_ClaimPartial",
-    "title": "Accounts Decision: Partially Approved",
-    "text": "Instruction 1002\n\nOf the eighty septims declared for the wine, thirty are allowed. The excess of fifty is personal expenditure, and any part of it paid from the advance is owed to Accounts. Consult the statement for the settlement.\n\nAn advance was permission to draw funds, not to ignore a ceiling.\n\nElenwen"
+    "title": "Accounts Decision: Partly Allowed",
+    "text": "Of the six hundred and fifty septims declared, five hundred are allowed: the fee. The remainder is personal expenditure, and any part of it drawn from the advance is owed.\n\nAccounts\n\nAn advance is permission to spend what was agreed. — E."
   },
   {
     "module": "EA_Accounts",
     "id": "819",
     "editorID": "EA_ClaimDenied",
-    "title": "Accounts Decision: Denied",
-    "text": "Instruction 1002\n\nPersonal expenditure is not chargeable to the Embassy. Any portion drawn from the advance is due from the bearer.\n\nYou were sent to buy wine. Your generosity is your own affair, and so is its cost.\n\nElenwen"
+    "title": "Accounts Decision: Not Allowed",
+    "text": "Personal expenditure is not chargeable. Any portion drawn from the advance is owed by the bearer.\n\nAccounts\n\nYour generosity is your own affair, and so is its cost. — E."
   },
   {
     "module": "EA_Accounts",
     "id": "81A",
     "editorID": "EA_ClaimReturned",
     "title": "Accounts Decision: Explanation Required",
-    "text": "Instruction 1002\n\nThe meal claim is returned without settlement. State whether it was a necessary meeting with the seller or personal entertainment, and file the explanation at the dispatch box. No money is paid by this letter.\n\nThe fourteen-day obligation to account for any advance is not suspended. A later accepted explanation may discharge recognized costs against an audited liability.\n\nA meal does not become Embassy business because it occurred during an errand.\n\nElenwen"
+    "text": "The meal is returned without settlement. State whether it was necessary to the hire or a personal expense, and file the explanation through the case. Nothing is paid by this notice.\n\nThe fourteen-day obligation on the advance is not suspended.\n\nAccounts"
   },
   {
     "module": "EA_Accounts",
     "id": "81B",
     "editorID": "EA_ExplanationForm",
-    "title": "Filed Explanation: Seller Meeting",
-    "text": "Instruction 1002\n\nThe bearer declares that the meal was a necessary meeting with the wine seller, not personal entertainment. Thirty septims are claimed; no more than fifteen are allowable.\n\nSubmitted for Accounts review. A decision follows by return dispatch."
+    "title": "Explanation: Necessary Meal",
+    "text": "The meal was a necessary meeting with the hired sword, not entertainment. Forty septims are claimed; no more than twenty are allowable.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "81C",
     "editorID": "EA_ExplanationPersonal",
-    "title": "Filed Explanation: Personal Entertainment",
-    "text": "Instruction 1002\n\nThe bearer declares that the thirty-septim meal was personal entertainment. No instruction required it.\n\nSubmitted for Accounts review. A decision follows by return dispatch."
+    "title": "Explanation: Personal Meal",
+    "text": "The forty-septim meal was a personal expense. No instruction required it.\n\nC."
   },
   {
     "module": "EA_Accounts",
     "id": "81D",
     "editorID": "EA_MealPartialDecision",
     "title": "Accounts Decision: Meal Allowance",
-    "text": "Instruction 1002\n\nFifteen septims of the thirty-septim meal are allowed. The remaining fifteen are personal expenditure. Recognized costs first settle any advance or audited liability; the remainder is reimbursed on collection.\n\nA necessary meeting may justify a modest expense. It does not justify the whole bill.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "85E",
-    "editorID": "EA_EvaluationRequest",
-    "title": "Filed Docket: Closing Review",
-    "text": "Instructions 1001-1012\n\nEvery instruction in this series is closed and its response collected. The filing dates and Accounts record are submitted for the First Emissary's review. Her response follows by the next dispatch.\n\nThis docket requests no payment or change in public standing."
-  },
-  {
-    "module": "EA_Service",
-    "id": "85F",
-    "editorID": "EA_EvaluationGood",
-    "title": "Private Assessment: Dependable Service",
-    "text": "Instructions 1001-1012\n\nThe series is closed. The record shows no missed deadline and no adverse finding from Accounts.\n\nYou did what you were told, when you were told. Your commission continues on its existing terms; this letter confers no rank and no further authority.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "860",
-    "editorID": "EA_EvaluationMixed",
-    "title": "Private Assessment: Further Care Required",
-    "text": "Instructions 1001-1012\n\nThe series is closed and the work accepted. The record also shows one lapse: a missed deadline, or an expense Accounts would not fully allow.\n\nOne lapse is a matter of care. Two would be a matter of reliability. Your commission continues; this letter confers no further authority.\n\nElenwen"
-  },
-  {
-    "module": "EA_Service",
-    "id": "861",
-    "editorID": "EA_EvaluationPoor",
-    "title": "Private Assessment: Formal Reprimand",
-    "text": "Instructions 1001-1012\n\nThe series is closed. I have accepted the work, but the record warrants a reprimand: more than one missed deadline, money still owed, an overdue advance, or a denied expense.\n\nAny sum shown as outstanding is to be returned through Accounts. Accepting your reports does not cancel it.\n\nYour commission continues. Future instructions will be read with this letter beside them.\n\nElenwen"
+    "text": "Twenty septims of the meal are allowed; the remainder is personal. Recognised costs first settle any advance or liability.\n\nAccounts\n\nA meeting may justify a modest meal. It does not justify the bill you sent. — E."
   }
 ]

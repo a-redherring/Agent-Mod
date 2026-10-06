@@ -1,6 +1,6 @@
 Scriptname EA_Accounts extends EA_Module
-; Prototype case ledger: a single supply operation, one advance and one claim.
-; This bounded pilot deliberately does not present itself as a banking system.
+; Case ledger for one authorised operation: one advance and one claim.
+; The operation and its amounts are set by the plugin; this is not a banking system.
 
 EA_Core Property Core Auto
 EA_Dispatch Property Dispatch Auto
@@ -15,6 +15,14 @@ Book Property PersonalExplanationForm Auto
 Book Property MealPartialDecision Auto
 Message Property BalanceMessage Auto
 Message[] Property FailureMessages Auto
+; The authorised operation (a Core assignment) and its money.
+Int Property OperationID Auto
+Int Property AdvanceAmount Auto
+; Declared amounts on the four claim forms: standard, inflated, personal gift, meal.
+Int[] Property ClaimAmounts Auto
+; Allowed for an inflated claim, and for a meal explained as necessary.
+Int Property AllowedAmount Auto
+Int Property ExplainedAllowance Auto
 Int lastError = 10
 Bool auditIssue = False
 
@@ -46,15 +54,15 @@ Bool Function IssueAdvance()
         Return Reject(0)
     ElseIf financialProbation || creditworthiness < 25
         Return Reject(1)
-    ElseIf !Core.IsOpen(1002)
+    ElseIf !Core.IsOpen(OperationID)
         Return Reject(2)
-    ElseIf Core.GetAuthority(1002, 5) != 2
+    ElseIf Core.GetAuthority(OperationID, 5) != 2
         Return Reject(3)
     EndIf
     advanceIssued = True
     advanceDate = Utility.GetCurrentGameTime()
-    advanceOutstanding = 80
-    Game.GetPlayer().AddItem(Gold, 80, True)
+    advanceOutstanding = AdvanceAmount
+    Game.GetPlayer().AddItem(Gold, AdvanceAmount, True)
     Game.GetPlayer().AddItem(AdvanceReceipt, 1, True)
     Dispatch.ArchiveDocument(AdvanceReceipt)
     Return True
@@ -62,7 +70,7 @@ EndFunction
 
 Bool Function SubmitClaim(Int selection)
     ; Costs are explicitly declared on authored forms, never inferred from inventory.
-    Int assignmentState = Core.GetAssignmentState(1002)
+    Int assignmentState = Core.GetAssignmentState(OperationID)
     lastError = 10
     If selection < 0 || selection > 3
         Return False
@@ -77,19 +85,17 @@ Bool Function SubmitClaim(Int selection)
     EndIf
     Int outcome = selection + 1
     Int transactionID = Core.NextTransactionID()
-    If !Dispatch.Queue(transactionID, 1002, outcome, ClaimForms[selection], Decisions[selection], Self)
+    If !Dispatch.Queue(transactionID, OperationID, outcome, ClaimForms[selection], Decisions[selection], Self)
         Return False
     EndIf
     claimTransaction = transactionID
     claimCategory = selection
     expenseDate = Utility.GetCurrentGameTime()
-    expenseOperation = 1002
-    expensePayee = "Supplier declared on claim form"
-    expenseService = "Alto wine procurement"
-    expenseAmount = 30
-    If selection == 1
-        expenseAmount = 80
-    ElseIf selection == 2
+    expenseOperation = OperationID
+    expensePayee = "Payee declared on claim form"
+    expenseService = "Operational expense"
+    expenseAmount = ClaimAmounts[selection]
+    If selection == 2
         expenseService = "Personal gift"
     ElseIf selection == 3
         expenseService = "Meal; explanation requested"
@@ -118,7 +124,7 @@ Bool Function ExplainClaim(Bool operationalPurpose)
         decision = MealPartialDecision
     EndIf
     Int transactionID = Core.NextTransactionID()
-    If !Dispatch.Queue(transactionID, 1002, outcome, explanation, decision, Self)
+    If !Dispatch.Queue(transactionID, OperationID, outcome, explanation, decision, Self)
         Return False
     EndIf
     claimTransaction = transactionID
@@ -142,9 +148,9 @@ Function ReceiveResponse(Int transactionID, Int subjectID, Int outcome)
     If outcome == 1
         allowed = claimAmount
     ElseIf outcome == 2
-        allowed = 30
+        allowed = AllowedAmount
         If claimState == 4
-            allowed = 15
+            allowed = ExplainedAllowance
         EndIf
     ElseIf outcome != 3
         Return

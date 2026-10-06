@@ -1,15 +1,13 @@
 Scriptname EA_Core extends Quest
 ; Persistent shared state. No SKSE, external mod events, or vanilla quest writes.
 ; Assignment states: 1 active, 2 overdue, 3 filed, 4 complete, 5 withdrawn, 6 failed.
-; Classes: 1 major, 2 intelligence, 3 duty. Authority: 1 standing, 2 prior, 3 emergency.
+; Classes: 1 major, 2 intelligence, 3 duty, 4 campaign (standing, many open). Authority: 1 standing, 2 prior, 3 emergency.
 
 Bool Property DebugEnabled = False Auto
 Bool initialized = False
 Bool serviceActive = False
 Bool coverEstablished = False
 Bool coverCompromised = False
-Bool fieldPapersRead = False
-EA_Module opening
 Int professionalTrust = 50
 Int nextTransaction = 1
 Int[] assignmentIDs
@@ -78,28 +76,6 @@ Bool Function HasCompromisedCover()
     Return coverCompromised
 EndFunction
 
-Function SetOpening(EA_Module module)
-    ; A start module registers itself so the dispatch controller need not master it.
-    If serviceActive
-        opening = module
-    EndIf
-EndFunction
-
-EA_Module Function GetOpening()
-    Return opening
-EndFunction
-
-Function RecordFieldPapersRead()
-    If serviceActive
-        fieldPapersRead = True
-        RecordFact(1001, 1)
-    EndIf
-EndFunction
-
-Bool Function HasReadFieldPapers()
-    Return fieldPapersRead
-EndFunction
-
 Int Function NextTransactionID()
     Initialize()
     Int result = nextTransaction
@@ -143,6 +119,9 @@ Bool Function RegisterAssignment(Int assignmentID, Int assignmentClass, Float du
         capacity = 3
     ElseIf assignmentClass == 3
         capacity = 6
+    ElseIf assignmentClass == 4
+        ; Standing campaign instructions stay open until reported, across phases.
+        capacity = 32
     EndIf
     If capacity == 0 || CountWorkload(assignmentClass) >= capacity
         Return False

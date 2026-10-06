@@ -15,3 +15,4 @@ Bool Function Activate(ObjectReference akActivator, Bool abDefaultProcessingOnly
 Float Function GetDistance(ObjectReference akOther) Native
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)
 EndEvent
+Location Function GetCurrentLocation() Native

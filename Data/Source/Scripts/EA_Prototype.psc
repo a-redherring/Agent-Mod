@@ -6,11 +6,9 @@ EA_Service Property Service Auto
 EA_Accounts Property Accounts Auto
 Form Property Gold Auto
 Book Property Commission Auto
-Book Property FieldPapers Auto
 Container Property ArchiveBase Auto
 Activator Property BoxBase Auto
 MiscObject Property CaseItem Auto
-Message Property OpeningMenu Auto
 Message Property CaseMenu Auto
 Message Property CommissionMenu Auto
 Message Property MainMenu Auto
@@ -23,7 +21,6 @@ Message Property UnavailableMessage Auto
 Message Property CollectedMessage Auto
 Message Property RepaymentMenu Auto
 Message Property ReturnedMessage Auto
-Message Property ReviewPendingMessage Auto
 Bool supplied = False
 ObjectReference activeBox
 
@@ -44,13 +41,16 @@ Function UseBox(ObjectReference box)
     Dispatch.Initialize()
     Service.Initialize()
     If !Core.IsInService()
+        ; Console path only: the Alternate Perspective start commissions through the packet.
         If CommissionMenu.Show() != 0
             GoToState("")
             Return
         EndIf
         Core.Commission()
-        ; The console path presumes an existing cover; a start module records its own.
         Core.SetCoverStatus(True, False)
+        supplied = True
+        Game.GetPlayer().AddItem(Commission, 1, True)
+        Game.GetPlayer().AddItem(Gold, 100, True)
     EndIf
     If Dispatch.Archive == None
         Dispatch.Archive = box.PlaceAtMe(ArchiveBase, 1, True, False)
@@ -60,63 +60,29 @@ Function UseBox(ObjectReference box)
             Return
         EndIf
         Dispatch.Archive.MoveTo(box, 65.0, 0.0, 0.0)
+        If supplied
+            Dispatch.ArchiveDocument(Commission)
+        EndIf
     EndIf
-    EA_Module opening = Core.GetOpening()
-    If !supplied && opening == None
-        supplied = True
-        Game.GetPlayer().AddItem(Commission, 1, True)
-        Game.GetPlayer().AddItem(FieldPapers, 1, True)
-        Game.GetPlayer().AddItem(Gold, 100, True)
-        Dispatch.ArchiveDocument(Commission)
-        Dispatch.ArchiveDocument(FieldPapers)
-    EndIf
-    If opening != None && !Core.HasEstablishedCover()
-        ; Until the cover is accepted, the case carries the establishment report only.
-        UseOpeningMenu(opening, box)
-        GoToState("")
-        Return
-    EndIf
-    Core.RefreshDeadlines(Utility.GetCurrentGameTime())
+    Service.BeginCampaign()
     Dispatch.ScheduleNext()
     Accounts.Audit()
-    Service.TryQueueEvaluation(Accounts.GetReviewConcern(), Accounts.IsReviewPending())
     Int selected = MainMenu.Show()
     Int assignment = -1
     If selected == 0
-        Service.CollectOrders()
-        Dispatch.RecoverDocument(Commission)
-        Dispatch.RecoverDocument(FieldPapers)
-    ElseIf selected == 1
         assignment = Service.ChooseInstruction(AssignmentMenu)
         If assignment >= 0
             ShowServiceResult(Service.FileReport(assignment))
         EndIf
-    ElseIf selected == 2
-        assignment = Service.ChooseInstruction(AssignmentMenu)
-        If assignment >= 0
-            ShowServiceResult(Service.RequestExtension(assignment))
-        EndIf
-    ElseIf selected == 3
-        ShowServiceResult(Service.RequestSupplyAuthority())
-    ElseIf selected == 4
-        UseAccounts()
-    ElseIf selected == 5
+    ElseIf selected == 1
         CollectedMessage.Show(Dispatch.CollectResponses())
-        Service.CheckPacketNotice()
-    ElseIf selected == 6
+    ElseIf selected == 2
+        UseAccounts()
+    ElseIf selected == 3
+        Service.ShowSummary()
+    ElseIf selected == 4
         UseCase(box)
-    ElseIf selected == 7
-        If Service.ShowSummary() == 0
-            assignment = Service.ChooseInstruction(AssignmentMenu)
-            If assignment >= 0
-                Service.ShowAssignmentStatus(assignment)
-            EndIf
-        EndIf
-        If Service.CountOpen() == 0 && Service.NextUnissued() < 0 && Service.GetEvaluationState() == 0 && Accounts.IsReviewPending()
-            ReviewPendingMessage.Show()
-        EndIf
     EndIf
-    Service.TryQueueEvaluation(Accounts.GetReviewConcern(), Accounts.IsReviewPending())
     GoToState("")
 EndFunction
 
@@ -154,17 +120,6 @@ Function UseAccounts()
         EndIf
     ElseIf selected == 3
         Accounts.ShowStatement()
-    EndIf
-EndFunction
-
-Function UseOpeningMenu(EA_Module opening, ObjectReference box)
-    Int selected = OpeningMenu.Show()
-    If selected == 0
-        opening.FileCoverReport()
-    ElseIf selected == 1
-        CollectedMessage.Show(Dispatch.CollectResponses())
-    ElseIf selected == 2
-        UseCase(box)
     EndIf
 EndFunction
 

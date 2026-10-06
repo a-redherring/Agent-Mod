@@ -1,5 +1,23 @@
 # Review record
 
+## Changes in 0.4.0: the campaign
+
+The job pool is replaced by the campaign in `Elenwen_Agent_Campaign_Opening.md`. The player is a Northwatch prisoner released by Elenwen, a sleeper at the Sleeping Giant in Riverwood, then sent to Markarth, given an interval, and placed in the College of Winterhold.
+- **Start.** The packet now commissions the service, sets the cover and begins the campaign at once. Establish Cover, its report, the assessment and the field papers are removed. The packet adds the conditional release and two books.
+- **Service.** `EA_Service` is rewritten as a campaign engine: four phases, 21 instructions (Core class 4, no deadline), 8 letters and a wander letter, all gated by one table of 22 condition kinds read from vanilla state. Optional plugins (At Your Own Pace, College of Winterhold - Quest Expansion) are read with `Game.GetFormFromFile` and are never masters. Letters can enclose books, advance the phase, and grant the advance or removal authority.
+- **Player alias.** `EA_ServicePlayer` now also reports waking from sleep, which counts nights at the inn; arrivals mark visits and enforce the Whiterun–Falkreath leash.
+- **Dispatch.** `Send` queues a letter that answers no report.
+- **Accounts** is parameterised by the plugin; the case is now the Dunmer's 500-septim fee.
+- **Core.** Class 4 (standing campaign instructions) holds 32 open assignments. It was 16, which silently stopped later instructions from issuing once Riverwood and Markarth were both open.
+- **Letters** follow the new tradecraft rules (initials only, nothing named in clear) and were rewritten against Elenwen's vanilla lines.
+- **Records.** 159 records were retired and 97 added. No retained ID moved and no retired ID was reused.
+
+**Compiler fault.** Caprica v0.3.0 compiled `CheckAll(...) == (pass == 0)` in `EA_Service.GetSlotIndex` as `COMPAREEQ ::temp0 ::temp0 ::temp0`: both sides went into one temporary, so the comparison was always true and menu positions past the ready reports wrapped round. The simulator caught it. It is fixed with named locals, and `test_plugins.test_compiled_code_never_operates_on_one_temporary_twice` scans all emitted assembly for the pattern; no other instance exists.
+
+Tests: 120. `test_campaign.py` (30) is new; the start, content and plugin tests were rewritten for the campaign.
+
+Not established, and impossible here: every vanilla FormID and quest stage the campaign uses, the optional plugins' IDs and behaviour in game, sleep events after loading, and how the leash behaves at hold borders. TESTING.md records them.
+
 ## Changes in 0.3.0, part 2: underling design and vanilla leads
 
 At the user's direction, the player now serves as an underling rather than an analyst.
